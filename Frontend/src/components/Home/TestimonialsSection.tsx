@@ -77,7 +77,7 @@ const thirdColumn = testimonials.slice(6, 9);
 export const TestimonialsSection = () => {
   return (
     <section className="w-full bg-background py-24 relative overflow-hidden">
-      <div className="container z-10 mx-auto px-6">
+      <div className="container z-10 mx-auto sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

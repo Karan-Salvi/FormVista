@@ -1,11 +1,11 @@
 const HowItWorks = () => {
   return (
-    <section className="max-w-7xl mx-auto px-6 py-24">
+    <section className="max-w-7xl mx-auto sm:px-6 pt-20  sm:py-24">
       <div className="text-center mb-16">
         <div className="inline-block bg-blue-50 text-blue-600 text-[11px] font-extrabold px-3 py-1 rounded-full border border-blue-100 mb-4">
           THE PROCESS
         </div>
-        <h2 className="text-4xl font-extrabold">
+        <h2 className="w-full text-3xl sm:text-4xl font-extrabold">
           3 Steps to <span className="text-blue-600">Create Beautiful</span>{" "}
           Form
         </h2>

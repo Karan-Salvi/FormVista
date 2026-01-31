@@ -1,11 +1,11 @@
 const Features = () => {
   return (
-    <section className="py-16 px-4 md:px-8 max-w-7xl mx-auto">
+    <section className="py-16 sm:px-4 md:px-8 max-w-7xl mx-auto">
       <div className="text-center mb-16 max-w-3xl mx-auto">
         <h2 className="text-blue-600 font-semibold tracking-wide uppercase text-sm mb-3">
           Everything you need
         </h2>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
+        <h1 className="text-lg sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
           Powerful features to create, customize, and analyze your forms.
         </h1>
       </div>

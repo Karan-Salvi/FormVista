@@ -6,17 +6,17 @@ import Theme from "@/svgs/Theme";
 const Hero = () => {
   return (
     <>
-      <section className=" w-full mx-auto px-6 pt-28 pb-16 text-center relative">
+      <section className="w-full mx-auto sm:px-6 pt-16 sm:pt-28 pb-16 text-center relative">
         <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 px-4 py-1.5 rounded-full mb-8">
-          <span className="bg-blue-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">
+          <span className="bg-blue-600 text-white text-nowrap  text-[6px] sm:text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">
             New Feature{" "}
           </span>
-          <span className="text-blue-700 text-xs font-bold">
+          <span className="text-blue-700 text-xs font-bold text-nowrap">
             AI Form Generation is now live!
           </span>
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6 leading-[1.1]">
+        <h1 className=" text-3xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6 leading-[1.1]">
           Stop Building{" "}
           <span className="text-slate-400 line-through decoration-blue-500/30">
             Boring
@@ -31,7 +31,7 @@ const Hero = () => {
         </p>
 
         <div className="flex flex-col items-center gap-6">
-          <button className="bg-blue-600 text-white px-10 py-4 rounded-full font-bold text-lg shadow-2xl shadow-blue-300 hover:scale-105 transition-transform flex items-center gap-3 cursor-pointer">
+          <button className="bg-blue-600 text-white px-6 sm:px-10 py-2 sm:py-4 rounded-full font-bold text-lg shadow-2xl shadow-blue-300 hover:scale-105 transition-transform flex items-center gap-3 cursor-pointer">
             Build your first form
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +54,7 @@ const Hero = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-4 mt-16">
+        <div className="hidden sm:flex flex-wrap justify-center gap-4 mt-16 ">
           <div className="glass-card px-5 py-2.5 rounded-xl flex items-center gap-2 text-[12px] font-bold text-slate-600 shadow-sm animate-float">
             <Theme />
             10+ Custom Themes
@@ -113,7 +113,7 @@ const Hero = () => {
         </div>
       </section>
 
-      <section className="pb-20 px-6">
+      <section className="w-full sm:pb-20 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <div
             className="relative rounded-2xl border border-border bg-card overflow-hidden shadow-xl animate-scale-in"

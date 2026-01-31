@@ -29,15 +29,15 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-background">
+    <section className="sm:py-20 sm:px-6 bg-background">
       <div className="w-full max-w-3xl mx-auto">
-        <p className="text-primary text-sm font-bold uppercase tracking-wider mb-2">
+        <p className="text-primary text-xs sm:text-sm font-bold uppercase tracking-wider mb-2">
           FAQ's
         </p>
-        <h2 className="text-3xl md:text-4xl font-extrabold mb-4">
+        <h2 className="text-xl sm:text-3xl md:text-4xl font-extrabold mb-4">
           Looking for answers?
         </h2>
-        <p className="text-muted-foreground mb-8">
+        <p className="text-xs sm:text-base text-muted-foreground mb-8">
           Everything you need to know about building beautiful, high-converting
           forms with FormVista.
         </p>
@@ -51,7 +51,7 @@ const FAQSection = () => {
               <div className="flex items-center justify-between gap-4">
                 <h3
                   className={cn(
-                    "text-lg font-semibold transition-colors",
+                    "text-sm sm:text-lg font-semibold transition-colors",
                     openIndex === index
                       ? "text-primary"
                       : "text-foreground group-hover:text-primary",
@@ -76,7 +76,7 @@ const FAQSection = () => {
                     : "max-h-0 opacity-0",
                 )}
               >
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   {faq.answer}
                 </p>
               </div>

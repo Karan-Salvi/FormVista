@@ -1,21 +1,21 @@
 const SecondaryCTA = () => {
   return (
-    <section className="max-w-6xl mx-auto px-6 py-20 text-start">
-      <div className="bg-blue-50/30 rounded-[3rem] p-12 md:flex items-center gap-16 border border-blue-50">
+    <section className="max-w-6xl mx-auto sm:px-6 py-12 sm:py-20 text-start">
+      <div className="bg-blue-50/30 rounded-2xl sm:rounded-[3rem] p-6 sm:p-12 md:flex items-center gap-16 border border-blue-50">
         <div className="md:w-1/2">
-          <div className="inline-flex items-center gap-2 bg-white px-3 py-1 rounded-full text-[11px] font-bold text-blue-600 shadow-sm mb-6">
+          <div className="inline-flex items-center gap-2 bg-white px-3 py-1 rounded-full text-[8px] sm:text-[11px] font-bold text-blue-600 shadow-sm mb-3 sm:mb-6">
             ✨ Create forms in minutes no skills needed!
           </div>
-          <h2 className="text-4xl font-extrabold leading-tight mb-6">
+          <h2 className="text-2xl sm:text-4xl font-extrabold leading-tight mb-3 sm:mb-6">
             Build <span className="text-blue-600">simple and beautiful</span>{" "}
             forms that people love to fill.
           </h2>
-          <p className="text-slate-500 text-sm mb-8 leading-relaxed">
+          <p className="text-slate-500 text-xs sm:text-sm mb-4 sm:mb-8 leading-relaxed">
             Design forms easily, share them anywhere, and collect responses in
             real time. Perfect for surveys, registrations, feedback, and more —
             all in one place.
           </p>
-          <button className="cursor-pointer font-bold text-blue-600 flex items-center gap-2 hover:gap-4 transition-all">
+          <button className="text-sm sm:text-lg cursor-pointer font-bold text-blue-600 flex items-center gap-2 hover:gap-4 transition-all">
             Create your first form
             <svg
               xmlns="http://www.w3.org/2000/svg"

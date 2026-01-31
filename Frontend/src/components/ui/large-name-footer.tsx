@@ -3,7 +3,7 @@ import { Sparkles } from "lucide-react";
 
 function Footer() {
   return (
-    <footer className="max-w-5xl mx-auto py-12 px-4 md:px-6 bg-background border-t border-gray-200">
+    <footer className="max-w-5xl mx-auto py-12 sm:px-4 md:px-6 bg-background border-t border-gray-200 text-start">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row justify-between">
           <div className="mb-8 md:mb-0">
@@ -12,11 +12,11 @@ function Footer() {
               <h2 className="text-lg font-bold">FormVista</h2>
             </Link>
 
-            <p className="text-sm dark:text-gray-400 mt-5">
+            <p className=" text-xs sm:text-sm dark:text-gray-400 mt-5">
               © {new Date().getFullYear()} FormVista. All rights reserved.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-start">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-start text-sm sm:text-base">
             <div>
               <h3 className="font-semibold mb-4">Pages</h3>
               <ul className="space-y-2">
@@ -113,7 +113,7 @@ function Footer() {
           </div>
         </div>
         <div className=" w-full flex mt-4 items-center justify-center   ">
-          <h1 className="text-center text-3xl md:text-5xl lg:text-[10rem] font-bold bg-clip-text text-transparent bg-gradient-to-b from-blue-700 to-blue-900 select-none">
+          <h1 className="text-center text-2xl sm:text-3xl md:text-5xl lg:text-[10rem] font-bold bg-clip-text text-transparent bg-gradient-to-b from-blue-700 to-blue-900 select-none">
             FormVista
           </h1>
         </div>

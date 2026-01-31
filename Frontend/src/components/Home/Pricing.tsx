@@ -1,19 +1,19 @@
 const Pricing = () => {
   return (
-    <section className="bg-white py-20 px-6">
+    <section className="bg-white py-20 sm:px-6">
       <div className="max-auto max-w-5xl">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-2xl  sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
             Simple, <span className="text-blue-600">Transparent</span> Pricing
           </h2>
-          <p className="text-gray-500 max-w-lg mx-auto">
+          <p className="text-xs text-gray-500 max-w-lg mx-auto">
             Choose the plan that's right for you. Start for free and upgrade as
             you grow.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <div className="border border-gray-100 rounded-3xl p-8 bg-white shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div className="grid md:grid-cols-2 gap-10 max-w-4xl mx-auto">
+          <div className="border border-gray-100 rounded-2xl sm:rounded-3xl p-8 bg-white shadow-sm hover:shadow-md transition-shadow flex flex-col">
             <div className="mb-8">
               <h3 className="text-xl font-bold text-gray-900">Basic</h3>
               <p className="text-gray-500 text-sm mt-2">
@@ -81,7 +81,7 @@ const Pricing = () => {
             </button>
           </div>
 
-          <div className="relative border-2 border-blue-600 rounded-3xl p-8 bg-white shadow-xl flex flex-col">
+          <div className="relative border-2 border-blue-600 rounded-2xl sm:rounded-3xl p-8 bg-white shadow-xl flex flex-col">
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
               Most Popular
             </div>
