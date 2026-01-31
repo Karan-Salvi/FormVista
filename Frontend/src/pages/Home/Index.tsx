@@ -1,14 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import {
-  ArrowRight,
-  Blocks,
-  Zap,
-  Palette,
-  BarChart3,
-  Check,
-} from "lucide-react";
 import "@/App.css";
 import { TestimonialsSection } from "@/components/Home/TestimonialsSection";
 import Navbar from "@/components/Home/Navbar";
