@@ -15,6 +15,7 @@ import Navbar from "@/components/Home/Navbar";
 import Hero from "@/components/Home/Hero";
 import HomeFooter from "@/components/Home/Footer";
 import HomeLayout from "@/pages/Home/HomeLayout";
+import FAQSection from "@/components/ui/faq-sections";
 
 const features = [
   {
@@ -341,6 +342,7 @@ const Index: React.FC = () => {
             </div>
           </div>
         </section>
+        <FAQSection />
         {/* CTA */}
         <section className="w-full py-20 px-6">
           <div className="max-w-4xl mx-auto text-center">
