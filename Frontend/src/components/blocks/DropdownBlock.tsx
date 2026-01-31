@@ -1,24 +1,24 @@
-import React, { useRef, useEffect, useCallback } from 'react';
-import { type Block } from '@/types/form';
-import { useFormStore } from '@/store/formStore';
-import { Label } from '@/components/ui/label';
+import React, { useRef, useEffect, useCallback } from 'react'
+import { type Block } from '@/types/form'
+import { useFormStore } from '@/store/formStore'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Plus, X } from 'lucide-react';
+} from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Plus, X } from 'lucide-react'
 
 interface DropdownBlockProps {
-  block: Block;
-  isSelected: boolean;
-  isPreview?: boolean;
-  value?: string;
-  onChange?: (value: string) => void;
+  block: Block
+  isSelected: boolean
+  isPreview?: boolean
+  value?: string
+  onChange?: (value: string) => void
 }
 
 export const DropdownBlock: React.FC<DropdownBlockProps> = ({
@@ -27,44 +27,47 @@ export const DropdownBlock: React.FC<DropdownBlockProps> = ({
   value,
   onChange,
 }) => {
-  const { updateBlock } = useFormStore();
-  const { label, options = [], required } = block.config;
-  const labelRef = useRef<HTMLSpanElement>(null);
-  const isInitialized = useRef(false);
+  const { updateBlock } = useFormStore()
+  const { label, options = [], required } = block.config
+  const labelRef = useRef<HTMLSpanElement>(null)
+  const isInitialized = useRef(false)
 
   // Set initial content only once
   useEffect(() => {
     if (labelRef.current && !isInitialized.current && !isPreview) {
-      labelRef.current.textContent = label || '';
-      isInitialized.current = true;
+      labelRef.current.textContent = label || ''
+      isInitialized.current = true
     }
-  }, [label, isPreview]);
+  }, [label, isPreview])
 
-  const handleLabelChange = useCallback((e: React.FormEvent<HTMLSpanElement>) => {
-    const newLabel = e.currentTarget.textContent || '';
-    updateBlock(block.id, { config: { ...block.config, label: newLabel } });
-  }, [block.id, block.config, updateBlock]);
+  const handleLabelChange = useCallback(
+    (e: React.FormEvent<HTMLSpanElement>) => {
+      const newLabel = e.currentTarget.textContent || ''
+      updateBlock(block.id, { config: { ...block.config, label: newLabel } })
+    },
+    [block.id, block.config, updateBlock]
+  )
 
   const handleOptionChange = (index: number, newValue: string) => {
-    const newOptions = [...options];
-    newOptions[index] = newValue;
-    updateBlock(block.id, { config: { ...block.config, options: newOptions } });
-  };
+    const newOptions = [...options]
+    newOptions[index] = newValue
+    updateBlock(block.id, { config: { ...block.config, options: newOptions } })
+  }
 
   const addOption = () => {
-    const newOptions = [...options, `Option ${options.length + 1}`];
-    updateBlock(block.id, { config: { ...block.config, options: newOptions } });
-  };
+    const newOptions = [...options, `Option ${options.length + 1}`]
+    updateBlock(block.id, { config: { ...block.config, options: newOptions } })
+  }
 
   const removeOption = (index: number) => {
-    const newOptions = options.filter((_, i) => i !== index);
-    updateBlock(block.id, { config: { ...block.config, options: newOptions } });
-  };
+    const newOptions = options.filter((_, i) => i !== index)
+    updateBlock(block.id, { config: { ...block.config, options: newOptions } })
+  }
 
   if (isPreview) {
     return (
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-foreground">
+        <Label className="text-foreground text-sm font-medium">
           {label}
           {required && <span className="text-destructive ml-0.5">*</span>}
         </Label>
@@ -81,7 +84,7 @@ export const DropdownBlock: React.FC<DropdownBlockProps> = ({
           </SelectContent>
         </Select>
       </div>
-    );
+    )
   }
 
   return (
@@ -92,28 +95,28 @@ export const DropdownBlock: React.FC<DropdownBlockProps> = ({
           contentEditable
           suppressContentEditableWarning
           onInput={handleLabelChange}
-          className="text-sm font-medium text-foreground outline-none empty:before:content-['Label'] empty:before:text-muted-foreground/50"
+          className="text-foreground empty:before:text-muted-foreground/50 text-sm font-medium outline-none empty:before:content-['Label']"
         />
       </Label>
 
       <div className="space-y-2">
         {options.map((option, index) => (
           <div key={index} className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded border-2 border-muted-foreground/30" />
+            <div className="border-muted-foreground/30 h-3 w-3 rounded border-2" />
             <Input
               value={option}
-              onChange={(e) => handleOptionChange(index, e.target.value)}
-              className="flex-1 h-8 text-sm"
+              onChange={e => handleOptionChange(index, e.target.value)}
+              className="h-8 flex-1 text-sm"
               placeholder={`Option ${index + 1}`}
             />
             {options.length > 1 && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                className="text-muted-foreground hover:text-destructive h-8 w-8"
                 onClick={() => removeOption(index)}
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="h-3.5 w-3.5" />
               </Button>
             )}
           </div>
@@ -124,11 +127,10 @@ export const DropdownBlock: React.FC<DropdownBlockProps> = ({
           className="text-muted-foreground hover:text-foreground"
           onClick={addOption}
         >
-          <Plus className="w-3.5 h-3.5 mr-1" />
+          <Plus className="mr-1 h-3.5 w-3.5" />
           Add option
         </Button>
       </div>
     </div>
-  );
-};
-
+  )
+}

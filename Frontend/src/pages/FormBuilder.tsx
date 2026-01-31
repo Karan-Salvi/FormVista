@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import { useFormStore } from "@/store/formStore";
-import { FormEditor } from "@/components/editor/FormEditor";
-import { FormPreview } from "@/components/editor/FormPreview";
-import { ThemePanel } from "@/components/editor/ThemePanel";
-import { Button } from "@/components/ui/button";
+import React, { useEffect } from 'react'
+import { useFormStore } from '@/store/formStore'
+import { FormEditor } from '@/components/editor/FormEditor'
+import { FormPreview } from '@/components/editor/FormPreview'
+import { ThemePanel } from '@/components/editor/ThemePanel'
+import { Button } from '@/components/ui/button'
 import {
   Eye,
   EyeOff,
@@ -11,68 +11,68 @@ import {
   ChevronLeft,
   Sparkles,
   Palette,
-} from "lucide-react";
-import { type Form } from "@/types/form";
+} from 'lucide-react'
+import { type Form } from '@/types/form'
 
 // Create a default form for demonstration
 const createDefaultForm = (): Form => ({
-  id: "demo-form",
-  title: "Customer Feedback Survey",
-  description: "Help us improve by sharing your thoughts",
+  id: 'demo-form',
+  title: 'Customer Feedback Survey',
+  description: 'Help us improve by sharing your thoughts',
   blocks: [
     {
-      id: "1",
-      type: "heading",
-      config: { content: "Tell us about your experience", level: 2 },
+      id: '1',
+      type: 'heading',
+      config: { content: 'Tell us about your experience', level: 2 },
       order: 0,
     },
     {
-      id: "2",
-      type: "text",
+      id: '2',
+      type: 'text',
       config: {
         content:
-          "We value your feedback and use it to improve our services. Please take a moment to share your thoughts.",
+          'We value your feedback and use it to improve our services. Please take a moment to share your thoughts.',
       },
       order: 1,
     },
     {
-      id: "3",
-      type: "short-text",
-      config: { label: "Your name", placeholder: "John Doe", required: true },
+      id: '3',
+      type: 'short-text',
+      config: { label: 'Your name', placeholder: 'John Doe', required: true },
       order: 2,
     },
     {
-      id: "4",
-      type: "email",
+      id: '4',
+      type: 'email',
       config: {
-        label: "Email address",
-        placeholder: "john@example.com",
+        label: 'Email address',
+        placeholder: 'john@example.com',
         required: true,
       },
       order: 3,
     },
     {
-      id: "5",
-      type: "multiple-choice",
+      id: '5',
+      type: 'multiple-choice',
       config: {
-        label: "How satisfied are you with our service?",
+        label: 'How satisfied are you with our service?',
         options: [
-          "Very satisfied",
-          "Satisfied",
-          "Neutral",
-          "Dissatisfied",
-          "Very dissatisfied",
+          'Very satisfied',
+          'Satisfied',
+          'Neutral',
+          'Dissatisfied',
+          'Very dissatisfied',
         ],
         required: true,
       },
       order: 4,
     },
     {
-      id: "6",
-      type: "long-text",
+      id: '6',
+      type: 'long-text',
       config: {
-        label: "What could we do better?",
-        placeholder: "Share your suggestions...",
+        label: 'What could we do better?',
+        placeholder: 'Share your suggestions...',
       },
       order: 5,
     },
@@ -80,22 +80,22 @@ const createDefaultForm = (): Form => ({
   createdAt: new Date(),
   updatedAt: new Date(),
   isPublished: false,
-});
+})
 
 const FormBuilderPage: React.FC = () => {
-  const { form, setForm, isPreviewMode, togglePreviewMode } = useFormStore();
+  const { form, setForm, isPreviewMode, togglePreviewMode } = useFormStore()
 
   useEffect(() => {
     if (!form) {
-      setForm(createDefaultForm());
+      setForm(createDefaultForm())
     }
-  }, [form, setForm]);
+  }, [form, setForm])
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
-        <div className="flex items-center justify-between px-4 h-14">
+      <header className="border-border bg-background/95 sticky top-0 z-40 border-b backdrop-blur-sm">
+        <div className="flex h-14 items-center justify-between px-4">
           {/* Left section */}
           <div className="flex items-center gap-4">
             <Button
@@ -103,18 +103,18 @@ const FormBuilderPage: React.FC = () => {
               size="icon"
               className="text-muted-foreground"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
-              <span className="font-semibold text-foreground">FormVista</span>
+              <Sparkles className="text-primary h-5 w-5" />
+              <span className="text-foreground font-semibold">FormVista</span>
             </div>
           </div>
 
           {/* Center - Form title */}
-          <div className="flex-1 flex justify-center">
-            <span className="text-sm text-muted-foreground truncate max-w-xs">
-              {form?.title || "Untitled Form"}
+          <div className="flex flex-1 justify-center">
+            <span className="text-muted-foreground max-w-xs truncate text-sm">
+              {form?.title || 'Untitled Form'}
             </span>
           </div>
 
@@ -128,12 +128,12 @@ const FormBuilderPage: React.FC = () => {
             >
               {isPreviewMode ? (
                 <>
-                  <EyeOff className="w-4 h-4" />
+                  <EyeOff className="h-4 w-4" />
                   Edit
                 </>
               ) : (
                 <>
-                  <Eye className="w-4 h-4" />
+                  <Eye className="h-4 w-4" />
                   Preview
                 </>
               )}
@@ -145,12 +145,12 @@ const FormBuilderPage: React.FC = () => {
                   size="icon"
                   className="text-muted-foreground"
                 >
-                  <Palette className="w-4 h-4" />
+                  <Palette className="h-4 w-4" />
                 </Button>
               }
             />
             <Button size="sm" className="gap-2">
-              <Share className="w-4 h-4" />
+              <Share className="h-4 w-4" />
               Publish
             </Button>
           </div>
@@ -162,7 +162,7 @@ const FormBuilderPage: React.FC = () => {
         {isPreviewMode ? <FormPreview /> : <FormEditor />}
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default FormBuilderPage;
+export default FormBuilderPage

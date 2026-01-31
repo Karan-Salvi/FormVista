@@ -1,114 +1,131 @@
-import React, { useCallback, useState } from 'react';
-import { type Block } from '@/types/form';
-import { useFormStore } from '@/store/formStore';
-import { Link as LinkIcon, ExternalLink, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import React, { useCallback, useState } from 'react'
+import { type Block } from '@/types/form'
+import { useFormStore } from '@/store/formStore'
+import { Link as LinkIcon, ExternalLink, X } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 interface BookmarkBlockProps {
-  block: Block;
-  isSelected: boolean;
-  isPreview?: boolean;
+  block: Block
+  isSelected: boolean
+  isPreview?: boolean
 }
 
-export const BookmarkBlock: React.FC<BookmarkBlockProps> = ({ block, isSelected, isPreview }) => {
-  const updateBlock = useFormStore((state) => state.updateBlock);
-  const [urlInput, setUrlInput] = useState('');
-  const [showUrlInput, setShowUrlInput] = useState(false);
+export const BookmarkBlock: React.FC<BookmarkBlockProps> = ({
+  block,
+  isSelected,
+  isPreview,
+}) => {
+  const updateBlock = useFormStore(state => state.updateBlock)
+  const [urlInput, setUrlInput] = useState('')
+  const [showUrlInput, setShowUrlInput] = useState(false)
 
   const handleUrlSubmit = useCallback(() => {
     if (urlInput.trim()) {
-      let url = urlInput.trim();
+      let url = urlInput.trim()
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
+        url = 'https://' + url
       }
-      
+
       // Extract domain for display
-      const domain = new URL(url).hostname;
-      
+      const domain = new URL(url).hostname
+
       updateBlock(block.id, {
         config: { url, label: domain },
-      });
-      setShowUrlInput(false);
-      setUrlInput('');
+      })
+      setShowUrlInput(false)
+      setUrlInput('')
     }
-  }, [block.id, urlInput, updateBlock]);
+  }, [block.id, urlInput, updateBlock])
 
-  const bookmarkUrl = block.config.url;
-  const domain = block.config.label;
+  const bookmarkUrl = block.config.url
+  const domain = block.config.label
 
   if (bookmarkUrl) {
     return (
-      <div className={`py-2 ${isSelected ? 'ring-2 ring-primary/20 rounded-lg' : ''}`}>
+      <div
+        className={`py-2 ${isSelected ? 'ring-primary/20 rounded-lg ring-2' : ''}`}
+      >
         <a
           href={bookmarkUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-4 p-4 bg-accent/30 rounded-lg border border-border hover:bg-accent/50 transition-colors group"
+          className="bg-accent/30 border-border hover:bg-accent/50 group flex items-center gap-4 rounded-lg border p-4 transition-colors"
         >
-          <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-            <LinkIcon className="w-6 h-6 text-primary" />
+          <div className="bg-primary/10 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg">
+            <LinkIcon className="text-primary h-6 w-6" />
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-foreground truncate">{domain}</p>
-            <p className="text-sm text-muted-foreground truncate">{bookmarkUrl}</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-foreground truncate font-medium">{domain}</p>
+            <p className="text-muted-foreground truncate text-sm">
+              {bookmarkUrl}
+            </p>
           </div>
-          <ExternalLink className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+          <ExternalLink className="text-muted-foreground h-5 w-5 flex-shrink-0" />
           {!isPreview && (
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                updateBlock(block.id, { config: { url: '', label: '' } });
+              onClick={e => {
+                e.preventDefault()
+                e.stopPropagation()
+                updateBlock(block.id, { config: { url: '', label: '' } })
               }}
-              className="p-2 hover:bg-accent rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+              className="hover:bg-accent rounded-lg p-2 opacity-0 transition-colors group-hover:opacity-100"
             >
-              <X className="w-4 h-4 text-muted-foreground" />
+              <X className="text-muted-foreground h-4 w-4" />
             </button>
           )}
         </a>
       </div>
-    );
+    )
   }
 
   if (isPreview) {
     return (
       <div className="py-2">
-        <div className="w-full h-20 bg-muted rounded-lg flex items-center justify-center gap-2">
-          <LinkIcon className="w-8 h-8 text-muted-foreground" />
+        <div className="bg-muted flex h-20 w-full items-center justify-center gap-2 rounded-lg">
+          <LinkIcon className="text-muted-foreground h-8 w-8" />
           <span className="text-muted-foreground">No bookmark added</span>
         </div>
       </div>
-    );
+    )
   }
 
   return (
-    <div className={`py-2 ${isSelected ? 'ring-2 ring-primary/20 rounded-lg' : ''}`}>
-      <div className="border-2 border-dashed border-border rounded-lg p-8">
+    <div
+      className={`py-2 ${isSelected ? 'ring-primary/20 rounded-lg ring-2' : ''}`}
+    >
+      <div className="border-border rounded-lg border-2 border-dashed p-8">
         {showUrlInput ? (
           <div className="flex gap-2">
             <Input
               value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
+              onChange={e => setUrlInput(e.target.value)}
               placeholder="Paste website URL..."
-              onKeyDown={(e) => e.key === 'Enter' && handleUrlSubmit()}
+              onKeyDown={e => e.key === 'Enter' && handleUrlSubmit()}
               autoFocus
             />
             <Button onClick={handleUrlSubmit}>Add</Button>
-            <Button variant="ghost" onClick={() => setShowUrlInput(false)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setShowUrlInput(false)}>
+              Cancel
+            </Button>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4">
-            <LinkIcon className="w-12 h-12 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">Create a web bookmark</p>
-            <Button variant="outline" size="sm" onClick={() => setShowUrlInput(true)}>
-              <LinkIcon className="w-4 h-4 mr-2" />
+            <LinkIcon className="text-muted-foreground h-12 w-12" />
+            <p className="text-muted-foreground text-sm">
+              Create a web bookmark
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowUrlInput(true)}
+            >
+              <LinkIcon className="mr-2 h-4 w-4" />
               Add URL
             </Button>
           </div>
         )}
       </div>
     </div>
-  );
-};
-
+  )
+}

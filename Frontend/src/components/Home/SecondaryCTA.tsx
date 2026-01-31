@@ -1,25 +1,25 @@
 const SecondaryCTA = () => {
   return (
-    <section className="max-w-6xl mx-auto sm:px-6 py-12 sm:py-20 text-start">
-      <div className="bg-blue-50/30 rounded-2xl sm:rounded-[3rem] p-6 sm:p-12 md:flex items-center gap-16 border border-blue-50">
+    <section className="mx-auto max-w-6xl py-12 text-start sm:px-6 sm:py-20">
+      <div className="items-center gap-16 rounded-2xl border border-blue-50 bg-blue-50/30 p-6 sm:rounded-[3rem] sm:p-12 md:flex">
         <div className="md:w-1/2">
-          <div className="inline-flex items-center gap-2 bg-white px-3 py-1 rounded-full text-[8px] sm:text-[11px] font-bold text-blue-600 shadow-sm mb-3 sm:mb-6">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[8px] font-bold text-blue-600 shadow-sm sm:mb-6 sm:text-[11px]">
             ✨ Create forms in minutes no skills needed!
           </div>
-          <h2 className="text-2xl sm:text-4xl font-extrabold leading-tight mb-3 sm:mb-6">
-            Build <span className="text-blue-600">simple and beautiful</span>{" "}
+          <h2 className="mb-3 text-2xl leading-tight font-extrabold sm:mb-6 sm:text-4xl">
+            Build <span className="text-blue-600">simple and beautiful</span>{' '}
             forms that people love to fill.
           </h2>
-          <p className="text-slate-500 text-xs sm:text-sm mb-4 sm:mb-8 leading-relaxed">
+          <p className="mb-4 text-xs leading-relaxed text-slate-500 sm:mb-8 sm:text-sm">
             Design forms easily, share them anywhere, and collect responses in
             real time. Perfect for surveys, registrations, feedback, and more —
             all in one place.
           </p>
-          <button className="text-sm sm:text-lg cursor-pointer font-bold text-blue-600 flex items-center gap-2 hover:gap-4 transition-all">
+          <button className="flex cursor-pointer items-center gap-2 text-sm font-bold text-blue-600 transition-all hover:gap-4 sm:text-lg">
             Create your first form
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5"
+              className="h-5 w-5"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -29,19 +29,19 @@ const SecondaryCTA = () => {
             </svg>
           </button>
         </div>
-        <div className="hidden sm:block md:w-1/2 mb-10 md:mb-0 animate-float">
-          <div className="bg-white p-8 rounded-xl shadow-2xl shadow-blue-100 border border-slate-100 max-w-sm">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 rounded-full bg-blue-100"></div>
-              <div className="h-2 w-24 bg-slate-100 rounded-full"></div>
+        <div className="animate-float mb-10 hidden sm:block md:mb-0 md:w-1/2">
+          <div className="max-w-sm rounded-xl border border-slate-100 bg-white p-8 shadow-2xl shadow-blue-100">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-blue-100"></div>
+              <div className="h-2 w-24 rounded-full bg-slate-100"></div>
             </div>
-            <h4 className="text-xl font-extrabold mb-4">
+            <h4 className="mb-4 text-xl font-extrabold">
               Create Your First Form
             </h4>
             <div className="space-y-3">
-              <div className="h-10 bg-slate-50 rounded-xl"></div>
-              <div className="h-10 bg-slate-50 rounded-xl"></div>
-              <button className="cursor-pointer w-full h-10 bg-blue-600 rounded-xl text-white font-bold text-sm">
+              <div className="h-10 rounded-xl bg-slate-50"></div>
+              <div className="h-10 rounded-xl bg-slate-50"></div>
+              <button className="h-10 w-full cursor-pointer rounded-xl bg-blue-600 text-sm font-bold text-white">
                 Get Started
               </button>
             </div>
@@ -49,7 +49,7 @@ const SecondaryCTA = () => {
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default SecondaryCTA;
+export default SecondaryCTA

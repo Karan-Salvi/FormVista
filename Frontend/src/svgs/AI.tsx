@@ -45,5 +45,5 @@ export default function AI({ className }: { className?: string }) {
         ></path>
       </g>
     </svg>
-  );
+  )
 }

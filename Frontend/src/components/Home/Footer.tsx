@@ -1,7 +1,7 @@
-import { Footer } from "@/components/ui/large-name-footer";
+import { Footer } from '@/components/ui/large-name-footer'
 
 const HomeFooter = () => {
-  return <Footer />;
-};
+  return <Footer />
+}
 
-export default HomeFooter;
+export default HomeFooter

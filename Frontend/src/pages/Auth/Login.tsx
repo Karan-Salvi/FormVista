@@ -1,33 +1,33 @@
-import { useState } from "react";
-import "@/App.css";
-import { Sparkles } from "lucide-react";
+import { useState } from 'react'
+import '@/App.css'
+import { Sparkles } from 'lucide-react'
 
 export default function LoginPage() {
-  return <LoginCard />;
+  return <LoginCard />
 }
 
 const LoginCard = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-neutral-50 to-white flex ">
+    <div className="flex min-h-screen w-full bg-gradient-to-br from-neutral-50 to-white">
       {/* Left Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16">
+      <div className="flex w-full items-center justify-center p-8 lg:w-1/2 lg:p-16">
         <div className="w-full max-w-md">
           {/* Logo/Brand */}
           <div className="mb-8">
-            <div className="flex items-center mb-6 gap-3">
-              <div className="w-10 h-10  rounded-xl border-none flex items-center justify-center bg-blue-600 shadow-lg ">
-                <Sparkles className="w-6 text-white h-6 " />
+            <div className="mb-6 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border-none bg-blue-600 shadow-lg">
+                <Sparkles className="h-6 w-6 text-white" />
               </div>
-              <span className="text-2xl font-medium tracking-tight text-black ">
+              <span className="text-2xl font-medium tracking-tight text-black">
                 FormVista
               </span>
             </div>
-            <h1 className="text-3xl lg:text-4xl font-medium text-gray-900 mb-3 tracking-tight">
+            <h1 className="mb-3 text-3xl font-medium tracking-tight text-gray-900 lg:text-4xl">
               Welcome back
             </h1>
-            <p className="text-gray-600 tracking-tight">
+            <p className="tracking-tight text-gray-600">
               Sign in to continue to your workspace
             </p>
           </div>
@@ -37,7 +37,7 @@ const LoginCard = () => {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-semibold text-gray-700 mb-2 "
+                className="mb-2 block text-sm font-semibold text-gray-700"
               >
                 Email
               </label>
@@ -46,7 +46,7 @@ const LoginCard = () => {
                 id="email"
                 name="email"
                 required
-                className="w-full px-4 py-3.5 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
+                className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-blue-600"
                 placeholder="name@company.com"
               />
             </div>
@@ -54,23 +54,23 @@ const LoginCard = () => {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-semibold text-gray-700 mb-2"
+                className="mb-2 block text-sm font-semibold text-gray-700"
               >
                 Password
               </label>
               <div className="relative">
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
                   required
-                  className="w-full px-4 py-3.5 pr-12 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all outline-none"
+                  className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 pr-12 transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-blue-600"
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="cursor-pointer absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
+                  className="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-4 text-gray-400 hover:text-gray-600"
                 >
                   {showPassword ? (
                     <svg
@@ -115,7 +115,7 @@ const LoginCard = () => {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-600 cursor-pointer"
+                  className="h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-blue-600"
                 />
                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
               </label>
@@ -129,7 +129,7 @@ const LoginCard = () => {
 
             <button
               type="submit"
-              className="cursor-pointer w-full py-3.5 px-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-600/90 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 transition-all shadow-lg shadow-blue-600/30"
+              className="w-full cursor-pointer rounded-xl bg-blue-600 px-4 py-3.5 font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:bg-blue-600/90 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:outline-none"
             >
               Sign in
             </button>
@@ -188,7 +188,7 @@ const LoginCard = () => {
 
           {/* Sign Up Link */}
           <p className="mt-16 text-center text-sm text-gray-600">
-            Don&apos;t have an account?{" "}
+            Don&apos;t have an account?{' '}
             <a
               href="/signup"
               className="font-semibold text-blue-600 hover:text-blue-600/80"
@@ -200,23 +200,23 @@ const LoginCard = () => {
       </div>
 
       {/* Right Side - Product Mockup */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-500 to-blue-800 p-16 items-center justify-center relative overflow-hidden">
+      <div className="relative hidden items-center justify-center overflow-hidden bg-gradient-to-br from-blue-500 to-blue-800 p-16 lg:flex lg:w-1/2">
         {/* Decorative Elements */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[length:24px_24px]"></div>
 
-        <div className="relative z-10 max-w-2xl w-full">
+        <div className="relative z-10 w-full max-w-2xl">
           {/* Hero Image */}
-          <div className="relative overflow-hidden rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-300 border-4 border-white/20">
+          <div className="relative transform overflow-hidden rounded-2xl border-4 border-white/20 shadow-2xl transition-transform duration-300 hover:scale-105">
             <img
-              src={"/Demo.png"}
+              src={'/Demo.png'}
               alt="Product Dashboard"
               width={800}
               height={500}
-              className="w-full h-auto object-cover"
+              className="h-auto w-full object-cover"
             />
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}

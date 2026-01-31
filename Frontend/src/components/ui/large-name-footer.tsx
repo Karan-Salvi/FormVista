@@ -1,24 +1,24 @@
-import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import { Link } from 'react-router-dom'
+import { Sparkles } from 'lucide-react'
 
 function Footer() {
   return (
-    <footer className="max-w-5xl mx-auto py-12 sm:px-4 md:px-6 bg-background border-t border-gray-200 text-start">
+    <footer className="bg-background mx-auto max-w-5xl border-t border-gray-200 py-12 text-start sm:px-4 md:px-6">
       <div className="container mx-auto">
-        <div className="flex flex-col md:flex-row justify-between">
+        <div className="flex flex-col justify-between md:flex-row">
           <div className="mb-8 md:mb-0">
             <Link to="/" className="flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-primary" />
+              <Sparkles className="text-primary h-6 w-6" />
               <h2 className="text-lg font-bold">FormVista</h2>
             </Link>
 
-            <p className=" text-xs sm:text-sm dark:text-gray-400 mt-5">
+            <p className="mt-5 text-xs sm:text-sm dark:text-gray-400">
               © {new Date().getFullYear()} FormVista. All rights reserved.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-start text-sm sm:text-base">
+          <div className="grid grid-cols-2 gap-8 text-start text-sm sm:text-base md:grid-cols-3">
             <div>
-              <h3 className="font-semibold mb-4">Pages</h3>
+              <h3 className="mb-4 font-semibold">Pages</h3>
               <ul className="space-y-2">
                 <li>
                   <Link
@@ -55,7 +55,7 @@ function Footer() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Socials</h3>
+              <h3 className="mb-4 font-semibold">Socials</h3>
               <ul className="space-y-2">
                 <li>
                   <a
@@ -90,7 +90,7 @@ function Footer() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold mb-4">Legal</h3>
+              <h3 className="mb-4 font-semibold">Legal</h3>
               <ul className="space-y-2">
                 <li>
                   <Link
@@ -112,14 +112,14 @@ function Footer() {
             </div>
           </div>
         </div>
-        <div className=" w-full flex mt-4 items-center justify-center   ">
-          <h1 className="text-center text-2xl sm:text-3xl md:text-5xl lg:text-[10rem] font-bold bg-clip-text text-transparent bg-gradient-to-b from-blue-700 to-blue-900 select-none">
+        <div className="mt-4 flex w-full items-center justify-center">
+          <h1 className="bg-gradient-to-b from-blue-700 to-blue-900 bg-clip-text text-center text-2xl font-bold text-transparent select-none sm:text-3xl md:text-5xl lg:text-[10rem]">
             FormVista
           </h1>
         </div>
       </div>
     </footer>
-  );
+  )
 }
 
-export { Footer };
+export { Footer }

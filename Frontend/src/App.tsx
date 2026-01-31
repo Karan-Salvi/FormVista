@@ -1,15 +1,15 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Home/Index";
-import FormBuilder from "./pages/FormBuilder";
-import NotFound from "./pages/NotFound";
-import LoginPage from "./pages/Auth/Login";
-import SignUpPage from "./pages/Auth/Signup";
+import { Toaster } from '@/components/ui/toaster'
+import { Toaster as Sonner } from '@/components/ui/sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Index from './pages/Home/Index'
+import FormBuilder from './pages/FormBuilder'
+import NotFound from './pages/NotFound'
+import LoginPage from './pages/Auth/Login'
+import SignUpPage from './pages/Auth/Signup'
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -28,6 +28,6 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-);
+)
 
-export default App;
+export default App
