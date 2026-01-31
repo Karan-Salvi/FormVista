@@ -111,7 +111,7 @@ export const FormEditor: React.FC = () => {
   const sortedBlocks = [...form.blocks].sort((a, b) => a.order - b.order);
 
   return (
-    <div ref={editorRef} className="max-w-2xl mx-auto py-12 px-8">
+    <div ref={editorRef} className="max-w-2xl mx-auto py-12 px-8 text-start">
       {/* Form Header */}
       <div className="mb-10">
         <h1

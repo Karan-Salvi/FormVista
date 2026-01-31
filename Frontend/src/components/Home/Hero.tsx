@@ -6,7 +6,7 @@ import Theme from "@/svgs/Theme";
 const Hero = () => {
   return (
     <>
-      <section className="max-w-7xl w-full mx-auto px-6 pt-28 pb-16 text-center relative">
+      <section className=" w-full mx-auto px-6 pt-28 pb-16 text-center relative">
         <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 px-4 py-1.5 rounded-full mb-8">
           <span className="bg-blue-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">
             New Feature{" "}

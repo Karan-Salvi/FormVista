@@ -28,7 +28,7 @@ export const FormPreview: React.FC = () => {
   const sortedBlocks = [...form.blocks].sort((a, b) => a.order - b.order);
 
   return (
-    <div className="min-h-screen bg-surface-subtle">
+    <div className="min-h-screen bg-surface-subtle text-start">
       <div className="max-w-2xl mx-auto py-16 px-8">
         <form onSubmit={handleSubmit}>
           {/* Form Header */}
