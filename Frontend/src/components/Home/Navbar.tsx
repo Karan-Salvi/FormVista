@@ -1,7 +1,13 @@
 import { ArrowRight, Sparkles, Menu } from "lucide-react";
 import { Button } from "../ui/button";
 import { Link } from "react-router-dom";
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "../ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetHeader,
+  SheetTitle,
+} from "../ui/sheet";
 
 const Navbar = () => {
   return (
@@ -22,10 +28,12 @@ const Navbar = () => {
           <Button variant="ghost" size="sm">
             Pricing
           </Button>
-          <Button variant="ghost" size="sm">
-            Login
-          </Button>
-          <Link to="/builder">
+          <Link to="/login">
+            <Button variant="ghost" size="sm">
+              Login
+            </Button>
+          </Link>
+          <Link to="/signup">
             <Button size="sm" className="gap-2">
               Get Started
               <ArrowRight className="w-4 h-4" />
@@ -74,4 +82,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
