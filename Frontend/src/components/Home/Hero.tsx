@@ -31,7 +31,7 @@ const Hero = () => {
         </p>
 
         <div className="flex flex-col items-center gap-6">
-          <button className="bg-blue-600 text-white px-10 py-4 rounded-full font-bold text-lg shadow-2xl shadow-blue-300 hover:scale-105 transition-transform flex items-center gap-3">
+          <button className="bg-blue-600 text-white px-10 py-4 rounded-full font-bold text-lg shadow-2xl shadow-blue-300 hover:scale-105 transition-transform flex items-center gap-3 cursor-pointer">
             Build your first form
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +124,7 @@ const Hero = () => {
               <div className="w-3 h-3 rounded-full bg-warning/60" />
               <div className="w-3 h-3 rounded-full bg-success/60" />
               <span className="ml-4 text-xs text-muted-foreground">
-                FormVista.app/builder
+                formvista.app/builder
               </span>
             </div>
             <div className="p-8 bg-gradient-to-b from-card to-secondary/20 min-h-[400px]">

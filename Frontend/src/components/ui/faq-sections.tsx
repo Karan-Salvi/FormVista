@@ -41,7 +41,7 @@ const FAQSection = () => {
           Everything you need to know about building beautiful, high-converting
           forms with FormVista.
         </p>
-        <div className="space-y-2">
+        <div className="space-y-2 text-start">
           {faqs.map((faq, index) => (
             <div
               key={index}
