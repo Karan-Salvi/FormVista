@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { type Block } from '@/types/form';
 import { useFormStore } from '@/store/formStore';
-import { Image, Upload, Link } from 'lucide-react';
+import { Image, Link } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 

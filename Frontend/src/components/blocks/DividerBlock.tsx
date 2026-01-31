@@ -7,7 +7,7 @@ interface DividerBlockProps {
   isPreview?: boolean;
 }
 
-export const DividerBlock: React.FC<DividerBlockProps> = ({ block, isSelected, isPreview }) => {
+export const DividerBlock: React.FC<DividerBlockProps> = () => {
   return (
     <div className="py-2">
       <hr className="border-t border-border" />

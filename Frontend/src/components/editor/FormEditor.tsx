@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { type Block, type BlockType } from '@/types/form';
+import { type BlockType } from '@/types/form';
 import { useFormStore } from '@/store/formStore';
 import { BlockRenderer } from '@/components/blocks/BlockRenderer';
 import { BlockToolbar } from './BlockToolbar';

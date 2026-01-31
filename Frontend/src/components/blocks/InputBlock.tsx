@@ -15,7 +15,6 @@ interface InputBlockProps {
 
 export const InputBlock: React.FC<InputBlockProps> = ({
   block,
-  isSelected,
   isPreview,
   value,
   onChange,

@@ -43,7 +43,7 @@ export const HeadingBlock: React.FC<HeadingBlockProps> = ({ block, isSelected, i
   };
 
   if (isPreview) {
-    const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+    const Tag = `h${level}` as any;
     return (
       <Tag className={`${baseClasses} ${levelClasses[level as 1 | 2 | 3]}`}>
         {content}

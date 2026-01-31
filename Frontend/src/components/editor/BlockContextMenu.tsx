@@ -6,7 +6,6 @@ import {
   ArrowUp, 
   ArrowDown, 
   Settings,
-  Palette,
 } from 'lucide-react';
 import {
   ContextMenu,

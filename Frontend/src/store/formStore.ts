@@ -75,7 +75,7 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
   }
 };
 
-export const useFormStore = create<FormState>((set, get) => ({
+export const useFormStore = create<FormState>((set) => ({
   form: null,
   selectedBlockId: null,
   isPreviewMode: false,

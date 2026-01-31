@@ -18,7 +18,6 @@ interface ChoiceBlockProps {
 
 export const ChoiceBlock: React.FC<ChoiceBlockProps> = ({
   block,
-  isSelected,
   isPreview,
   value,
   onChange,

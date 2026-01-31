@@ -23,7 +23,6 @@ interface DateBlockProps {
 
 export const DateBlock: React.FC<DateBlockProps> = ({
   block,
-  isSelected,
   isPreview,
   value,
   onChange,

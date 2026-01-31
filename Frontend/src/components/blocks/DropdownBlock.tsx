@@ -23,7 +23,6 @@ interface DropdownBlockProps {
 
 export const DropdownBlock: React.FC<DropdownBlockProps> = ({
   block,
-  isSelected,
   isPreview,
   value,
   onChange,
