@@ -1,0 +1,197 @@
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { type Block, type BlockType } from '@/types/form';
+import { useFormStore } from '@/store/formStore';
+import { BlockRenderer } from '@/components/blocks/BlockRenderer';
+import { BlockToolbar } from './BlockToolbar';
+import { SlashCommandMenu } from './SlashCommandMenu';
+import { BlockContextMenu } from './BlockContextMenu';
+import { Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+export const FormEditor: React.FC = () => {
+  const {
+    form,
+    selectedBlockId,
+    isPreviewMode,
+    selectBlock,
+    addBlock,
+    deleteBlock,
+    duplicateBlock,
+    reorderBlocks,
+    updateFormTitle,
+    updateFormDescription,
+  } = useFormStore();
+
+  const [showSlashMenu, setShowSlashMenu] = useState(false);
+  const [slashMenuPosition, setSlashMenuPosition] = useState({ top: 0, left: 0 });
+  const [slashQuery, setSlashQuery] = useState('');
+  const [contextBlockId, setContextBlockId] = useState<string | null>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === '/' && !showSlashMenu) {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        setSlashMenuPosition({
+          top: rect.bottom + 8,
+          left: rect.left,
+        });
+        setShowSlashMenu(true);
+        setSlashQuery('');
+        e.preventDefault();
+      }
+    } else if (showSlashMenu) {
+      if (e.key === 'Backspace' && slashQuery === '') {
+        setShowSlashMenu(false);
+      } else if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'Enter' && e.key !== 'Escape') {
+        if (e.key.length === 1) {
+          setSlashQuery(prev => prev + e.key);
+        } else if (e.key === 'Backspace') {
+          setSlashQuery(prev => prev.slice(0, -1));
+        }
+      }
+    }
+  }, [showSlashMenu, slashQuery]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
+  const handleBlockSelect = (type: BlockType) => {
+    addBlock(type, contextBlockId || selectedBlockId || undefined);
+    setShowSlashMenu(false);
+    setSlashQuery('');
+    setContextBlockId(null);
+  };
+
+  const handleAddBlockClick = (afterBlockId?: string) => {
+    if (editorRef.current) {
+      const rect = editorRef.current.getBoundingClientRect();
+      setSlashMenuPosition({
+        top: rect.top + window.scrollY + 100,
+        left: rect.left + 80,
+      });
+      setContextBlockId(afterBlockId || null);
+      setShowSlashMenu(true);
+      setSlashQuery('');
+    }
+  };
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    if (draggedIndex !== null && dragOverIndex !== null && draggedIndex !== dragOverIndex) {
+      reorderBlocks(draggedIndex, dragOverIndex);
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  if (!form) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted-foreground">No form loaded</p>
+      </div>
+    );
+  }
+
+  const sortedBlocks = [...form.blocks].sort((a, b) => a.order - b.order);
+
+  return (
+    <div ref={editorRef} className="max-w-2xl mx-auto py-12 px-8">
+      {/* Form Header */}
+      <div className="mb-10">
+        <h1
+          contentEditable={!isPreviewMode}
+          suppressContentEditableWarning
+          onInput={(e) => updateFormTitle(e.currentTarget.textContent || '')}
+          className="text-display text-foreground outline-none mb-4 empty:before:content-['Untitled_Form'] empty:before:text-muted-foreground/50"
+        >
+          {form.title}
+        </h1>
+        <p
+          contentEditable={!isPreviewMode}
+          suppressContentEditableWarning
+          onInput={(e) => updateFormDescription(e.currentTarget.textContent || '')}
+          className="text-body text-muted-foreground outline-none empty:before:content-['Add_a_description...'] empty:before:text-muted-foreground/40"
+        >
+          {form.description}
+        </p>
+      </div>
+
+      {/* Blocks */}
+      <div className="space-y-1">
+        {sortedBlocks.map((block, index) => (
+          <BlockContextMenu key={block.id} blockId={block.id}>
+            <div
+              draggable={!isPreviewMode}
+              onDragStart={() => handleDragStart(index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDragEnd={handleDragEnd}
+              onClick={() => selectBlock(block.id)}
+              className={`form-block pl-20 pr-4 group ${
+                selectedBlockId === block.id ? 'selected' : ''
+              } ${dragOverIndex === index ? 'border-t-2 border-primary' : ''} ${
+                draggedIndex === index ? 'opacity-50' : ''
+              }`}
+            >
+              {!isPreviewMode && (
+                <BlockToolbar
+                  onDuplicate={() => duplicateBlock(block.id)}
+                  onDelete={() => deleteBlock(block.id)}
+                />
+              )}
+              <div className="py-2">
+                <BlockRenderer
+                  block={block}
+                  isSelected={selectedBlockId === block.id}
+                  isPreview={isPreviewMode}
+                />
+              </div>
+            </div>
+          </BlockContextMenu>
+        ))}
+      </div>
+
+      {/* Add Block Button */}
+      {!isPreviewMode && (
+        <div className="mt-6 pl-20">
+          <Button
+            variant="ghost"
+            className="text-muted-foreground hover:text-foreground gap-2"
+            onClick={() => handleAddBlockClick()}
+          >
+            <Plus className="w-4 h-4" />
+            Add a block or type /
+          </Button>
+        </div>
+      )}
+
+      {/* Slash Command Menu */}
+      {showSlashMenu && (
+        <SlashCommandMenu
+          position={slashMenuPosition}
+          onSelect={handleBlockSelect}
+          onClose={() => {
+            setShowSlashMenu(false);
+            setSlashQuery('');
+          }}
+          searchQuery={slashQuery}
+        />
+      )}
+    </div>
+  );
+};

@@ -1,0 +1,105 @@
+import React from 'react';
+import { useFormStore } from '@/store/formStore';
+import { 
+  Copy, 
+  Trash2, 
+  ArrowUp, 
+  ArrowDown, 
+  Settings,
+  Palette,
+} from 'lucide-react';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
+
+interface BlockContextMenuProps {
+  children: React.ReactNode;
+  blockId: string;
+  onOpenSettings?: () => void;
+}
+
+export const BlockContextMenu: React.FC<BlockContextMenuProps> = ({
+  children,
+  blockId,
+  onOpenSettings,
+}) => {
+  const { 
+    form, 
+    deleteBlock, 
+    duplicateBlock, 
+    reorderBlocks,
+    selectBlock,
+  } = useFormStore();
+
+  const blockIndex = form?.blocks.findIndex(b => b.id === blockId) ?? -1;
+  const canMoveUp = blockIndex > 0;
+  const canMoveDown = blockIndex < (form?.blocks.length ?? 0) - 1;
+
+  const handleMoveUp = () => {
+    if (canMoveUp) {
+      reorderBlocks(blockIndex, blockIndex - 1);
+    }
+  };
+
+  const handleMoveDown = () => {
+    if (canMoveDown) {
+      reorderBlocks(blockIndex, blockIndex + 1);
+    }
+  };
+
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        {children}
+      </ContextMenuTrigger>
+      <ContextMenuContent className="w-56">
+        <ContextMenuItem 
+          onClick={() => {
+            selectBlock(blockId);
+            onOpenSettings?.();
+          }}
+          className="gap-2"
+        >
+          <Settings className="w-4 h-4" />
+          Edit block
+        </ContextMenuItem>
+        <ContextMenuItem 
+          onClick={() => duplicateBlock(blockId)}
+          className="gap-2"
+        >
+          <Copy className="w-4 h-4" />
+          Duplicate
+        </ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem 
+          onClick={handleMoveUp}
+          disabled={!canMoveUp}
+          className="gap-2"
+        >
+          <ArrowUp className="w-4 h-4" />
+          Move up
+        </ContextMenuItem>
+        <ContextMenuItem 
+          onClick={handleMoveDown}
+          disabled={!canMoveDown}
+          className="gap-2"
+        >
+          <ArrowDown className="w-4 h-4" />
+          Move down
+        </ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem 
+          onClick={() => deleteBlock(blockId)}
+          className="gap-2 text-destructive focus:text-destructive"
+        >
+          <Trash2 className="w-4 h-4" />
+          Delete
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+};
