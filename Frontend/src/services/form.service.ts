@@ -1,5 +1,5 @@
 import { apiClient } from '../api/client'
-import type { Form, Block } from '../types/form'
+import type { Block } from '../types/form'
 
 export interface FormResponse {
   id: string
