@@ -32,16 +32,16 @@ export const FormPreview: React.FC = () => {
       <div className="mx-auto max-w-2xl px-8 py-16">
         <form onSubmit={handleSubmit}>
           {/* Form Header */}
-          <div className="mb-10">
-            <h1 className="text-display text-foreground mb-4">
+          {/* <div className="mb-10">
+            <h1 className="text-display text-foreground mb-4 text-2xl">
               {form.title || 'Untitled Form'}
             </h1>
             {form.description && (
-              <p className="text-body text-muted-foreground">
+              <p className="text-body text-muted-foreground text-lg">
                 {form.description}
               </p>
             )}
-          </div>
+          </div> */}
 
           {/* Blocks */}
           <div className="space-y-6">
