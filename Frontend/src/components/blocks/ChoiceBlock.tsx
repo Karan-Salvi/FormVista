@@ -18,6 +18,7 @@ interface ChoiceBlockProps {
 
 export const ChoiceBlock: React.FC<ChoiceBlockProps> = ({
   block,
+  isSelected,
   isPreview,
   value,
   onChange,
@@ -27,6 +28,12 @@ export const ChoiceBlock: React.FC<ChoiceBlockProps> = ({
   const isMultiple = block.type === 'checkbox'
   const labelRef = useRef<HTMLSpanElement>(null)
   const isInitialized = useRef(false)
+
+  useEffect(() => {
+    if (isSelected && labelRef.current && !isPreview) {
+      labelRef.current.focus()
+    }
+  }, [isSelected, isPreview])
 
   // Set initial content only once
   useEffect(() => {

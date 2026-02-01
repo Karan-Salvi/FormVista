@@ -34,6 +34,12 @@ export const ToggleBlock: React.FC<ToggleBlockProps> = ({
   }, [])
 
   useEffect(() => {
+    if (isSelected && labelRef.current && !isPreview) {
+      labelRef.current.focus()
+    }
+  }, [isSelected, isPreview])
+
+  useEffect(() => {
     if (contentRef.current && !isContentInitialized.current) {
       contentRef.current.textContent =
         block.config.content || 'Toggle content...'

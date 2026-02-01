@@ -23,6 +23,7 @@ interface DateBlockProps {
 
 export const DateBlock: React.FC<DateBlockProps> = ({
   block,
+  isSelected,
   isPreview,
   value,
   onChange,
@@ -31,6 +32,12 @@ export const DateBlock: React.FC<DateBlockProps> = ({
   const { label, required } = block.config
   const labelRef = useRef<HTMLSpanElement>(null)
   const isInitialized = useRef(false)
+
+  useEffect(() => {
+    if (isSelected && labelRef.current && !isPreview) {
+      labelRef.current.focus()
+    }
+  }, [isSelected, isPreview])
 
   // Set initial content only once
   useEffect(() => {

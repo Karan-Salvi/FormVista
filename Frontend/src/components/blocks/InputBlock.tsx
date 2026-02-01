@@ -15,6 +15,7 @@ interface InputBlockProps {
 
 export const InputBlock: React.FC<InputBlockProps> = ({
   block,
+  isSelected,
   isPreview,
   value,
   onChange,
@@ -24,6 +25,12 @@ export const InputBlock: React.FC<InputBlockProps> = ({
   const labelRef = useRef<HTMLSpanElement>(null)
   const placeholderRef = useRef<HTMLSpanElement>(null)
   const isInitialized = useRef(false)
+
+  useEffect(() => {
+    if (isSelected && labelRef.current && !isPreview) {
+      labelRef.current.focus()
+    }
+  }, [isSelected, isPreview])
 
   // Set initial content only once
   useEffect(() => {

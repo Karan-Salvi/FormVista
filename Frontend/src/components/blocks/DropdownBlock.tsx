@@ -23,6 +23,7 @@ interface DropdownBlockProps {
 
 export const DropdownBlock: React.FC<DropdownBlockProps> = ({
   block,
+  isSelected,
   isPreview,
   value,
   onChange,
@@ -31,6 +32,12 @@ export const DropdownBlock: React.FC<DropdownBlockProps> = ({
   const { label, options = [], required } = block.config
   const labelRef = useRef<HTMLSpanElement>(null)
   const isInitialized = useRef(false)
+
+  useEffect(() => {
+    if (isSelected && labelRef.current && !isPreview) {
+      labelRef.current.focus()
+    }
+  }, [isSelected, isPreview])
 
   // Set initial content only once
   useEffect(() => {

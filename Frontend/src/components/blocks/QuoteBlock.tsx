@@ -24,6 +24,12 @@ export const QuoteBlock: React.FC<QuoteBlockProps> = ({
     }
   }, [])
 
+  useEffect(() => {
+    if (isSelected && contentRef.current && !isPreview) {
+      contentRef.current.focus()
+    }
+  }, [isSelected, isPreview])
+
   const handleInput = useCallback(() => {
     if (contentRef.current) {
       updateBlock(block.id, {

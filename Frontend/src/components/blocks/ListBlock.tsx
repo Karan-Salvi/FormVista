@@ -62,6 +62,7 @@ export const ListBlock: React.FC<ListBlockProps> = ({
             onUpdate={updateItem}
             onRemove={removeItem}
             showRemove={items.length > 1}
+            autoFocus={isSelected && index === 0}
           />
         ))}
       </ul>
@@ -88,7 +89,7 @@ interface ListItemProps {
   showRemove: boolean
 }
 
-const ListItem: React.FC<ListItemProps> = ({
+const ListItem: React.FC<ListItemProps & { autoFocus?: boolean }> = ({
   index,
   item,
   isNumbered,
@@ -96,6 +97,7 @@ const ListItem: React.FC<ListItemProps> = ({
   onUpdate,
   onRemove,
   showRemove,
+  autoFocus,
 }) => {
   const itemRef = useRef<HTMLSpanElement>(null)
   const isInitialized = useRef(false)
@@ -106,6 +108,12 @@ const ListItem: React.FC<ListItemProps> = ({
       isInitialized.current = true
     }
   }, [])
+
+  useEffect(() => {
+    if (autoFocus && itemRef.current && !isPreview) {
+      itemRef.current.focus()
+    }
+  }, [autoFocus, isPreview])
 
   const handleInput = useCallback(() => {
     if (itemRef.current) {

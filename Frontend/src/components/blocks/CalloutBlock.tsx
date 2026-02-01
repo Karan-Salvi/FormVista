@@ -51,6 +51,12 @@ export const CalloutBlock: React.FC<CalloutBlockProps> = ({
     }
   }, [])
 
+  useEffect(() => {
+    if (isSelected && contentRef.current && !isPreview) {
+      contentRef.current.focus()
+    }
+  }, [isSelected, isPreview])
+
   const handleInput = useCallback(() => {
     if (contentRef.current) {
       updateBlock(block.id, {
