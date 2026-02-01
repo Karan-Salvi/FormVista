@@ -32,7 +32,8 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { toast } from 'sonner'
-import { colorThemes } from '@/components/editor/ThemePanel'
+import { colorThemes } from '@/constants/theme'
+import { hexToHsl } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   Sheet,
@@ -225,9 +226,16 @@ export default function DashboardPage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {forms.map(form => {
               const themeColorId = form.theme_config?.primaryColor || 'blue'
-              const themeColor =
-                colorThemes.find(t => t.id === themeColorId)?.primary ||
-                '221 83% 53%'
+              let themeColor = '221 83% 53%'
+
+              if (themeColorId.startsWith('#')) {
+                const { h, s, l } = hexToHsl(themeColorId)
+                themeColor = `${h} ${s}% ${l}%`
+              } else {
+                themeColor =
+                  colorThemes.find(t => t.id === themeColorId)?.primary ||
+                  '221 83% 53%'
+              }
               const statusColor =
                 form.status === 'published'
                   ? 'bg-green-100 text-green-700'

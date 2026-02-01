@@ -6,7 +6,8 @@ import { BlockRenderer } from '@/components/blocks/BlockRenderer'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { Loader2, CheckCircle2 } from 'lucide-react'
-import { colorThemes, fontFamilies } from '@/components/editor/ThemePanel'
+import { colorThemes, fontFamilies } from '@/constants/theme'
+import { hexToHsl } from '@/lib/utils'
 
 const PublicForm: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -55,20 +56,32 @@ const PublicForm: React.FC = () => {
           if (formData.theme) {
             const { primaryColor, fontFamily } = formData.theme
 
-            const theme = colorThemes.find(t => t.id === primaryColor)
-            if (theme) {
-              document.documentElement.style.setProperty(
-                '--primary',
-                theme.primary
-              )
+            if (primaryColor.startsWith('#')) {
+              const { h, s, l } = hexToHsl(primaryColor)
+              const hslString = `${h} ${s}% ${l}%`
+              const accentString = `${h} 100% 96%`
+              document.documentElement.style.setProperty('--primary', hslString)
               document.documentElement.style.setProperty(
                 '--accent-soft',
-                theme.accent
+                accentString
               )
-              document.documentElement.style.setProperty(
-                '--ring',
-                theme.primary
-              )
+              document.documentElement.style.setProperty('--ring', hslString)
+            } else {
+              const theme = colorThemes.find(t => t.id === primaryColor)
+              if (theme) {
+                document.documentElement.style.setProperty(
+                  '--primary',
+                  theme.primary
+                )
+                document.documentElement.style.setProperty(
+                  '--accent-soft',
+                  theme.accent
+                )
+                document.documentElement.style.setProperty(
+                  '--ring',
+                  theme.primary
+                )
+              }
             }
 
             const font = fontFamilies.find(f => f.id === fontFamily)

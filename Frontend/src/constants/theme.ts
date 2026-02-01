@@ -42,6 +42,48 @@ export const colorThemes = [
     primary: '240 60% 55%',
     accent: '240 100% 96%',
   },
+  {
+    id: 'slate',
+    name: 'Slate Gray',
+    primary: '215 16% 47%',
+    accent: '215 16% 96%',
+  },
+  {
+    id: 'emerald',
+    name: 'Emerald',
+    primary: '160 84% 39%',
+    accent: '160 84% 96%',
+  },
+  {
+    id: 'amber',
+    name: 'Amber',
+    primary: '38 92% 50%',
+    accent: '38 92% 96%',
+  },
+  {
+    id: 'crimson',
+    name: 'Crimson',
+    primary: '348 83% 47%',
+    accent: '348 83% 96%',
+  },
+  {
+    id: 'lime',
+    name: 'Lime',
+    primary: '84 81% 44%',
+    accent: '84 81% 96%',
+  },
+  {
+    id: 'cyan',
+    name: 'Cyan',
+    primary: '190 90% 41%',
+    accent: '190 90% 96%',
+  },
+  {
+    id: 'midnight',
+    name: 'Midnight',
+    primary: '222 47% 11%',
+    accent: '222 47% 96%',
+  },
 ]
 
 export const fontFamilies = [
@@ -61,6 +103,16 @@ export const fontFamilies = [
     name: 'Playfair Display',
     value: "'Playfair Display', serif",
   },
+  { id: 'lora', name: 'Lora', value: "'Lora', serif" },
+  { id: 'quicksand', name: 'Quicksand', value: "'Quicksand', sans-serif" },
+  {
+    id: 'space-grotesk',
+    name: 'Space Grotesk',
+    value: "'Space Grotesk', sans-serif",
+  },
+  { id: 'work-sans', name: 'Work Sans', value: "'Work Sans', sans-serif" },
+  { id: 'raleway', name: 'Raleway', value: "'Raleway', sans-serif" },
+  { id: 'cabin', name: 'Cabin', value: "'Cabin', sans-serif" },
   { id: 'georgia', name: 'Georgia', value: 'Georgia, serif' },
   { id: 'mono', name: 'Monospace', value: 'ui-monospace, monospace' },
   {

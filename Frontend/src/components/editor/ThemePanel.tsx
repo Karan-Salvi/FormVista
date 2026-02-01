@@ -20,6 +20,8 @@ import {
 } from '@/components/ui/select'
 
 import { colorThemes, fontFamilies } from '@/constants/theme'
+import { Input } from '@/components/ui/input'
+import { hexToHsl } from '@/lib/utils'
 
 interface ThemePanelProps {
   trigger?: React.ReactNode
@@ -27,12 +29,20 @@ interface ThemePanelProps {
 
 export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
   const { form, setForm } = useFormStore()
+  const [customHex, setCustomHex] = React.useState('#000000')
 
   const currentTheme = form?.theme || {
     primaryColor: 'blue',
     backgroundColor: '0 0% 100%',
     fontFamily: 'inter',
   }
+
+  // Initialize customHex if current color is not in presets
+  React.useEffect(() => {
+    if (currentTheme.primaryColor.startsWith('#')) {
+      setCustomHex(currentTheme.primaryColor)
+    }
+  }, [currentTheme.primaryColor])
 
   const updateTheme = (updates: Partial<typeof currentTheme>) => {
     if (!form) return
@@ -49,8 +59,22 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
       document.documentElement.style.setProperty('--primary', theme.primary)
       document.documentElement.style.setProperty('--accent-soft', theme.accent)
       document.documentElement.style.setProperty('--ring', theme.primary)
+      updateTheme({ primaryColor: themeId })
     }
-    updateTheme({ primaryColor: themeId })
+  }
+
+  const applyCustomColor = (hex: string) => {
+    if (!/^#[0-9A-F]{6}$/i.test(hex) && !/^#[0-9A-F]{3}$/i.test(hex)) return
+
+    const { h, s, l } = hexToHsl(hex)
+    const hslString = `${h} ${s}% ${l}%`
+    const accentString = `${h} 100% 96%`
+
+    document.documentElement.style.setProperty('--primary', hslString)
+    document.documentElement.style.setProperty('--accent-soft', accentString)
+    document.documentElement.style.setProperty('--ring', hslString)
+
+    updateTheme({ primaryColor: hex })
   }
 
   const applyFontToDocument = (fontId: string) => {
@@ -71,7 +95,7 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent className="w-80">
+      <SheetContent className="scrollbar-thin w-80 overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5" />
@@ -82,11 +106,16 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6">
+        <div className="mt-6 space-y-8">
           {/* Color Theme */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Color Theme</Label>
-            <div className="grid grid-cols-4 gap-2">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Color Theme</Label>
+              <span className="text-muted-foreground text-[10px] tracking-wider uppercase">
+                Presets
+              </span>
+            </div>
+            <div className="grid grid-cols-5 gap-2">
               {colorThemes.map(theme => {
                 const isSelected = currentTheme.primaryColor === theme.id
                 return (
@@ -105,6 +134,40 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
                   </button>
                 )
               })}
+            </div>
+
+            {/* Custom Color */}
+            <div className="space-y-3 pt-2">
+              <Label className="text-muted-foreground text-xs">
+                Custom Color (Hex)
+              </Label>
+              <div className="flex gap-2">
+                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md border">
+                  <input
+                    type="color"
+                    value={customHex.startsWith('#') ? customHex : '#3b82f6'}
+                    onChange={e => {
+                      setCustomHex(e.target.value)
+                      applyCustomColor(e.target.value)
+                    }}
+                    className="absolute -inset-2 h-[150%] w-[150%] cursor-pointer border-none bg-transparent"
+                  />
+                </div>
+                <Input
+                  value={customHex}
+                  onChange={e => {
+                    setCustomHex(e.target.value)
+                    if (
+                      /^#[0-9A-F]{6}$/i.test(e.target.value) ||
+                      /^#[0-9A-F]{3}$/i.test(e.target.value)
+                    ) {
+                      applyCustomColor(e.target.value)
+                    }
+                  }}
+                  placeholder="#000000"
+                  className="h-10 text-sm"
+                />
+              </div>
             </div>
           </div>
 

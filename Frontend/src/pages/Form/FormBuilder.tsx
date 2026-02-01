@@ -4,6 +4,7 @@ import { FormEditor } from '@/components/editor/FormEditor'
 import { FormPreview } from '@/components/editor/FormPreview'
 import { ThemePanel } from '@/components/editor/ThemePanel'
 import { colorThemes, fontFamilies } from '@/constants/theme'
+import { hexToHsl } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Eye,
@@ -147,14 +148,27 @@ const FormBuilderPage: React.FC = () => {
     if (form?.theme) {
       const { primaryColor, fontFamily } = form.theme
 
-      const theme = colorThemes.find(t => t.id === primaryColor)
-      if (theme) {
-        document.documentElement.style.setProperty('--primary', theme.primary)
+      // Handle primary color (preset ID or Hex)
+      if (primaryColor.startsWith('#')) {
+        const { h, s, l } = hexToHsl(primaryColor)
+        const hslString = `${h} ${s}% ${l}%`
+        const accentString = `${h} 100% 96%`
+        document.documentElement.style.setProperty('--primary', hslString)
         document.documentElement.style.setProperty(
           '--accent-soft',
-          theme.accent
+          accentString
         )
-        document.documentElement.style.setProperty('--ring', theme.primary)
+        document.documentElement.style.setProperty('--ring', hslString)
+      } else {
+        const theme = colorThemes.find(t => t.id === primaryColor)
+        if (theme) {
+          document.documentElement.style.setProperty('--primary', theme.primary)
+          document.documentElement.style.setProperty(
+            '--accent-soft',
+            theme.accent
+          )
+          document.documentElement.style.setProperty('--ring', theme.primary)
+        }
       }
 
       const font = fontFamilies.find(f => f.id === fontFamily)
