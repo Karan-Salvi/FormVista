@@ -22,6 +22,7 @@ import { type Form } from '@/types/form'
 const createDefaultForm = (): Form => ({
   id: 'demo-form',
   title: 'Customer Feedback Survey',
+  slug: 'demo-form',
   description: 'Help us improve by sharing your thoughts',
   blocks: [
     {
@@ -110,25 +111,31 @@ const FormBuilderPage: React.FC = () => {
         ])
 
         if (formRes.data) {
-          const blocks = blocksRes.data || []
           // Transform backend blocks to frontend blocks if needed
           // Assuming types are compatible or nearly compatible
           // Backend Block: { ..., position: number }
           // Frontend Block: { ..., order: number }
 
-          const formattedBlocks = blocks.map((b: any) => ({
+          const formattedBlocks: Block[] = (
+            (blocksRes.data as any[]) || []
+          ).map((b: any) => ({
             ...b,
-            id: b._id || b.id, // Handle _id from mongoose
+            id: b._id || b.id,
             config: b.config || {},
             order: b.position !== undefined ? b.position : b.order,
           }))
 
           setForm({
-            ...formRes.data,
+            id: formRes.data.id,
+            title: formRes.data.title,
+            slug: formRes.data.slug,
+            description: formRes.data.description,
             theme: formRes.data.theme_config,
-            blocks: formattedBlocks as Block[], // Cast or map strictly
+            blocks: formattedBlocks,
             isPublished: formRes.data.status === 'published',
-          } as any) // Type casting might be needed due to mismatch
+            createdAt: new Date(formRes.data.createdAt),
+            updatedAt: new Date(formRes.data.updatedAt),
+          })
         }
       } catch (error) {
         console.error(error)
@@ -237,23 +244,31 @@ const FormBuilderPage: React.FC = () => {
                     config: b.config,
                   }))
 
-                  await formService.update(form.id, {
+                  const res = await formService.update(form.id, {
                     title: form.title,
                     description: form.description,
                     theme_config: form.theme,
                     blocks: blocksToSave as any,
                   })
 
-                  // Refresh blocks to get valid IDs from backend
-                  const blocksRes = await formService.getBlocks(form.id)
-                  if (blocksRes.data) {
-                    const formattedBlocks = blocksRes.data.map((b: any) => ({
-                      ...b,
-                      id: b._id || b.id,
-                      config: b.config || {},
-                      order: b.position !== undefined ? b.position : b.order,
-                    }))
-                    setForm({ ...form, blocks: formattedBlocks as Block[] })
+                  if (res.data) {
+                    const blocksRes = await formService.getBlocks(form.id)
+                    const formattedBlocks: Block[] = (blocksRes.data || []).map(
+                      (b: any) => ({
+                        ...b,
+                        id: b._id || b.id,
+                        config: b.config || {},
+                        order: b.position !== undefined ? b.position : b.order,
+                      })
+                    )
+                    setForm({
+                      ...form,
+                      title: res.data.title,
+                      description: res.data.description,
+                      theme: res.data.theme_config,
+                      isPublished: res.data.status === 'published',
+                      blocks: formattedBlocks,
+                    })
                   }
 
                   toast.success('Form saved!')
@@ -266,9 +281,79 @@ const FormBuilderPage: React.FC = () => {
               <Sparkles className="h-4 w-4" />
               Save
             </Button>
-            <Button size="sm" className="gap-2">
-              <Share className="h-4 w-4" />
-              Publish
+            <Button
+              size="sm"
+              className="gap-2"
+              variant={form?.isPublished ? 'outline' : 'default'}
+              onClick={async () => {
+                if (!form) return
+                try {
+                  const blocksToSave = form.blocks.map(b => ({
+                    id: /^[0-9a-fA-F]{24}$/.test(b.id) ? b.id : undefined,
+                    type: b.type,
+                    label: b.config.label || 'Untitled',
+                    field_key: (b as any).field_key || `field_${b.id}`,
+                    position: b.order,
+                    required: b.config.required,
+                    config: b.config,
+                  }))
+
+                  const res = await formService.update(form.id, {
+                    title: form.title,
+                    description: form.description,
+                    theme_config: form.theme,
+                    blocks: blocksToSave as any,
+                    status: 'published',
+                  })
+
+                  if (res.data) {
+                    const blocksRes = await formService.getBlocks(form.id)
+                    const formattedBlocks: Block[] = (blocksRes.data || []).map(
+                      (b: any) => ({
+                        ...b,
+                        id: b._id || b.id,
+                        config: b.config || {},
+                        order: b.position !== undefined ? b.position : b.order,
+                      })
+                    )
+                    setForm({
+                      ...form,
+                      title: res.data.title,
+                      description: res.data.description,
+                      theme: res.data.theme_config,
+                      isPublished: true,
+                      blocks: formattedBlocks,
+                    })
+
+                    const formUrl = `${window.location.origin}/f/${res.data.slug}`
+                    toast.success('Form published successfully!', {
+                      description: 'Anyone with the link can now fill it out.',
+                      action: {
+                        label: 'Copy Link',
+                        onClick: () => {
+                          navigator.clipboard.writeText(formUrl)
+                          toast.success('Link copied to clipboard!')
+                        },
+                      },
+                    })
+                  }
+                } catch (e) {
+                  console.error(e)
+                  toast.error('Failed to publish')
+                }
+              }}
+            >
+              {form?.isPublished ? (
+                <>
+                  <Share className="h-4 w-4" />
+                  Published
+                </>
+              ) : (
+                <>
+                  <Share className="h-4 w-4" />
+                  Publish
+                </>
+              )}
             </Button>
           </div>
         </div>

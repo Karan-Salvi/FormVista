@@ -12,6 +12,7 @@ const router = Router();
 
 // Public routes for form submission
 router.get('/slug/:slug', FormController.getFormBySlug);
+router.get('/:formId/blocks', FormController.getBlocks);
 router.post(
   '/slug/:slug/submit',
   validate(submitResponseSchema),
@@ -28,7 +29,6 @@ router.patch('/:id', validate(updateFormSchema), FormController.updateForm);
 router.delete('/:id', FormController.deleteForm);
 
 // Block management
-router.get('/:formId/blocks', FormController.getBlocks);
 router.post(
   '/:formId/blocks',
   validate(addBlockSchema),

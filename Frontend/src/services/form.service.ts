@@ -70,4 +70,18 @@ export const formService = {
   deleteBlock: async (blockId: string) => {
     return apiClient.delete<{ success: boolean }>(`/forms/blocks/${blockId}`)
   },
+
+  // Public
+  getBySlug: async (slug: string) => {
+    return apiClient.get<{ success: boolean; data: FormResponse }>(
+      `/forms/slug/${slug}`
+    )
+  },
+
+  submitResponse: async (slug: string, data: any) => {
+    return apiClient.post<{ success: boolean }>(
+      `/forms/slug/${slug}/submit`,
+      data
+    )
+  },
 }

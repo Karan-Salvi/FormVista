@@ -25,13 +25,18 @@ export class FormService {
     data: CreateFormRequest
   ): Promise<FormResponse> {
     try {
-      const existingForm = await FormModel.findOne({ slug: data.slug });
+      let finalSlug = data.slug;
+      const existingForm = await FormModel.findOne({ slug: finalSlug });
+
       if (existingForm) {
-        throw new ValidationError('Form with this slug already exists');
+        // Append a short random string if slug is taken
+        const randomSuffix = Math.random().toString(36).substring(2, 7);
+        finalSlug = `${data.slug}-${randomSuffix}`;
       }
 
       const form = await FormModel.create({
         ...data,
+        slug: finalSlug,
         user_id: new Types.ObjectId(userId),
       });
 

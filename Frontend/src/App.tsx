@@ -11,6 +11,8 @@ import SignUpPage from './pages/Auth/Signup'
 import DashboardPage from './pages/Dashboard/Dashboard'
 import { ProtectedRoute } from './components/ProtectedRoute'
 
+import PublicForm from './pages/Form/PublicForm'
+
 const queryClient = new QueryClient()
 
 const App = () => (
@@ -29,6 +31,7 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+          <Route path="/f/:slug" element={<PublicForm />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route

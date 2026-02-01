@@ -57,7 +57,16 @@ export function CreateFormDialog() {
     setIsLoading(true)
     try {
       const response = await formService.create({ title, slug, description })
-      toast.success('Form created successfully')
+      if (response.data.slug !== slug) {
+        toast.success(
+          `Form created with unique link: /f/${response.data.slug}`,
+          {
+            duration: 5000,
+          }
+        )
+      } else {
+        toast.success('Form created successfully')
+      }
       setOpen(false)
       navigate(`/builder?formId=${response.data.id}`)
     } catch (error: any) {

@@ -50,6 +50,7 @@ export interface Block {
 export interface Form {
   id: string
   title: string
+  slug: string
   description?: string
   blocks: Block[]
   theme?: FormTheme
