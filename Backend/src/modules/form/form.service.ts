@@ -1,6 +1,6 @@
 import { logger } from '@core/utils/logger.util.js';
 import FormModel, { IForm } from './form.model.js';
-import BlockModel from './block.model.js';
+import BlockModel, { IBlock } from './block.model.js';
 import FormResponseModel from './response.model.js';
 import ResponseAnswerModel from './answer.model.js';
 import FormAnalyticsModel from './analytics.model.js';
@@ -15,6 +15,7 @@ import {
   BlocksResponse,
   FormResponseData,
   FormResponsesResponse,
+  FormSubmissionData,
 } from './form.types.js';
 import { NotFoundError, ValidationError } from '@core/errors/index.js';
 import { Types } from 'mongoose';
@@ -302,16 +303,22 @@ export class FormService {
 
   static async getResponses(
     formId: string,
-    userId: string
+    userId: string,
+    page: number = 1,
+    limit: number = 10
   ): Promise<FormResponsesResponse> {
     const form = await FormModel.findOne({ _id: formId, user_id: userId });
     if (!form) {
       throw new NotFoundError('Form not found');
     }
 
-    const responses = await FormResponseModel.find({ form_id: formId }).sort({
-      createdAt: -1,
-    });
+    const total = await FormResponseModel.countDocuments({ form_id: formId });
+    const totalPages = Math.ceil(total / limit);
+
+    const responses = await FormResponseModel.find({ form_id: formId })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
 
     const responseData: FormSubmissionData[] = await Promise.all(
       responses.map(async (res) => {
@@ -332,7 +339,17 @@ export class FormService {
 
     return {
       success: true,
-      data: responseData,
+      data: {
+        items: responseData,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+          hasNext: page < totalPages,
+          hasPrev: page > 1,
+        },
+      },
     };
   }
 

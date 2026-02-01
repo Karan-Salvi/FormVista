@@ -178,7 +178,16 @@ export class FormController {
     try {
       const user = getUser(req);
       const { formId } = req.params as { formId: string };
-      const result = await FormService.getResponses(formId, user.userId);
+      const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+      const limit = req.query.limit
+        ? parseInt(req.query.limit as string, 10)
+        : 10;
+      const result = await FormService.getResponses(
+        formId,
+        user.userId,
+        page,
+        limit
+      );
       sendSuccess(res, result.data, undefined, req);
     } catch (error) {
       next(error);

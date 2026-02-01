@@ -1,6 +1,9 @@
 import { IForm } from './form.model.js';
 import { IBlock } from './block.model.js';
-import { ApiResponse } from '../../shared/interfaces/response.interface.js';
+import {
+  ApiResponse,
+  PaginatedResponse,
+} from '../../shared/interfaces/response.interface.js';
 
 export interface CreateFormRequest {
   title: string;
@@ -59,4 +62,6 @@ export interface FormSubmissionData {
   }[];
 }
 
-export type FormResponsesResponse = ApiResponse<FormSubmissionData[]>;
+export type FormResponsesResponse = ApiResponse<
+  PaginatedResponse<FormSubmissionData>
+>;

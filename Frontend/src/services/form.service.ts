@@ -85,9 +85,24 @@ export const formService = {
     )
   },
 
-  getResponses: async (formId: string) => {
-    return apiClient.get<{ success: boolean; data: any[] }>(
-      `/forms/${formId}/responses`
-    )
+  getResponses: async (
+    formId: string,
+    page: number = 1,
+    limit: number = 10
+  ) => {
+    return apiClient.get<{
+      success: boolean
+      data: {
+        items: any[]
+        pagination: {
+          page: number
+          limit: number
+          total: number
+          totalPages: number
+          hasNext: boolean
+          hasPrev: boolean
+        }
+      }
+    }>(`/forms/${formId}/responses?page=${page}&limit=${limit}`)
   },
 }
