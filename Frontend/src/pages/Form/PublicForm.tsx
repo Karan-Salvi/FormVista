@@ -56,7 +56,7 @@ const PublicForm: React.FC = () => {
           if (formData.theme) {
             const { primaryColor, fontFamily } = formData.theme
 
-            if (primaryColor.startsWith('#')) {
+            if (primaryColor?.startsWith('#')) {
               const { h, s, l } = hexToHsl(primaryColor)
               const hslString = `${h} ${s}% ${l}%`
               const accentString = `${h} 100% 96%`

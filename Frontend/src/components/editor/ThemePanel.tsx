@@ -39,7 +39,7 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
 
   // Initialize customHex if current color is not in presets
   React.useEffect(() => {
-    if (currentTheme.primaryColor.startsWith('#')) {
+    if (currentTheme.primaryColor?.startsWith('#')) {
       setCustomHex(currentTheme.primaryColor)
     }
   }, [currentTheme.primaryColor])
@@ -145,7 +145,7 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
                 <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md border">
                   <input
                     type="color"
-                    value={customHex.startsWith('#') ? customHex : '#3b82f6'}
+                    value={customHex?.startsWith('#') ? customHex : '#3b82f6'}
                     onChange={e => {
                       setCustomHex(e.target.value)
                       applyCustomColor(e.target.value)

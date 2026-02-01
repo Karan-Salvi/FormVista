@@ -149,7 +149,7 @@ const FormBuilderPage: React.FC = () => {
       const { primaryColor, fontFamily } = form.theme
 
       // Handle primary color (preset ID or Hex)
-      if (primaryColor.startsWith('#')) {
+      if (primaryColor?.startsWith('#')) {
         const { h, s, l } = hexToHsl(primaryColor)
         const hslString = `${h} ${s}% ${l}%`
         const accentString = `${h} 100% 96%`
