@@ -198,6 +198,7 @@ export default function ResponsesPage() {
             'multiple-choice',
             'checkbox',
             'date',
+            'phone',
           ].includes(b.type)
         ) || []
 
@@ -289,6 +290,7 @@ export default function ResponsesPage() {
         'multiple-choice',
         'checkbox',
         'date',
+        'phone',
       ].includes(b.type)
     ) || []
 

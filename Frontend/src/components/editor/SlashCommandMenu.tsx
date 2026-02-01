@@ -23,6 +23,7 @@ import {
   File,
   FileText,
   Link,
+  Phone,
 } from 'lucide-react'
 
 interface SlashCommandMenuProps {
@@ -55,6 +56,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   file: File,
   'file-text': FileText,
   link: Link,
+  phone: Phone,
 }
 
 export const SlashCommandMenu: React.FC<SlashCommandMenuProps> = ({
@@ -64,6 +66,7 @@ export const SlashCommandMenu: React.FC<SlashCommandMenuProps> = ({
   searchQuery,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [lastSearchQuery, setLastSearchQuery] = useState(searchQuery)
   const menuRef = useRef<HTMLDivElement>(null)
 
   const filteredBlocks = BLOCK_TYPES.filter(
@@ -72,9 +75,10 @@ export const SlashCommandMenu: React.FC<SlashCommandMenuProps> = ({
       block.type.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  useEffect(() => {
+  if (searchQuery !== lastSearchQuery) {
+    setLastSearchQuery(searchQuery)
     setActiveIndex(0)
-  }, [searchQuery])
+  }
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

@@ -93,6 +93,7 @@ export const BlockRenderer: React.FC<BlockRendererProps> = ({
     case 'long-text':
     case 'email':
     case 'number':
+    case 'phone':
       return (
         <InputBlock
           block={block}

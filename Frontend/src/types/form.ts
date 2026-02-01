@@ -21,6 +21,7 @@ export type BlockType =
   | 'audio'
   | 'file'
   | 'pdf'
+  | 'phone'
 
 export interface BlockConfig {
   label?: string
@@ -204,5 +205,11 @@ export const BLOCK_TYPES: {
     label: 'Web Bookmark',
     icon: 'link',
     description: 'Visual URL preview',
+  },
+  {
+    type: 'phone',
+    label: 'Phone Number',
+    icon: 'phone',
+    description: 'Phone number input',
   },
 ]

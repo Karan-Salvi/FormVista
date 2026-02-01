@@ -22,15 +22,18 @@ export const InputBlock: React.FC<InputBlockProps> = ({
   const { updateBlock } = useFormStore()
   const { label, placeholder, helpText, required } = block.config
   const labelRef = useRef<HTMLSpanElement>(null)
+  const placeholderRef = useRef<HTMLSpanElement>(null)
   const isInitialized = useRef(false)
 
   // Set initial content only once
   useEffect(() => {
-    if (labelRef.current && !isInitialized.current && !isPreview) {
-      labelRef.current.textContent = label || ''
+    if (!isInitialized.current && !isPreview) {
+      if (labelRef.current) labelRef.current.textContent = label || ''
+      if (placeholderRef.current)
+        placeholderRef.current.textContent = placeholder || ''
       isInitialized.current = true
     }
-  }, [label, isPreview])
+  }, [label, placeholder, isPreview])
 
   const handleLabelChange = useCallback(
     (e: React.FormEvent<HTMLSpanElement>) => {
@@ -40,12 +43,24 @@ export const InputBlock: React.FC<InputBlockProps> = ({
     [block.id, block.config, updateBlock]
   )
 
+  const handlePlaceholderChange = useCallback(
+    (e: React.FormEvent<HTMLSpanElement>) => {
+      const newPlaceholder = e.currentTarget.textContent || ''
+      updateBlock(block.id, {
+        config: { ...block.config, placeholder: newPlaceholder },
+      })
+    },
+    [block.id, block.config, updateBlock]
+  )
+
   const inputType =
     block.type === 'email'
       ? 'email'
       : block.type === 'number'
         ? 'number'
-        : 'text'
+        : block.type === 'phone'
+          ? 'tel'
+          : 'text'
 
   return (
     <div className="space-y-2">
@@ -67,22 +82,42 @@ export const InputBlock: React.FC<InputBlockProps> = ({
       </Label>
 
       {block.type === 'long-text' ? (
-        <Textarea
-          placeholder={placeholder}
-          value={value}
-          onChange={e => onChange?.(e.target.value)}
-          disabled={!isPreview}
-          className="bg-background border-input focus:border-primary focus:ring-primary/20 min-h-[100px] resize-y transition-all focus:ring-1"
-        />
-      ) : (
+        isPreview ? (
+          <Textarea
+            placeholder={placeholder}
+            value={value}
+            onChange={e => onChange?.(e.target.value)}
+            className="bg-background border-input focus:border-primary focus:ring-primary/20 min-h-[100px] resize-y transition-all focus:ring-1"
+          />
+        ) : (
+          <div className="bg-background border-input relative min-h-[100px] rounded-md border p-3">
+            <span
+              ref={placeholderRef}
+              contentEditable
+              suppressContentEditableWarning
+              onInput={handlePlaceholderChange}
+              className="text-muted-foreground/50 empty:before:text-muted-foreground/30 block w-full outline-none empty:before:content-['Add_placeholder...']"
+            />
+          </div>
+        )
+      ) : isPreview ? (
         <Input
           type={inputType}
           placeholder={placeholder}
           value={value}
           onChange={e => onChange?.(e.target.value)}
-          disabled={!isPreview}
           className="bg-background border-input focus:border-primary focus:ring-primary/20 transition-all focus:ring-1"
         />
+      ) : (
+        <div className="bg-background border-input relative flex h-10 items-center rounded-md border px-3 py-2">
+          <span
+            ref={placeholderRef}
+            contentEditable
+            suppressContentEditableWarning
+            onInput={handlePlaceholderChange}
+            className="text-muted-foreground/50 empty:before:text-muted-foreground/30 w-full outline-none empty:before:content-['Add_placeholder...']"
+          />
+        </div>
       )}
 
       {helpText && <p className="text-muted-foreground text-xs">{helpText}</p>}

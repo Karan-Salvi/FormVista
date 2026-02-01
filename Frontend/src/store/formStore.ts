@@ -188,6 +188,17 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
       return { id: generateId(), type, config: { url: '' }, order }
     case 'bookmark':
       return { id: generateId(), type, config: { url: '', label: '' }, order }
+    case 'phone':
+      return {
+        id: generateId(),
+        type,
+        config: {
+          ...baseConfig,
+          label: 'Phone Number',
+          placeholder: 'Enter your phone number',
+        },
+        order,
+      }
     default:
       return { id: generateId(), type, config: baseConfig, order }
   }
