@@ -21,7 +21,7 @@ export const BlockToolbar: React.FC<BlockToolbarProps> = ({
   dragHandleProps,
 }) => {
   return (
-    <div className="absolute top-1/2 -left-20 flex -translate-y-1/2 items-center gap-0.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+    <div className="absolute top-1/2 -left-9 flex -translate-y-1/2 items-center gap-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100 sm:-left-20">
       <div {...dragHandleProps} className="drag-handle">
         <GripVertical className="h-4 w-4" />
       </div>

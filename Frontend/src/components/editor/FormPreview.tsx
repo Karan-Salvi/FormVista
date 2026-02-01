@@ -29,7 +29,7 @@ export const FormPreview: React.FC = () => {
 
   return (
     <div className="bg-surface-subtle min-h-screen text-start">
-      <div className="mx-auto max-w-2xl px-8 py-16">
+      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-8 sm:py-16">
         <form onSubmit={handleSubmit}>
           {/* Form Header */}
           {/* <div className="mb-10">

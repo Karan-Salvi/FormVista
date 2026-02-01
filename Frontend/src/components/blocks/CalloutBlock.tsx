@@ -78,7 +78,7 @@ export const CalloutBlock: React.FC<CalloutBlockProps> = ({
   if (isPreview) {
     return (
       <div className="bg-accent/50 border-border flex items-start gap-3 rounded-lg border p-4">
-        <Icon className={`mt-0.5 h-5 w-5 flex-shrink-0 ${IconData.color}`} />
+        <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${IconData.color}`} />
         <p className="text-foreground">
           {block.config.content || 'Type callout text...'}
         </p>
@@ -93,7 +93,7 @@ export const CalloutBlock: React.FC<CalloutBlockProps> = ({
       <div className="bg-accent/50 border-border flex items-start gap-3 rounded-lg border p-4">
         <Popover open={isIconPickerOpen} onOpenChange={setIsIconPickerOpen}>
           <PopoverTrigger asChild>
-            <button className="mt-0.5 flex-shrink-0 transition-transform hover:scale-110">
+            <button className="mt-0.5 shrink-0 transition-transform hover:scale-110">
               <Icon className={`h-5 w-5 ${IconData.color}`} />
             </button>
           </PopoverTrigger>

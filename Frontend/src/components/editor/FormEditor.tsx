@@ -127,7 +127,10 @@ export const FormEditor: React.FC = () => {
   const sortedBlocks = [...form.blocks].sort((a, b) => a.order - b.order)
 
   return (
-    <div ref={editorRef} className="mx-auto max-w-2xl px-8 py-12 text-start">
+    <div
+      ref={editorRef}
+      className="mx-auto max-w-2xl px-4 py-8 text-start sm:px-8 sm:py-12"
+    >
       {/* Form Header */}
       <div className="mb-10">
         <TextareaAutosize
@@ -137,7 +140,7 @@ export const FormEditor: React.FC = () => {
             updateFormTitle(e.target.value)
           }
           placeholder="Untitled Form"
-          className="text-display text-2xl text-foreground placeholder:text-muted-foreground/50 mb-4 w-full resize-none bg-transparent outline-none"
+          className="text-display text-foreground placeholder:text-muted-foreground/50 mb-4 w-full resize-none bg-transparent text-lg sm:text-2xl outline-none"
         />
         <TextareaAutosize
           readOnly={isPreviewMode}
@@ -146,7 +149,7 @@ export const FormEditor: React.FC = () => {
             updateFormDescription(e.target.value)
           }
           placeholder="Add a description..."
-          className="text-body text-lg text-muted-foreground placeholder:text-muted-foreground/50 w-full resize-none bg-transparent outline-none"
+          className="text-body text-muted-foreground placeholder:text-muted-foreground/50 w-full resize-none bg-transparent text-sm sm:text-lg outline-none"
         />
       </div>
 
@@ -160,7 +163,7 @@ export const FormEditor: React.FC = () => {
               onDragOver={e => handleDragOver(e, index)}
               onDragEnd={handleDragEnd}
               onClick={() => selectBlock(block.id)}
-              className={`form-block group pr-4 pl-20 ${
+              className={`form-block group pr-2 pl-10 sm:pr-4 sm:pl-20 ${
                 selectedBlockId === block.id ? 'selected' : ''
               } ${dragOverIndex === index ? 'border-primary border-t-2' : ''} ${
                 draggedIndex === index ? 'opacity-50' : ''
@@ -186,7 +189,7 @@ export const FormEditor: React.FC = () => {
 
       {/* Add Block Button */}
       {!isPreviewMode && (
-        <div className="mt-6 pl-20">
+        <div className="mt-6 pl-10 sm:pl-20">
           <Button
             variant="ghost"
             className="text-muted-foreground hover:text-foreground gap-2"

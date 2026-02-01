@@ -174,45 +174,47 @@ const FormBuilderPage: React.FC = () => {
       <header className="border-border bg-background/95 sticky top-0 z-40 border-b backdrop-blur-sm">
         <div className="flex h-14 items-center justify-between px-4">
           {/* Left section */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground"
+              className="text-muted-foreground h-9 w-9"
               onClick={() => (window.location.href = '/dashboard')}
             >
               <ChevronLeft className="h-5 w-5" />
             </Button>
             <div className="flex items-center gap-2">
               <Sparkles className="text-primary h-5 w-5" />
-              <span className="text-foreground font-semibold">FormVista</span>
+              <span className="text-foreground extra-sm:inline hidden font-semibold sm:inline">
+                FormVista
+              </span>
             </div>
           </div>
 
           {/* Center - Form title */}
-          <div className="flex flex-1 justify-center">
+          <div className="hidden flex-1 justify-center md:flex">
             <span className="text-muted-foreground max-w-xs truncate text-sm">
               {form?.title || 'Untitled Form'}
             </span>
           </div>
 
           {/* Right section */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={togglePreviewMode}
-              className="gap-2"
+              className="h-9 gap-2 px-2 sm:px-3"
             >
               {isPreviewMode ? (
                 <>
                   <EyeOff className="h-4 w-4" />
-                  Edit
+                  <span className="hidden sm:inline">Edit</span>
                 </>
               ) : (
                 <>
                   <Eye className="h-4 w-4" />
-                  Preview
+                  <span className="hidden sm:inline">Preview</span>
                 </>
               )}
             </Button>
@@ -221,7 +223,7 @@ const FormBuilderPage: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground"
+                  className="text-muted-foreground h-9 w-9"
                 >
                   <Palette className="h-4 w-4" />
                 </Button>
@@ -230,8 +232,9 @@ const FormBuilderPage: React.FC = () => {
             <Button
               variant="default"
               size="sm"
-              className="gap-2"
+              className="h-9 gap-2 px-2 sm:px-3"
               onClick={async () => {
+                // ... (save logic)
                 if (!form) return
                 try {
                   const blocksToSave = form.blocks.map(b => ({
@@ -279,13 +282,14 @@ const FormBuilderPage: React.FC = () => {
               }}
             >
               <Sparkles className="h-4 w-4" />
-              Save
+              <span className="hidden sm:inline">Save</span>
             </Button>
             <Button
               size="sm"
-              className="gap-2"
+              className="h-9 gap-2 px-2 sm:px-3"
               variant={form?.isPublished ? 'outline' : 'default'}
               onClick={async () => {
+                // ... (publish logic)
                 if (!form) return
                 try {
                   const blocksToSave = form.blocks.map(b => ({
@@ -343,17 +347,10 @@ const FormBuilderPage: React.FC = () => {
                 }
               }}
             >
-              {form?.isPublished ? (
-                <>
-                  <Share className="h-4 w-4" />
-                  Published
-                </>
-              ) : (
-                <>
-                  <Share className="h-4 w-4" />
-                  Publish
-                </>
-              )}
+              <Share className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                {form?.isPublished ? 'Published' : 'Publish'}
+              </span>
             </Button>
           </div>
         </div>
