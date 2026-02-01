@@ -96,14 +96,63 @@ export class FormService {
     userId: string,
     data: UpdateFormRequest
   ): Promise<FormResponse> {
+    const { blocks, ...formData } = data;
+
     const form = await FormModel.findOneAndUpdate(
       { _id: formId, user_id: userId },
-      { $set: data },
+      { $set: formData },
       { new: true }
     );
 
     if (!form) {
       throw new NotFoundError('Form not found');
+    }
+
+    if (blocks) {
+      // Get existing blocks
+      const existingBlocks = await BlockModel.find({ form_id: form._id });
+      const existingBlockIds = existingBlocks.map((b) => b._id.toString());
+      const incomingBlockIds = blocks
+        .filter((b) => b.id)
+        .map((b) => b.id as string);
+
+      // Delete blocks not in incoming
+      const blocksToDelete = existingBlockIds.filter(
+        (id) => !incomingBlockIds.includes(id)
+      );
+      if (blocksToDelete.length > 0) {
+        await BlockModel.deleteMany({ _id: { $in: blocksToDelete } });
+      }
+
+      // Update or Create
+      for (const block of blocks) {
+        if (block.id && existingBlockIds.includes(block.id)) {
+          // Update
+          await BlockModel.findByIdAndUpdate(block.id, {
+            $set: {
+              type: block.type,
+              label: block.label,
+              field_key: block.field_key,
+              position: block.position,
+              required: block.required,
+              config: block.config,
+            },
+          });
+        } else {
+          // Create
+          await BlockModel.create({
+            form_id: form._id,
+            type: block.type,
+            label: block.label,
+            field_key:
+              block.field_key ||
+              `field_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            position: block.position,
+            required: block.required,
+            config: block.config,
+          });
+        }
+      }
     }
 
     return {

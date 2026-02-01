@@ -11,6 +11,15 @@ export const createFormSchema = z.object({
   theme_config: z.record(z.string(), z.unknown()).optional(),
 });
 
+export const addBlockSchema = z.object({
+  type: z.string().min(1, 'Type is required'),
+  label: z.string().min(1, 'Label is required'),
+  field_key: z.string().min(1, 'Field key is required'),
+  position: z.number().int().min(0),
+  required: z.boolean().optional(),
+  config: z.record(z.string(), z.unknown()).optional(),
+});
+
 export const updateFormSchema = z.object({
   title: z.string().trim().min(1).optional(),
   description: z.string().optional(),
@@ -23,15 +32,13 @@ export const updateFormSchema = z.object({
       dateFormat: z.string().optional(),
     })
     .optional(),
-});
-
-export const addBlockSchema = z.object({
-  type: z.string().min(1, 'Type is required'),
-  label: z.string().min(1, 'Label is required'),
-  field_key: z.string().min(1, 'Field key is required'),
-  position: z.number().int().min(0),
-  required: z.boolean().optional(),
-  config: z.record(z.string(), z.unknown()).optional(),
+  blocks: z
+    .array(
+      addBlockSchema.extend({
+        id: z.string().optional(),
+      })
+    )
+    .optional(),
 });
 
 export const submitResponseSchema = z.object({

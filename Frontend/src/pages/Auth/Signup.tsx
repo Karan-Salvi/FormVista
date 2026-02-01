@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import '@/App.css'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, Loader2 } from 'lucide-react'
+import { authService } from '@/services/auth.service'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 
 export default function SignUpPage() {
   return <SignUpCard />
@@ -8,8 +11,26 @@ export default function SignUpPage() {
 
 const SignUpCard = () => {
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [fullName, setFullName] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      await authService.register({ name: fullName, email, password })
+      toast.success('Successfully account created!')
+      navigate('/dashboard')
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to create account')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className="flex min-h-screen w-full bg-gradient-to-br from-neutral-50 to-white">
@@ -54,7 +75,7 @@ const SignUpCard = () => {
           </div>
 
           {/* Form */}
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSignup}>
             <div>
               <label className="mb-2 block text-sm font-semibold text-gray-700">
                 Full Name
@@ -101,6 +122,8 @@ const SignUpCard = () => {
                   id="password"
                   name="password"
                   required
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
                   className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3.5 pr-12 transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-blue-600"
                   placeholder="Enter your password"
                 />
@@ -166,9 +189,11 @@ const SignUpCard = () => {
 
             <button
               type="submit"
-              className="w-full cursor-pointer rounded-xl bg-blue-600 px-4 py-3.5 font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:bg-blue-600/90 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:outline-none"
+              disabled={isLoading}
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3.5 font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:bg-blue-600/90 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Create an account
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isLoading ? 'Creating account...' : 'Create an account'}
             </button>
           </form>
 

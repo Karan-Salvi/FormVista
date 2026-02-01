@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-const colorThemes = [
+export const colorThemes = [
   {
     id: 'blue',
     name: 'Ocean Blue',
@@ -65,7 +65,7 @@ const colorThemes = [
   },
 ]
 
-const fontFamilies = [
+export const fontFamilies = [
   { id: 'inter', name: 'Inter', value: "'Inter', system-ui, sans-serif" },
   {
     id: 'system',

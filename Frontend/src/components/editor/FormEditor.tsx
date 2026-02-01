@@ -7,6 +7,7 @@ import { SlashCommandMenu } from './SlashCommandMenu'
 import { BlockContextMenu } from './BlockContextMenu'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import TextareaAutosize from 'react-textarea-autosize'
 
 export const FormEditor: React.FC = () => {
   const {
@@ -129,24 +130,24 @@ export const FormEditor: React.FC = () => {
     <div ref={editorRef} className="mx-auto max-w-2xl px-8 py-12 text-start">
       {/* Form Header */}
       <div className="mb-10">
-        <h1
-          contentEditable={!isPreviewMode}
-          suppressContentEditableWarning
-          onInput={e => updateFormTitle(e.currentTarget.textContent || '')}
-          className="text-display text-foreground empty:before:text-muted-foreground/50 mb-4 outline-none empty:before:content-['Untitled_Form']"
-        >
-          {form.title}
-        </h1>
-        <p
-          contentEditable={!isPreviewMode}
-          suppressContentEditableWarning
-          onInput={e =>
-            updateFormDescription(e.currentTarget.textContent || '')
+        <TextareaAutosize
+          readOnly={isPreviewMode}
+          value={form.title}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+            updateFormTitle(e.target.value)
           }
-          className="text-body text-muted-foreground empty:before:text-muted-foreground/40 outline-none empty:before:content-['Add_a_description...']"
-        >
-          {form.description}
-        </p>
+          placeholder="Untitled Form"
+          className="text-display text-foreground placeholder:text-muted-foreground/50 mb-4 w-full resize-none bg-transparent outline-none"
+        />
+        <TextareaAutosize
+          readOnly={isPreviewMode}
+          value={form.description}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+            updateFormDescription(e.target.value)
+          }
+          placeholder="Add a description..."
+          className="text-body text-muted-foreground placeholder:text-muted-foreground/50 w-full resize-none bg-transparent outline-none"
+        />
       </div>
 
       {/* Blocks */}

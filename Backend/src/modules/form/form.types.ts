@@ -19,6 +19,7 @@ export interface UpdateFormRequest {
     includeMetadata?: boolean;
     dateFormat?: string;
   };
+  blocks?: (AddBlockRequest & { id?: string })[];
 }
 
 export interface AddBlockRequest {

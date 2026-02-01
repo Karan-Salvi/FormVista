@@ -2,7 +2,11 @@ import React, { useEffect } from 'react'
 import { useFormStore } from '@/store/formStore'
 import { FormEditor } from '@/components/editor/FormEditor'
 import { FormPreview } from '@/components/editor/FormPreview'
-import { ThemePanel } from '@/components/editor/ThemePanel'
+import {
+  ThemePanel,
+  colorThemes,
+  fontFamilies,
+} from '@/components/editor/ThemePanel'
 import { Button } from '@/components/ui/button'
 import {
   Eye,
@@ -82,14 +86,80 @@ const createDefaultForm = (): Form => ({
   isPublished: false,
 })
 
+import { useSearchParams } from 'react-router-dom'
+import { formService } from '@/services/form.service'
+import { toast } from 'sonner'
+import type { Block } from '@/types/form'
+
 const FormBuilderPage: React.FC = () => {
   const { form, setForm, isPreviewMode, togglePreviewMode } = useFormStore()
+  const [searchParams] = useSearchParams()
+  const formId = searchParams.get('formId')
 
   useEffect(() => {
-    if (!form) {
-      setForm(createDefaultForm())
+    const loadForm = async () => {
+      if (!formId) {
+        setForm(createDefaultForm())
+        return
+      }
+
+      try {
+        const [formRes, blocksRes] = await Promise.all([
+          formService.getById(formId),
+          formService.getBlocks(formId),
+        ])
+
+        if (formRes.data) {
+          const blocks = blocksRes.data || []
+          // Transform backend blocks to frontend blocks if needed
+          // Assuming types are compatible or nearly compatible
+          // Backend Block: { ..., position: number }
+          // Frontend Block: { ..., order: number }
+
+          const formattedBlocks = blocks.map((b: any) => ({
+            ...b,
+            id: b._id || b.id, // Handle _id from mongoose
+            config: b.config || {},
+            order: b.position !== undefined ? b.position : b.order,
+          }))
+
+          setForm({
+            ...formRes.data,
+            theme: formRes.data.theme_config,
+            blocks: formattedBlocks as Block[], // Cast or map strictly
+            isPublished: formRes.data.status === 'published',
+          } as any) // Type casting might be needed due to mismatch
+        }
+      } catch (error) {
+        console.error(error)
+        toast.error('Failed to load form')
+      }
     }
-  }, [form, setForm])
+    loadForm()
+  }, [formId, setForm])
+
+  // Apply theme styles
+  useEffect(() => {
+    if (form?.theme) {
+      const { primaryColor, fontFamily } = form.theme
+
+      const theme = colorThemes.find(t => t.id === primaryColor)
+      if (theme) {
+        document.documentElement.style.setProperty('--primary', theme.primary)
+        document.documentElement.style.setProperty(
+          '--accent-soft',
+          theme.accent
+        )
+        document.documentElement.style.setProperty('--ring', theme.primary)
+      }
+
+      const font = fontFamilies.find(f => f.id === fontFamily)
+      if (font) {
+        document.documentElement.style.setProperty('--font-family', font.value)
+        document.body.style.fontFamily = font.value
+      }
+    }
+  }, [form?.theme])
 
   return (
     <div className="bg-background min-h-screen">
@@ -102,6 +172,7 @@ const FormBuilderPage: React.FC = () => {
               variant="ghost"
               size="icon"
               className="text-muted-foreground"
+              onClick={() => (window.location.href = '/dashboard')}
             >
               <ChevronLeft className="h-5 w-5" />
             </Button>
@@ -149,6 +220,52 @@ const FormBuilderPage: React.FC = () => {
                 </Button>
               }
             />
+            <Button
+              variant="default"
+              size="sm"
+              className="gap-2"
+              onClick={async () => {
+                if (!form) return
+                try {
+                  const blocksToSave = form.blocks.map(b => ({
+                    id: /^[0-9a-fA-F]{24}$/.test(b.id) ? b.id : undefined,
+                    type: b.type,
+                    label: b.config.label || 'Untitled',
+                    field_key: (b as any).field_key || `field_${b.id}`,
+                    position: b.order,
+                    required: b.config.required,
+                    config: b.config,
+                  }))
+
+                  await formService.update(form.id, {
+                    title: form.title,
+                    description: form.description,
+                    theme_config: form.theme,
+                    blocks: blocksToSave as any,
+                  })
+
+                  // Refresh blocks to get valid IDs from backend
+                  const blocksRes = await formService.getBlocks(form.id)
+                  if (blocksRes.data) {
+                    const formattedBlocks = blocksRes.data.map((b: any) => ({
+                      ...b,
+                      id: b._id || b.id,
+                      config: b.config || {},
+                      order: b.position !== undefined ? b.position : b.order,
+                    }))
+                    setForm({ ...form, blocks: formattedBlocks as Block[] })
+                  }
+
+                  toast.success('Form saved!')
+                } catch (e) {
+                  console.error(e)
+                  toast.error('Failed to save')
+                }
+              }}
+            >
+              <Sparkles className="h-4 w-4" />
+              Save
+            </Button>
             <Button size="sm" className="gap-2">
               <Share className="h-4 w-4" />
               Publish
