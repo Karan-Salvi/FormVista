@@ -1,6 +1,12 @@
+import { Link } from 'react-router-dom'
+import { authService } from '@/services/auth.service'
+
 const Pricing = () => {
+  const isAuthenticated = authService.isAuthenticated()
+  const startLink = isAuthenticated ? '/dashboard' : '/signup'
+
   return (
-    <section className="bg-white py-20 sm:px-6">
+    <section id="pricing" className="bg-white py-20 sm:px-6">
       <div className="max-auto max-w-5xl">
         <div className="mb-12 text-center sm:mb-16">
           <h2 className="mb-4 text-2xl font-extrabold text-gray-900 sm:text-3xl md:text-4xl">
@@ -76,9 +82,11 @@ const Pricing = () => {
               </li>
             </ul>
 
-            <button className="w-full cursor-pointer rounded-xl border-2 border-blue-600 px-6 py-3 font-semibold text-blue-600 transition-colors hover:bg-blue-50">
-              Get Started
-            </button>
+            <Link to={startLink}>
+              <button className="w-full cursor-pointer rounded-xl border-2 border-blue-600 px-6 py-3 font-semibold text-blue-600 transition-colors hover:bg-blue-50">
+                {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
+              </button>
+            </Link>
           </div>
 
           <div className="relative flex flex-col rounded-2xl border-2 border-blue-600 bg-white p-8 shadow-xl sm:rounded-3xl">
@@ -164,9 +172,11 @@ const Pricing = () => {
               </li>
             </ul>
 
-            <button className="w-full transform cursor-pointer rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow-lg shadow-blue-200 transition-all hover:-translate-y-1 hover:bg-blue-700">
-              Go Pro
-            </button>
+            <Link to={startLink}>
+              <button className="w-full transform cursor-pointer rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow-lg shadow-blue-200 transition-all hover:-translate-y-1 hover:bg-blue-700">
+                {isAuthenticated ? 'Go to Dashboard' : 'Go Pro'}
+              </button>
+            </Link>
           </div>
         </div>
       </div>

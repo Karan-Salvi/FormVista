@@ -19,6 +19,8 @@ import {
   Edit,
   Sparkles,
   Menu,
+  LogOut,
+  ChevronLeft,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
@@ -27,9 +29,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { toast } from 'sonner'
 import { colorThemes } from '@/components/editor/ThemePanel'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   Sheet,
   SheetContent,
@@ -91,17 +95,63 @@ export default function DashboardPage() {
   return (
     <div className="relative min-h-screen bg-gray-50 p-8">
       <nav className="bg-background/80 border-border/50 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-          <Link to="/" className="flex items-center gap-2">
-            <Sparkles className="text-primary h-6 w-6" />
-            <span className="text-foreground text-xl font-semibold">
-              FormVista
-            </span>
-          </Link>
+        <div className="mx-auto flex h-16 items-center justify-between px-6">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground h-9 w-9"
+              onClick={() => navigate('/')}
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            <Link
+              to="/"
+              className="flex items-center gap-2 transition-opacity hover:opacity-80"
+            >
+              <Sparkles className="text-primary h-6 w-6" />
+              <span className="text-foreground text-xl font-semibold">
+                FormVista
+              </span>
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden items-center gap-4 md:flex">
             <CreateFormDialog />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="relative h-10 w-10 rounded-full"
+                >
+                  <Avatar className="border-primary/10 hover:border-primary/30 h-10 w-10 border-2 transition-all">
+                    <AvatarImage src={`/images/profile.png`} alt={user?.name} />
+                    <AvatarFallback className="bg-primary/5 text-primary">
+                      {user?.name?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <div className="flex flex-col space-y-1 p-2">
+                  <p className="text-sm leading-none font-medium">
+                    {user?.name}
+                  </p>
+                  <p className="text-muted-foreground text-xs leading-none">
+                    {user?.email}
+                  </p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => authService.logout()}
+                  className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* Mobile Navigation */}
@@ -120,7 +170,30 @@ export default function DashboardPage() {
                   </SheetTitle>
                 </SheetHeader>
                 <div className="mt-8 flex flex-col gap-4">
+                  <div className="border-border/50 flex items-center gap-3 border-b px-2 py-4">
+                    <Avatar className="border-primary/10 h-10 w-10 border">
+                      <AvatarFallback className="bg-primary/5 text-primary">
+                        {user?.name?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold">
+                        {user?.name}
+                      </span>
+                      <span className="text-muted-foreground text-xs">
+                        {user?.email}
+                      </span>
+                    </div>
+                  </div>
                   <CreateFormDialog />
+                  <Button
+                    variant="ghost"
+                    className="justify-start text-red-600 hover:bg-red-50 hover:text-red-600"
+                    onClick={() => authService.logout()}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </Button>
                 </div>
               </SheetContent>
             </Sheet>

@@ -1,6 +1,9 @@
 const HowItWorks = () => {
   return (
-    <section className="mx-auto max-w-7xl pt-20 sm:px-6 sm:py-24">
+    <section
+      id="how-it-works"
+      className="mx-auto max-w-7xl pt-20 sm:px-6 sm:py-24"
+    >
       <div className="mb-16 text-center">
         <div className="mb-4 inline-block rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[11px] font-extrabold text-blue-600">
           THE PROCESS

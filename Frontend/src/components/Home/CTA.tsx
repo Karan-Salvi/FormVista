@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom'
 import { Button } from '../ui/button'
 import { ArrowRight } from 'lucide-react'
+import { authService } from '@/services/auth.service'
 
 const CTA = () => {
+  const isAuthenticated = authService.isAuthenticated()
+  const startLink = isAuthenticated ? '/dashboard' : '/signup'
+
   return (
     <section className="flex w-full items-center justify-center py-16 sm:px-6 sm:py-20">
       <div className="mx-auto w-full text-center">
@@ -14,12 +18,12 @@ const CTA = () => {
             Join thousands of creators building beautiful forms today. No credit
             card required. Free forever.
           </p>
-          <Link to="/builder">
+          <Link to={startLink}>
             <Button
               size="lg"
               className="shadow-glow h-12 gap-2 rounded-full text-xs font-semibold sm:px-8 sm:text-base"
             >
-              Start Building Free
+              {isAuthenticated ? 'Go to Dashboard' : 'Start Building Free'}
               <ArrowRight className="h-5 w-5" />
             </Button>
           </Link>

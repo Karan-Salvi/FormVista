@@ -2,8 +2,13 @@ import AI from '@/svgs/AI'
 import Analytics from '@/svgs/Analytics'
 import DragArrow from '@/svgs/DragArrow'
 import Theme from '@/svgs/Theme'
+import { Link } from 'react-router-dom'
+import { authService } from '@/services/auth.service'
 
 const Hero = () => {
+  const isAuthenticated = authService.isAuthenticated()
+  const startLink = isAuthenticated ? '/dashboard' : '/signup'
+
   return (
     <>
       <section className="relative mx-auto w-full pt-16 pb-16 text-center sm:px-6 sm:pt-28">
@@ -31,21 +36,23 @@ const Hero = () => {
         </p>
 
         <div className="flex flex-col items-center gap-6">
-          <button className="flex cursor-pointer items-center gap-3 rounded-full bg-blue-600 px-6 py-2 text-lg font-bold text-white shadow-2xl shadow-blue-300 transition-transform hover:scale-105 sm:px-10 sm:py-4">
-            Build your first form
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M5 12h14m-7-7 7 7-7 7" />
-            </svg>
-          </button>
+          <Link to={startLink}>
+            <button className="flex cursor-pointer items-center gap-3 rounded-full bg-blue-600 px-6 py-2 text-lg font-bold text-white shadow-2xl shadow-blue-300 transition-transform hover:scale-105 sm:px-10 sm:py-4">
+              {isAuthenticated ? 'Go to Dashboard' : 'Build your first form'}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14m-7-7 7 7-7 7" />
+              </svg>
+            </button>
+          </Link>
 
           <div className="flex flex-col items-center gap-3">
             <p className="text-[13px] font-medium text-slate-500">

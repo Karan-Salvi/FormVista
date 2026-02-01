@@ -1,6 +1,6 @@
 const Features = () => {
   return (
-    <section className="mx-auto max-w-7xl py-16 sm:px-4 md:px-8">
+    <section id="features" className="mx-auto max-w-7xl py-16 sm:px-4 md:px-8">
       <div className="mx-auto mb-16 max-w-3xl text-center">
         <h2 className="mb-3 text-sm font-semibold tracking-wide text-blue-600 uppercase">
           Everything you need
