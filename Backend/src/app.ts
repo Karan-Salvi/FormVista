@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import { appConfig } from '@config/index.js';
@@ -20,13 +20,14 @@ export function createApp(): Application {
 
   app.use(requestTracker);
 
-  app.use((req, res, next) => {
+  app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.path.includes('/webhook/')) {
       next();
     } else {
       express.json()(req, res, next);
     }
   });
+
   app.use(express.urlencoded({ extended: true }));
 
   app.get('/', (_req: Request, res: Response) => {

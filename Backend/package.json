@@ -17,8 +17,7 @@
     "fix:eol": "prettier --write --end-of-line lf .",
     "validate": "npm run type-check && npm run lint && npm run format:check",
     "clean": "rm -rf dist",
-    "clean:build": "npm run clean && npm run build",
-    "prepare": "husky"
+    "clean:build": "npm run clean && npm run build"
   },
   "repository": {
     "type": "git",
@@ -69,7 +68,6 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.5.0",
-    "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "nodemon": "^3.0.2",
     "prettier": "^3.6.2",

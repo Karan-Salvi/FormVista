@@ -23,7 +23,7 @@ export class SubscriptionService {
     const plans = await PlanModel.find().sort({ price: 1 });
     return {
       success: true,
-      data: plans.map((plan) => this.mapPlan(plan)),
+      data: plans.map((plan: IPlan) => this.mapPlan(plan)),
     };
   }
 

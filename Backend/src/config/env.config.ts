@@ -43,7 +43,7 @@ function validateEnv() {
     if (error instanceof z.ZodError) {
       // eslint-disable-next-line no-console
       console.error('Environment validation failed:');
-      error.issues.forEach((err) => {
+      error.issues.forEach((err: any) => {
         // eslint-disable-next-line no-console
         console.error(`  - ${err.path.join('.')}: ${err.message}`);
       });

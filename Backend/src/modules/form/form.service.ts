@@ -62,7 +62,7 @@ export class FormService {
     }).sort({ createdAt: -1 });
     return {
       success: true,
-      data: forms.map((form) => this.mapForm(form)),
+      data: forms.map((form: IForm) => this.mapForm(form)),
     };
   }
 
@@ -124,14 +124,14 @@ export class FormService {
     if (blocks) {
       // Get existing blocks
       const existingBlocks = await BlockModel.find({ form_id: form._id });
-      const existingBlockIds = existingBlocks.map((b) => b._id.toString());
+      const existingBlockIds = existingBlocks.map((b: any) => b._id.toString());
       const incomingBlockIds = blocks
-        .filter((b) => b.id)
-        .map((b) => b.id as string);
+        .filter((b: any) => b.id)
+        .map((b: any) => b.id as string);
 
       // Delete blocks not in incoming
       const blocksToDelete = existingBlockIds.filter(
-        (id) => !incomingBlockIds.includes(id)
+        (id: string) => !incomingBlockIds.includes(id)
       );
       if (blocksToDelete.length > 0) {
         await BlockModel.deleteMany({ _id: { $in: blocksToDelete } });
@@ -321,14 +321,14 @@ export class FormService {
       .limit(limit);
 
     const responseData: FormSubmissionData[] = await Promise.all(
-      responses.map(async (res) => {
+      responses.map(async (res: any) => {
         const answers = await ResponseAnswerModel.find({
           response_id: res._id,
         });
         return {
           id: res._id.toString(),
           submittedAt: res.createdAt,
-          answers: answers.map((ans) => ({
+          answers: answers.map((ans: any) => ({
             block_id: ans.block_id.toString(),
             field_key: ans.field_key,
             value: ans.value,

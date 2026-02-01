@@ -4,7 +4,7 @@ import { env } from './env.config.js';
 const consoleFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.colorize(),
-  winston.format.printf(({ timestamp, level, message, ...meta }) => {
+  winston.format.printf(({ timestamp, level, message, ...meta }: any) => {
     let metaString = '';
     if (Object.keys(meta).length > 0) {
       metaString = `\n${JSON.stringify(meta, null, 2)}`;

@@ -124,12 +124,12 @@ async function gracefulShutdown(signal: string) {
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 
-process.on('uncaughtException', (error) => {
+process.on('uncaughtException', (error: any) => {
   logger.error('Uncaught Exception', error);
   gracefulShutdown('uncaughtException');
 });
 
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', (reason: any, promise: any) => {
   logger.error('Unhandled Rejection', reason as Error, {
     promise: String(promise),
   });

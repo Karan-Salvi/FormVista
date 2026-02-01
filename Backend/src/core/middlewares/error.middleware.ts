@@ -12,7 +12,7 @@ export const errorHandler = (
   _next: NextFunction
 ): void => {
   if (err instanceof ZodError) {
-    const errors = err.issues.map((error) => ({
+    const errors = err.issues.map((error: any) => ({
       field: error.path.join('.'),
       message: error.message,
     }));
