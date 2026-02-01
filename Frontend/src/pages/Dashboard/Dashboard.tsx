@@ -93,7 +93,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-gray-50 p-8">
+    <div className="relative min-h-screen p-8">
       <nav className="bg-background/80 border-border/50 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-xl">
         <div className="mx-auto flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-4">
@@ -200,7 +200,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </nav>
-      <div className="mx-auto mt-12 max-w-5xl">
+      <div className="mx-auto mt-12 max-w-7xl">
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Your Forms</h1>
@@ -279,6 +279,14 @@ export default function DashboardPage() {
                           }}
                         >
                           <Edit className="mr-2 h-4 w-4" /> Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={e => {
+                            e.stopPropagation()
+                            navigate(`/responses/${form.id}`)
+                          }}
+                        >
+                          <FileText className="mr-2 h-4 w-4" /> View Responses
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-red-600"

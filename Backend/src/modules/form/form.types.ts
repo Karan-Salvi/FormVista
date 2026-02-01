@@ -42,9 +42,21 @@ export interface SubmitResponseRequest {
 
 export interface FormResponseData extends Partial<IForm> {
   id: string;
+  blocks?: IBlock[];
 }
 
 export type FormResponse = ApiResponse<FormResponseData>;
 export type FormsResponse = ApiResponse<FormResponseData[]>;
 export type BlockResponse = ApiResponse<IBlock>;
 export type BlocksResponse = ApiResponse<IBlock[]>;
+export interface FormSubmissionData {
+  id: string;
+  submittedAt: Date;
+  answers: {
+    block_id: string;
+    field_key: string;
+    value: unknown;
+  }[];
+}
+
+export type FormResponsesResponse = ApiResponse<FormSubmissionData[]>;

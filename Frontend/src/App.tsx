@@ -12,6 +12,7 @@ import DashboardPage from './pages/Dashboard/Dashboard'
 import { ProtectedRoute } from './components/ProtectedRoute'
 
 import PublicForm from './pages/Form/PublicForm'
+import ResponsesPage from './pages/Form/Responses'
 
 const queryClient = new QueryClient()
 
@@ -39,6 +40,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/responses/:formId"
+            element={
+              <ProtectedRoute>
+                <ResponsesPage />
               </ProtectedRoute>
             }
           />

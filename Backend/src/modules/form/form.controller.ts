@@ -169,4 +169,19 @@ export class FormController {
       next(error);
     }
   }
+
+  static async getResponses(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const user = getUser(req);
+      const { formId } = req.params as { formId: string };
+      const result = await FormService.getResponses(formId, user.userId);
+      sendSuccess(res, result.data, undefined, req);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

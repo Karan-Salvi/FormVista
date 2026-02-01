@@ -84,4 +84,10 @@ export const formService = {
       data
     )
   },
+
+  getResponses: async (formId: string) => {
+    return apiClient.get<{ success: boolean; data: any[] }>(
+      `/forms/${formId}/responses`
+    )
+  },
 }

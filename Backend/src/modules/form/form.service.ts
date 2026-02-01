@@ -14,6 +14,7 @@ import {
   BlockResponse,
   BlocksResponse,
   FormResponseData,
+  FormResponsesResponse,
 } from './form.types.js';
 import { NotFoundError, ValidationError } from '@core/errors/index.js';
 import { Types } from 'mongoose';
@@ -76,9 +77,12 @@ export class FormService {
       { $inc: { total_views: 1 } }
     );
 
+    const blocks = await BlockModel.find({ form_id: form._id }).sort({
+      position: 1,
+    });
     return {
       success: true,
-      data: this.mapForm(form),
+      data: this.mapForm(form, blocks),
     };
   }
 
@@ -90,9 +94,12 @@ export class FormService {
     if (!form) {
       throw new NotFoundError('Form not found');
     }
+    const blocks = await BlockModel.find({ form_id: form._id }).sort({
+      position: 1,
+    });
     return {
       success: true,
-      data: this.mapForm(form),
+      data: this.mapForm(form, blocks),
     };
   }
 
@@ -293,7 +300,43 @@ export class FormService {
     };
   }
 
-  private static mapForm(form: IForm): FormResponseData {
+  static async getResponses(
+    formId: string,
+    userId: string
+  ): Promise<FormResponsesResponse> {
+    const form = await FormModel.findOne({ _id: formId, user_id: userId });
+    if (!form) {
+      throw new NotFoundError('Form not found');
+    }
+
+    const responses = await FormResponseModel.find({ form_id: formId }).sort({
+      createdAt: -1,
+    });
+
+    const responseData: FormSubmissionData[] = await Promise.all(
+      responses.map(async (res) => {
+        const answers = await ResponseAnswerModel.find({
+          response_id: res._id,
+        });
+        return {
+          id: res._id.toString(),
+          submittedAt: res.createdAt,
+          answers: answers.map((ans) => ({
+            block_id: ans.block_id.toString(),
+            field_key: ans.field_key,
+            value: ans.value,
+          })),
+        };
+      })
+    );
+
+    return {
+      success: true,
+      data: responseData,
+    };
+  }
+
+  private static mapForm(form: IForm, blocks?: IBlock[]): FormResponseData {
     return {
       id: form._id.toString(),
       title: form.title,
@@ -304,6 +347,7 @@ export class FormService {
       export_settings: form.export_settings,
       createdAt: form.createdAt,
       updatedAt: form.updatedAt,
+      blocks: blocks,
     };
   }
 }

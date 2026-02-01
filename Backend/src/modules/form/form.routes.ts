@@ -25,6 +25,7 @@ router.use(authenticate);
 router.post('/', validate(createFormSchema), FormController.createForm);
 router.get('/', FormController.getForms);
 router.get('/:id', FormController.getFormById);
+router.get('/:formId/responses', FormController.getResponses);
 router.patch('/:id', validate(updateFormSchema), FormController.updateForm);
 router.delete('/:id', FormController.deleteForm);
 
