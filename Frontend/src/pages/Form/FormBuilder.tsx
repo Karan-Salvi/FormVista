@@ -2,11 +2,8 @@ import React, { useEffect } from 'react'
 import { useFormStore } from '@/store/formStore'
 import { FormEditor } from '@/components/editor/FormEditor'
 import { FormPreview } from '@/components/editor/FormPreview'
-import {
-  ThemePanel,
-  colorThemes,
-  fontFamilies,
-} from '@/components/editor/ThemePanel'
+import { ThemePanel } from '@/components/editor/ThemePanel'
+import { colorThemes, fontFamilies } from '@/constants/theme'
 import { Button } from '@/components/ui/button'
 import {
   Eye,
