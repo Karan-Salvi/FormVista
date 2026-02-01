@@ -199,7 +199,7 @@ const PublicForm: React.FC = () => {
             ))}
           </div>
 
-          <div className="flex items-center justify-between gap-4 pt-4">
+          <div className="flex w-full flex-col items-center justify-between gap-4 pt-4 sm:flex-row">
             <Button
               type="submit"
               size="lg"
@@ -215,7 +215,7 @@ const PublicForm: React.FC = () => {
                 'Submit'
               )}
             </Button>
-            <span className="text-muted-foreground hidden text-sm sm:block">
+            <span className="text-muted-foreground text-sm">
               Powered by FormVista
             </span>
           </div>
