@@ -126,7 +126,7 @@ export default function DashboardPage() {
                   className="relative h-10 w-10 rounded-full"
                 >
                   <Avatar className="border-primary/10 hover:border-primary/30 h-10 w-10 border-2 transition-all">
-                    <AvatarImage src={`/images/profile.png`} alt={user?.name} />
+                    {/* <AvatarImage src={`/images/profile.png`} alt={user?.name} /> */}
                     <AvatarFallback className="bg-primary/5 text-primary">
                       {user?.name?.charAt(0).toUpperCase()}
                     </AvatarFallback>
