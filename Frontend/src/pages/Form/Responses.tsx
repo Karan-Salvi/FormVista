@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { formService } from '@/services/form.service'
+import { authService } from '@/services/auth.service'
 import {
   Table,
   TableBody,
@@ -16,10 +17,12 @@ import {
   Download,
   FileSpreadsheet,
   Filter,
-  MoreHorizontal,
   Mail,
   Calendar,
   Clock,
+  Sparkles,
+  LogOut,
+  Menu,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
@@ -29,8 +32,17 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { Card, CardContent } from '@/components/ui/card'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 
 interface Response {
   id: string
@@ -45,6 +57,7 @@ interface Response {
 export default function ResponsesPage() {
   const { formId } = useParams<{ formId: string }>()
   const navigate = useNavigate()
+  const user = authService.getCurrentUser()
   const [responses, setResponses] = useState<Response[]>([])
   const [form, setForm] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -176,63 +189,155 @@ export default function ResponsesPage() {
   return (
     <div className="min-h-screen bg-gray-50/50 pb-12">
       {/* Header */}
-      <div className="sticky top-0 z-10 border-b bg-white">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+      <nav className="bg-background/80 border-border/50 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-xl">
+        <div className="mx-auto flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full hover:bg-gray-100"
+              className="text-muted-foreground h-9 w-9"
               onClick={() => navigate('/dashboard')}
             >
               <ChevronLeft className="h-5 w-5" />
             </Button>
-            <div>
-              <h1 className="max-w-[300px] truncate text-lg font-semibold text-gray-900">
-                {form?.title}
-              </h1>
-              <div className="text-muted-foreground flex items-center gap-2 text-xs">
-                <Badge variant="secondary" className="font-normal">
-                  {responses.length} Responses
-                </Badge>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 transition-opacity hover:opacity-80"
+                >
+                  <Sparkles className="text-primary h-5 w-5" />
+                  <span className="text-foreground hidden text-lg font-semibold sm:block">
+                    FormVista
+                  </span>
+                </Link>
+                <div className="mx-2 hidden h-4 w-[1px] bg-gray-200 sm:block" />
+                <h1 className="max-w-[150px] truncate text-sm font-semibold text-gray-900 sm:max-w-[300px]">
+                  {form?.title}{' '}
+                  <Badge
+                    variant="secondary"
+                    className="h-4 py-0 text-[10px] font-normal"
+                  >
+                    {responses.length} Responses
+                  </Badge>
+                </h1>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="hidden gap-2 sm:flex"
-              onClick={exportToCSV}
-            >
-              <Download className="h-4 w-4" />
-              Export
-            </Button>
-            <Button size="sm" className="hidden gap-2 sm:flex">
-              <Filter className="h-4 w-4" />
-              Filter
-            </Button>
+            <div className="hidden items-center gap-2 sm:flex">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={exportToCSV}
+              >
+                <Download className="h-4 w-4" />
+                Export
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-muted-foreground h-9 w-9 p-0"
+              >
+                <Filter className="h-4 w-4" />
+              </Button>
+            </div>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="sm:hidden">
-                  <MoreHorizontal className="h-5 w-5" />
+                <Button
+                  variant="ghost"
+                  className="relative h-10 w-10 rounded-full"
+                >
+                  <Avatar className="border-primary/10 hover:border-primary/30 h-10 w-10 border-2 transition-all">
+                    <AvatarFallback className="bg-primary/5 text-primary">
+                      {user?.name?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={exportToCSV}>
-                  <Download className="mr-2 h-4 w-4" /> Export CSV
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <div className="flex flex-col space-y-1 p-2">
+                  <p className="text-sm leading-none font-medium">
+                    {user?.name}
+                  </p>
+                  <p className="text-muted-foreground text-xs leading-none">
+                    {user?.email}
+                  </p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={exportToCSV} className="sm:hidden">
+                  <Download className="mr-2 h-4 w-4" />
+                  Export CSV
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Filter className="mr-2 h-4 w-4" /> Filter
+                <DropdownMenuItem
+                  onClick={() => authService.logout()}
+                  className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Mobile Actions Drawer */}
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[300px]">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-2">
+                      <Sparkles className="text-primary h-6 w-6" />
+                      FormVista
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-8 flex flex-col gap-4">
+                    <div className="border-border/50 flex items-center gap-3 border-b px-2 py-4">
+                      <Avatar className="border-primary/10 h-10 w-10 border">
+                        <AvatarFallback className="bg-primary/5 text-primary">
+                          {user?.name?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold">
+                          {user?.name}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                          {user?.email}
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="justify-start"
+                      onClick={exportToCSV}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Export Responses
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="justify-start text-red-600 hover:bg-red-50 hover:text-red-600"
+                      onClick={() => authService.logout()}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
-      </div>
+      </nav>
 
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto mt-16 max-w-7xl px-6 py-8">
         {/* Stats Summary */}
         <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
           <Card className="border-none bg-blue-50/50 shadow-sm">
