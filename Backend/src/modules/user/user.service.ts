@@ -1,7 +1,7 @@
 import { PasswordUtil } from '@core/utils/password.util.js';
 import { logger } from '@core/utils/logger.util.js';
 import { JwtService } from './jwt.service.js';
-import UserModel from './user.model.js';
+import UserModel, { IUser } from './user.model.js';
 import type {
   LoginRequest,
   AuthResponse,
@@ -32,7 +32,7 @@ export class AuthService {
       });
 
       const tokenPayload: Omit<JwtPayload, 'iat' | 'exp'> = {
-        userId: user.id || (user as any)._id.toString(),
+        userId: user.id || user._id.toString(),
         email: user.email,
         plan: user.plan,
       };
@@ -85,7 +85,7 @@ export class AuthService {
       }
 
       const tokenPayload: Omit<JwtPayload, 'iat' | 'exp'> = {
-        userId: user.id || (user as any)._id.toString(),
+        userId: user.id || user._id.toString(),
         email: user.email,
         plan: user.plan,
       };
@@ -119,9 +119,9 @@ export class AuthService {
     return user ? this.mapUser(user) : null;
   }
 
-  private static mapUser(user: any): UserResponseData {
+  private static mapUser(user: IUser): UserResponseData {
     return {
-      id: user.id || user._id.toString(),
+      id: user._id.toString(),
       name: user.name,
       email: user.email,
       plan: user.plan,

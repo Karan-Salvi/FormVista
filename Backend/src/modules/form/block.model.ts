@@ -7,7 +7,7 @@ export interface IBlock extends Document {
   field_key: string;
   position: number;
   required: boolean;
-  config?: any;
+  config?: Record<string, unknown>;
   createdAt: Date;
   updatedAt: Date;
 }

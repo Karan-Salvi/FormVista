@@ -4,7 +4,7 @@ export interface IResponseAnswer extends Document {
   response_id: Types.ObjectId;
   block_id: Types.ObjectId;
   field_key: string;
-  value: any;
+  value: unknown;
   createdAt: Date;
   updatedAt: Date;
 }
