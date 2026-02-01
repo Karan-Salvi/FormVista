@@ -15,14 +15,7 @@ import { useState, useEffect } from 'react'
 import { formService } from '@/services/form.service'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
-import {
-  Plus,
-  Sparkles,
-  Type,
-  Link as LinkIcon,
-  Loader2,
-  FileText,
-} from 'lucide-react'
+import { Plus, Type, Link as LinkIcon, Loader2, FileText } from 'lucide-react'
 
 export function CreateFormDialog() {
   const [open, setOpen] = useState(false)
