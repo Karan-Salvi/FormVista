@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '@core/utils/logger.util.js';
 
-declare module 'express-serve-static-core' {
+declare module 'express' {
   interface Request {
     id?: string;
     requestId?: string;

@@ -52,13 +52,11 @@ export const validateMultiple = (schemas: {
       }
 
       if (schemas.query) {
-        // @ts-expect-error - Assigning validated data to query
-        req.query = await schemas.query.parseAsync(req.query);
+        req.query = (await schemas.query.parseAsync(req.query)) as any;
       }
 
       if (schemas.params) {
-        // @ts-expect-error - Assigning validated data to params
-        req.params = await schemas.params.parseAsync(req.params);
+        req.params = (await schemas.params.parseAsync(req.params)) as any;
       }
 
       next();
