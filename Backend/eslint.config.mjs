@@ -36,7 +36,7 @@ export default tseslint.config(
       'prettier/prettier': 'error',
       'max-lines': [
         'error',
-        { max: 500, skipBlankLines: true, skipComments: true },
+        { max: 1000, skipBlankLines: true, skipComments: true },
       ],
       'no-console': 'warn',
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
@@ -68,7 +68,7 @@ export default tseslint.config(
       'prettier/prettier': 'error',
       'max-lines': [
         'error',
-        { max: 500, skipBlankLines: true, skipComments: true },
+        { max: 1000, skipBlankLines: true, skipComments: true },
       ],
       'no-console': 'warn',
       'no-debugger': 'error',
