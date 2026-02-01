@@ -1,4 +1,6 @@
-const BASE_URL = 'http://localhost:5000/api'
+const apiUrl = import.meta.env.VITE_API_URL
+
+const BASE_URL = `${apiUrl}/api`
 
 interface RequestOptions extends RequestInit {
   data?: any
