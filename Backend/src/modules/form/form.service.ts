@@ -107,7 +107,7 @@ export class FormService {
       // Try to get from cache
       const cached = await redisClient.get(cacheKey);
       if (cached) {
-        logger.debug(`Cache hit for user forms: ${userId}`);
+        logger.info(`Cache hit for user forms: ${userId}`);
         return JSON.parse(cached);
       }
     } catch (error) {
@@ -149,7 +149,7 @@ export class FormService {
       // Try to get from cache
       const cached = await redisClient.get(cacheKey);
       if (cached) {
-        logger.debug(`Cache hit for form slug: ${slug}`);
+        logger.info(`Cache hit for form slug: ${slug}`);
         // Still increment views even for cached responses
         const cachedData = JSON.parse(cached);
         await FormAnalyticsModel.updateOne(
@@ -166,6 +166,7 @@ export class FormService {
 
     // Cache miss - fetch from database
     const form = await FormModel.findOne({ slug });
+
     if (!form) {
       throw new NotFoundError('Form not found');
     }
@@ -211,13 +212,16 @@ export class FormService {
       // Try to get from cache
       const cached = await redisClient.get(cacheKey);
       if (cached) {
-        logger.debug(`Cache hit for form ID: ${formId}`);
+        logger.info(`Cache hit for form ID: ${formId}`);
         const cachedData = JSON.parse(cached);
         // Verify ownership (security check even for cached data)
-        if (cachedData.data.user_id !== userId) {
-          throw new NotFoundError('Form not found');
+        // If user_id is missing (legacy cache), treat as miss to refresh
+        if (cachedData.data.user_id) {
+          if (cachedData.data.user_id !== userId) {
+            throw new NotFoundError('Form not found');
+          }
+          return cachedData;
         }
-        return cachedData;
       }
     } catch (error) {
       if (error instanceof NotFoundError) {
@@ -399,7 +403,7 @@ export class FormService {
       // Try to get from cache
       const cached = await redisClient.get(cacheKey);
       if (cached) {
-        logger.debug(`Cache hit for form blocks: ${formId}`);
+        logger.info(`Cache hit for form blocks: ${formId}`);
         return JSON.parse(cached);
       }
     } catch (error) {
@@ -538,7 +542,7 @@ export class FormService {
       // Try to get from cache
       const cached = await redisClient.get(cacheKey);
       if (cached) {
-        logger.debug(`Cache hit for form responses: ${formId}`);
+        logger.info(`Cache hit for form responses: ${formId}`);
         return JSON.parse(cached);
       }
     } catch (error) {
@@ -616,6 +620,7 @@ export class FormService {
       createdAt: form.createdAt,
       updatedAt: form.updatedAt,
       blocks: blocks,
+      user_id: form.user_id ? form.user_id.toString() : undefined,
     };
   }
 }

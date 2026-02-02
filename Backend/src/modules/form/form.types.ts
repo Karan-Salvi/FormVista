@@ -43,8 +43,9 @@ export interface SubmitResponseRequest {
   completion_time_ms?: number;
 }
 
-export interface FormResponseData extends Partial<IForm> {
+export interface FormResponseData extends Omit<Partial<IForm>, 'user_id'> {
   id: string;
+  user_id?: string;
   blocks?: IBlock[];
 }
 
