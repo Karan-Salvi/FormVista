@@ -4,3 +4,4 @@ export { PasswordUtil } from './password.util.js';
 export * from './response.types.js';
 export * from './response.util.js';
 export * from './response.helpers.js';
+export { getOrSetCache } from './redis.util.js';

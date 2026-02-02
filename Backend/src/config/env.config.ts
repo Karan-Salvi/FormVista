@@ -32,7 +32,7 @@ const envSchema = z.object({
   STRIPE_SUCCESS_URL: z.string().url(),
   STRIPE_CANCEL_URL: z.string().url(),
 
-  // Parent auth (OTP) - optional; when missing, OTP send is skipped (e.g. dev)
+  REDIS_URL: z.string().optional(),
 });
 
 function validateEnv() {
