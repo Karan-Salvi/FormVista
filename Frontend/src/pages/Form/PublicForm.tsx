@@ -105,6 +105,30 @@ const PublicForm: React.FC = () => {
     loadForm()
   }, [slug])
 
+  // Load responses from local storage
+  useEffect(() => {
+    if (slug) {
+      const saved = localStorage.getItem(`form-draft-${slug}`)
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          // Convert date strings back to Date objects if needed
+          // Some blocks might store dates as strings in JSON
+          setResponses(parsed)
+        } catch (e) {
+          console.error('Failed to parse saved responses', e)
+        }
+      }
+    }
+  }, [slug])
+
+  // Save responses to local storage
+  useEffect(() => {
+    if (slug && !submitted && Object.keys(responses).length > 0) {
+      localStorage.setItem(`form-draft-${slug}`, JSON.stringify(responses))
+    }
+  }, [responses, slug, submitted])
+
   const handleResponseChange = (blockId: string, value: unknown) => {
     setResponses(prev => ({ ...prev, [blockId]: value }))
     if (errors[blockId]) {
@@ -215,6 +239,7 @@ const PublicForm: React.FC = () => {
       }
 
       await formService.submitResponse(slug, submissionData)
+      localStorage.removeItem(`form-draft-${slug}`)
       setSubmitted(true)
       toast.success('Response submitted successfully!')
     } catch (error) {

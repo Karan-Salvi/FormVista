@@ -30,6 +30,12 @@ export const DateBlock: React.FC<DateBlockProps> = ({
   onChange,
   error,
 }) => {
+  const dateValue =
+    value instanceof Date
+      ? value
+      : typeof value === 'string'
+        ? new Date(value)
+        : undefined
   const { updateBlock } = useFormStore()
   const { label, required } = block.config
   const labelRef = useRef<HTMLSpanElement>(null)
@@ -85,18 +91,18 @@ export const DateBlock: React.FC<DateBlockProps> = ({
             disabled={!isPreview}
             className={cn(
               'bg-background w-full justify-start text-left font-normal',
-              !value && 'text-muted-foreground',
+              !dateValue && 'text-muted-foreground',
               error && 'border-destructive focus:ring-destructive/20'
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {value ? format(value, 'PPP') : 'Pick a date'}
+            {dateValue ? format(dateValue, 'PPP') : 'Pick a date'}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
-            selected={value}
+            selected={dateValue}
             onSelect={onChange}
             initialFocus
           />
