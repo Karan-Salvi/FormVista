@@ -13,12 +13,15 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Plus, X } from 'lucide-react'
 
+import { cn } from '@/lib/utils'
+
 interface DropdownBlockProps {
   block: Block
   isSelected: boolean
   isPreview?: boolean
   value?: string
   onChange?: (value: string) => void
+  error?: string
 }
 
 export const DropdownBlock: React.FC<DropdownBlockProps> = ({
@@ -27,6 +30,7 @@ export const DropdownBlock: React.FC<DropdownBlockProps> = ({
   isPreview,
   value,
   onChange,
+  error,
 }) => {
   const { updateBlock } = useFormStore()
   const { label, options = [], required } = block.config
@@ -76,10 +80,17 @@ export const DropdownBlock: React.FC<DropdownBlockProps> = ({
       <div className="space-y-2">
         <Label className="text-foreground text-sm font-medium">
           {label}
-          {required && <span className="text-destructive ml-0.5">*</span>}
+          {(required || isPreview) && (
+            <span className="text-destructive ml-0.5">*</span>
+          )}
         </Label>
         <Select value={value} onValueChange={onChange}>
-          <SelectTrigger className="bg-background">
+          <SelectTrigger
+            className={cn(
+              'bg-background',
+              error && 'border-destructive focus:ring-destructive/20'
+            )}
+          >
             <SelectValue placeholder="Select an option" />
           </SelectTrigger>
           <SelectContent>

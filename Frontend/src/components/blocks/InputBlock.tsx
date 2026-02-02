@@ -4,6 +4,7 @@ import { useFormStore } from '@/store/formStore'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 
 interface InputBlockProps {
   block: Block
@@ -11,6 +12,7 @@ interface InputBlockProps {
   isPreview?: boolean
   value?: string
   onChange?: (value: string) => void
+  error?: string
 }
 
 export const InputBlock: React.FC<InputBlockProps> = ({
@@ -19,6 +21,7 @@ export const InputBlock: React.FC<InputBlockProps> = ({
   isPreview,
   value,
   onChange,
+  error,
 }) => {
   const { updateBlock } = useFormStore()
   const { label, placeholder, helpText, required } = block.config
@@ -75,7 +78,9 @@ export const InputBlock: React.FC<InputBlockProps> = ({
         {isPreview ? (
           <span className="text-foreground text-sm font-medium">
             {label}
-            {required && <span className="text-destructive ml-0.5">*</span>}
+            {(required || isPreview) && (
+              <span className="text-destructive ml-0.5">*</span>
+            )}
           </span>
         ) : (
           <span
@@ -94,7 +99,11 @@ export const InputBlock: React.FC<InputBlockProps> = ({
             placeholder={placeholder}
             value={value}
             onChange={e => onChange?.(e.target.value)}
-            className="bg-background border-input focus:border-primary focus:ring-primary/20 min-h-[100px] resize-y transition-all focus:ring-1"
+            className={cn(
+              'bg-background border-input focus:border-primary focus:ring-primary/20 min-h-[100px] resize-y transition-all focus:ring-1',
+              error &&
+                'border-destructive focus:border-destructive focus:ring-destructive/20'
+            )}
           />
         ) : (
           <div className="bg-background border-input relative min-h-[100px] rounded-md border p-3">
@@ -113,7 +122,11 @@ export const InputBlock: React.FC<InputBlockProps> = ({
           placeholder={placeholder}
           value={value}
           onChange={e => onChange?.(e.target.value)}
-          className="bg-background border-input focus:border-primary focus:ring-primary/20 transition-all focus:ring-1"
+          className={cn(
+            'bg-background border-input focus:border-primary focus:ring-primary/20 transition-all focus:ring-1',
+            error &&
+              'border-destructive focus:border-destructive focus:ring-destructive/20'
+          )}
         />
       ) : (
         <div className="bg-background border-input relative flex h-10 items-center rounded-md border px-3 py-2">

@@ -8,12 +8,15 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Plus, X } from 'lucide-react'
 
+import { cn } from '@/lib/utils'
+
 interface ChoiceBlockProps {
   block: Block
   isSelected: boolean
   isPreview?: boolean
   value?: string | string[]
   onChange?: (value: string | string[]) => void
+  error?: string
 }
 
 export const ChoiceBlock: React.FC<ChoiceBlockProps> = ({
@@ -22,6 +25,7 @@ export const ChoiceBlock: React.FC<ChoiceBlockProps> = ({
   isPreview,
   value,
   onChange,
+  error,
 }) => {
   const { updateBlock } = useFormStore()
   const { label, options = [], required } = block.config
@@ -80,11 +84,18 @@ export const ChoiceBlock: React.FC<ChoiceBlockProps> = ({
       <div className="space-y-3">
         <Label className="text-foreground text-sm font-medium">
           {label}
-          {required && <span className="text-destructive ml-0.5">*</span>}
+          {(required || isPreview) && (
+            <span className="text-destructive ml-0.5">*</span>
+          )}
         </Label>
 
         {isMultiple ? (
-          <div className="space-y-2.5">
+          <div
+            className={cn(
+              'space-y-2.5 rounded-lg transition-colors',
+              error && 'bg-destructive/5 ring-destructive/20 -mx-2 p-2 ring-1'
+            )}
+          >
             {options.map((option, index) => (
               <div key={index} className="flex items-center gap-3">
                 <Checkbox
@@ -93,6 +104,7 @@ export const ChoiceBlock: React.FC<ChoiceBlockProps> = ({
                   onCheckedChange={checked =>
                     handleCheckboxChange(option, checked as boolean)
                   }
+                  className={cn(error && 'border-destructive')}
                 />
                 <label
                   htmlFor={`${block.id}-${index}`}
@@ -107,11 +119,19 @@ export const ChoiceBlock: React.FC<ChoiceBlockProps> = ({
           <RadioGroup
             value={value as string}
             onValueChange={onChange as (value: string) => void}
+            className={cn(
+              'rounded-lg transition-colors',
+              error && 'bg-destructive/5 ring-destructive/20 -mx-2 p-2 ring-1'
+            )}
           >
             <div className="space-y-2.5">
               {options.map((option, index) => (
                 <div key={index} className="flex items-center gap-3">
-                  <RadioGroupItem value={option} id={`${block.id}-${index}`} />
+                  <RadioGroupItem
+                    value={option}
+                    id={`${block.id}-${index}`}
+                    className={cn(error && 'border-destructive')}
+                  />
                   <label
                     htmlFor={`${block.id}-${index}`}
                     className="text-foreground cursor-pointer text-sm"

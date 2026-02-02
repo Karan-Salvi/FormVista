@@ -16,6 +16,7 @@ const PublicForm: React.FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [responses, setResponses] = useState<Record<string, unknown>>({})
+  const [errors, setErrors] = useState<Record<string, string>>({})
   const [startTime] = useState(Date.now())
 
   useEffect(() => {
@@ -106,11 +107,98 @@ const PublicForm: React.FC = () => {
 
   const handleResponseChange = (blockId: string, value: unknown) => {
     setResponses(prev => ({ ...prev, [blockId]: value }))
+    if (errors[blockId]) {
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[blockId]
+        return newErrors
+      })
+    }
+  }
+
+  const validate = (): { isValid: boolean; errors: Record<string, string> } => {
+    const newErrors: Record<string, string> = {}
+    const inputBlockTypes = [
+      'short-text',
+      'long-text',
+      'email',
+      'number',
+      'dropdown',
+      'multiple-choice',
+      'checkbox',
+      'date',
+      'phone',
+    ]
+
+    form?.blocks.forEach(block => {
+      if (!inputBlockTypes.includes(block.type)) return
+
+      const value = responses[block.id]
+      const label = block.config.label || 'This field'
+
+      // Required check
+      const isEmpty =
+        value === undefined ||
+        value === null ||
+        (typeof value === 'string' && value.trim() === '') ||
+        (Array.isArray(value) && value.length === 0)
+
+      if (isEmpty) {
+        newErrors[block.id] = `${label} is required`
+      } else if (
+        block.type === 'email' &&
+        typeof value === 'string' &&
+        value.trim() !== ''
+      ) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(value)) {
+          newErrors[block.id] = 'Please enter a valid email address'
+        }
+      } else if (
+        block.type === 'phone' &&
+        typeof value === 'string' &&
+        value.trim() !== ''
+      ) {
+        const phoneRegex = /^\+?[\d\s-]{10,}$/
+        if (!phoneRegex.test(value)) {
+          newErrors[block.id] = 'Please enter a valid phone number'
+        }
+      } else if (
+        block.type === 'number' &&
+        value !== undefined &&
+        value !== null &&
+        value !== ''
+      ) {
+        if (isNaN(Number(value))) {
+          newErrors[block.id] = 'Please enter a valid number'
+        }
+      }
+    })
+
+    setErrors(newErrors)
+    return { isValid: Object.keys(newErrors).length === 0, errors: newErrors }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form || !slug) return
+
+    const { isValid, errors: validationErrors } = validate()
+    if (!isValid) {
+      toast.error('Please fix the errors before submitting')
+      // Scroll to first error
+      const firstErrorId = Object.keys(validationErrors)[0]
+      if (firstErrorId) {
+        const element = document.getElementById(`block-${firstErrorId}`)
+        if (element) {
+          element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          })
+        }
+      }
+      return
+    }
 
     setSubmitting(true)
     try {
@@ -200,13 +288,14 @@ const PublicForm: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-6">
             {sortedBlocks.map(block => (
-              <div key={block.id}>
+              <div key={block.id} id={`block-${block.id}`}>
                 <BlockRenderer
                   block={block}
                   isSelected={false}
                   isPreview={true}
                   value={responses[block.id]}
                   onChange={value => handleResponseChange(block.id, value)}
+                  error={errors[block.id]}
                 />
               </div>
             ))}

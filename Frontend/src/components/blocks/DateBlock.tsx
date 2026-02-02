@@ -19,6 +19,7 @@ interface DateBlockProps {
   isPreview?: boolean
   value?: Date
   onChange?: (value: Date | undefined) => void
+  error?: string
 }
 
 export const DateBlock: React.FC<DateBlockProps> = ({
@@ -27,6 +28,7 @@ export const DateBlock: React.FC<DateBlockProps> = ({
   isPreview,
   value,
   onChange,
+  error,
 }) => {
   const { updateBlock } = useFormStore()
   const { label, required } = block.config
@@ -61,7 +63,9 @@ export const DateBlock: React.FC<DateBlockProps> = ({
         {isPreview ? (
           <span className="text-foreground text-sm font-medium">
             {label}
-            {required && <span className="text-destructive ml-0.5">*</span>}
+            {(required || isPreview) && (
+              <span className="text-destructive ml-0.5">*</span>
+            )}
           </span>
         ) : (
           <span
@@ -81,7 +85,8 @@ export const DateBlock: React.FC<DateBlockProps> = ({
             disabled={!isPreview}
             className={cn(
               'bg-background w-full justify-start text-left font-normal',
-              !value && 'text-muted-foreground'
+              !value && 'text-muted-foreground',
+              error && 'border-destructive focus:ring-destructive/20'
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
