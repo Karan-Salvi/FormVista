@@ -20,8 +20,49 @@ import {
 import { NotFoundError, ValidationError } from '@core/errors/index.js';
 import { Types } from 'mongoose';
 import { ApiResponse } from '../../shared/interfaces/response.interface.js';
+import redisClient from '@config/redis.config.js';
+
+// Cache key generators
+const CACHE_KEYS = {
+  formBySlug: (slug: string) => `form:slug:${slug}`,
+  formById: (formId: string) => `form:id:${formId}`,
+  userForms: (userId: string) => `forms:user:${userId}`,
+  formBlocks: (formId: string) => `blocks:form:${formId}`,
+  formResponses: (formId: string, page: number, limit: number) =>
+    `responses:form:${formId}:page:${page}:limit:${limit}`,
+};
+
+// Cache TTL in seconds
+const CACHE_TTL = {
+  form: 3600, // 1 hour for form data
+  blocks: 3600, // 1 hour for blocks
+  userForms: 300, // 5 minutes for user's forms list
+  responses: 60, // 1 minute for responses (frequently updated)
+};
 
 export class FormService {
+  // Cache invalidation helpers
+  private static async invalidateFormCache(formId: string, slug?: string) {
+    const keys = [CACHE_KEYS.formById(formId)];
+    if (slug) {
+      keys.push(CACHE_KEYS.formBySlug(slug));
+    }
+    keys.push(CACHE_KEYS.formBlocks(formId));
+    await Promise.all(keys.map((key) => redisClient.del(key)));
+  }
+
+  private static async invalidateUserFormsCache(userId: string) {
+    await redisClient.del(CACHE_KEYS.userForms(userId));
+  }
+
+  private static async invalidateResponsesCache(formId: string) {
+    // Delete all response cache keys for this form (pattern matching)
+    const pattern = `responses:form:${formId}:*`;
+    const keys = await redisClient.keys(pattern);
+    if (keys.length > 0) {
+      await redisClient.del(...keys);
+    }
+  }
   static async createForm(
     userId: string,
     data: CreateFormRequest
@@ -45,6 +86,9 @@ export class FormService {
       // Initialize analytics
       await FormAnalyticsModel.create({ form_id: form._id });
 
+      // Invalidate user's forms cache
+      await this.invalidateUserFormsCache(userId);
+
       return {
         success: true,
         message: 'Form created successfully',
@@ -57,16 +101,70 @@ export class FormService {
   }
 
   static async getForms(userId: string): Promise<FormsResponse> {
+    const cacheKey = CACHE_KEYS.userForms(userId);
+
+    try {
+      // Try to get from cache
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        logger.debug(`Cache hit for user forms: ${userId}`);
+        return JSON.parse(cached);
+      }
+    } catch (error) {
+      logger.warn('Redis get error, falling back to database', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    // Cache miss - fetch from database
     const forms = await FormModel.find({
       user_id: new Types.ObjectId(userId),
     }).sort({ createdAt: -1 });
-    return {
+
+    const response = {
       success: true,
       data: forms.map((form) => this.mapForm(form)),
     };
+
+    // Store in cache
+    try {
+      await redisClient.setex(
+        cacheKey,
+        CACHE_TTL.userForms,
+        JSON.stringify(response)
+      );
+    } catch (error) {
+      logger.warn('Redis set error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    return response;
   }
 
   static async getFormBySlug(slug: string): Promise<FormResponse> {
+    const cacheKey = CACHE_KEYS.formBySlug(slug);
+
+    try {
+      // Try to get from cache
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        logger.debug(`Cache hit for form slug: ${slug}`);
+        // Still increment views even for cached responses
+        const cachedData = JSON.parse(cached);
+        await FormAnalyticsModel.updateOne(
+          { form_id: new Types.ObjectId(cachedData.data.id) },
+          { $inc: { total_views: 1 } }
+        );
+        return cachedData;
+      }
+    } catch (error) {
+      logger.warn('Redis get error, falling back to database', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    // Cache miss - fetch from database
     const form = await FormModel.findOne({ slug });
     if (!form) {
       throw new NotFoundError('Form not found');
@@ -81,27 +179,84 @@ export class FormService {
     const blocks = await BlockModel.find({ form_id: form._id }).sort({
       position: 1,
     });
-    return {
+
+    const response = {
       success: true,
       data: this.mapForm(form, blocks),
     };
+
+    // Store in cache
+    try {
+      await redisClient.setex(
+        cacheKey,
+        CACHE_TTL.form,
+        JSON.stringify(response)
+      );
+    } catch (error) {
+      logger.warn('Redis set error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    return response;
   }
 
   static async getFormById(
     formId: string,
     userId: string
   ): Promise<FormResponse> {
+    const cacheKey = CACHE_KEYS.formById(formId);
+
+    try {
+      // Try to get from cache
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        logger.debug(`Cache hit for form ID: ${formId}`);
+        const cachedData = JSON.parse(cached);
+        // Verify ownership (security check even for cached data)
+        if (cachedData.data.user_id !== userId) {
+          throw new NotFoundError('Form not found');
+        }
+        return cachedData;
+      }
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      logger.warn('Redis get error, falling back to database', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    // Cache miss - fetch from database
     const form = await FormModel.findOne({ _id: formId, user_id: userId });
     if (!form) {
       throw new NotFoundError('Form not found');
     }
+
     const blocks = await BlockModel.find({ form_id: form._id }).sort({
       position: 1,
     });
-    return {
+
+    const response = {
       success: true,
       data: this.mapForm(form, blocks),
     };
+
+    // Store in cache
+    try {
+      await redisClient.setex(
+        cacheKey,
+        CACHE_TTL.form,
+        JSON.stringify(response)
+      );
+    } catch (error) {
+      logger.warn('Redis set error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    return response;
   }
 
   static async updateForm(
@@ -168,6 +323,12 @@ export class FormService {
       }
     }
 
+    // Invalidate all related caches
+    await Promise.all([
+      this.invalidateFormCache(formId, form.slug),
+      this.invalidateUserFormsCache(userId),
+    ]);
+
     return {
       success: true,
       message: 'Form updated successfully',
@@ -192,6 +353,13 @@ export class FormService {
     await FormResponseModel.deleteMany({ form_id: formId });
     await FormAnalyticsModel.deleteOne({ form_id: formId });
 
+    // Invalidate all related caches
+    await Promise.all([
+      this.invalidateFormCache(formId, form.slug),
+      this.invalidateUserFormsCache(userId),
+      this.invalidateResponsesCache(formId),
+    ]);
+
     return {
       success: true,
       message: 'Form deleted successfully',
@@ -214,6 +382,9 @@ export class FormService {
       form_id: new Types.ObjectId(formId),
     });
 
+    // Invalidate form caches since blocks changed
+    await this.invalidateFormCache(formId, form.slug);
+
     return {
       success: true,
       message: 'Block added successfully',
@@ -222,13 +393,45 @@ export class FormService {
   }
 
   static async getBlocks(formId: string): Promise<BlocksResponse> {
+    const cacheKey = CACHE_KEYS.formBlocks(formId);
+
+    try {
+      // Try to get from cache
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        logger.debug(`Cache hit for form blocks: ${formId}`);
+        return JSON.parse(cached);
+      }
+    } catch (error) {
+      logger.warn('Redis get error, falling back to database', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    // Cache miss - fetch from database
     const blocks = await BlockModel.find({ form_id: formId }).sort({
       position: 1,
     });
-    return {
+
+    const response = {
       success: true,
       data: blocks,
     };
+
+    // Store in cache
+    try {
+      await redisClient.setex(
+        cacheKey,
+        CACHE_TTL.blocks,
+        JSON.stringify(response)
+      );
+    } catch (error) {
+      logger.warn('Redis set error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    return response;
   }
 
   static async updateBlock(
@@ -243,6 +446,13 @@ export class FormService {
     if (!block) {
       throw new NotFoundError('Block not found');
     }
+
+    // Invalidate form caches
+    const form = await FormModel.findById(block.form_id);
+    if (form) {
+      await this.invalidateFormCache(form._id.toString(), form.slug);
+    }
+
     return {
       success: true,
       data: block,
@@ -254,6 +464,13 @@ export class FormService {
     if (!block) {
       throw new NotFoundError('Block not found');
     }
+
+    // Invalidate form caches
+    const form = await FormModel.findById(block.form_id);
+    if (form) {
+      await this.invalidateFormCache(form._id.toString(), form.slug);
+    }
+
     return {
       success: true,
       message: 'Block deleted successfully',
@@ -295,6 +512,9 @@ export class FormService {
       }
     );
 
+    // Invalidate responses cache for this form
+    await this.invalidateResponsesCache(form._id.toString());
+
     return {
       success: true,
       message: 'Response submitted successfully',
@@ -312,6 +532,22 @@ export class FormService {
       throw new NotFoundError('Form not found');
     }
 
+    const cacheKey = CACHE_KEYS.formResponses(formId, page, limit);
+
+    try {
+      // Try to get from cache
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        logger.debug(`Cache hit for form responses: ${formId}`);
+        return JSON.parse(cached);
+      }
+    } catch (error) {
+      logger.warn('Redis get error, falling back to database', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    // Cache miss - fetch from database
     const total = await FormResponseModel.countDocuments({ form_id: formId });
     const totalPages = Math.ceil(total / limit);
 
@@ -337,7 +573,7 @@ export class FormService {
       })
     );
 
-    return {
+    const response = {
       success: true,
       data: {
         items: responseData,
@@ -351,6 +587,21 @@ export class FormService {
         },
       },
     };
+
+    // Store in cache with short TTL
+    try {
+      await redisClient.setex(
+        cacheKey,
+        CACHE_TTL.responses,
+        JSON.stringify(response)
+      );
+    } catch (error) {
+      logger.warn('Redis set error', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    return response;
   }
 
   private static mapForm(form: IForm, blocks?: IBlock[]): FormResponseData {
