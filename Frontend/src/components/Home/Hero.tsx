@@ -11,7 +11,7 @@ const Hero = () => {
 
   return (
     <>
-      <section className="relative mx-auto w-full pt-16 pb-16 text-center sm:px-6 sm:pt-28">
+      <section className="relative mx-auto w-full pt-24 pb-16 text-center sm:px-6 sm:pt-28">
         <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-1.5">
           <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[6px] font-extrabold text-nowrap text-white uppercase sm:text-[10px]">
             New Feature{' '}
