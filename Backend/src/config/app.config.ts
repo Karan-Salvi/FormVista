@@ -33,6 +33,14 @@ export const appConfig = {
     prefix: '/api',
     version: 'v1',
   },
+  rateLimit: {
+    windowMs: env.RATE_LIMIT_WINDOW_MS,
+    max: env.RATE_LIMIT_MAX_REQUESTS,
+    message:
+      'Too many requests from this IP, please try again after 15 minutes',
+    standardHeaders: true,
+    legacyHeaders: false,
+  },
 } as const;
 
 export type AppConfig = typeof appConfig;

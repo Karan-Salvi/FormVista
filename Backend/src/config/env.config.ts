@@ -33,6 +33,16 @@ const envSchema = z.object({
   STRIPE_CANCEL_URL: z.string().url(),
 
   REDIS_URL: z.string().optional(),
+  RATE_LIMIT_WINDOW_MS: z
+    .string()
+    .default('900000')
+    .transform(Number)
+    .pipe(z.number().positive()),
+  RATE_LIMIT_MAX_REQUESTS: z
+    .string()
+    .default('100')
+    .transform(Number)
+    .pipe(z.number().positive()),
 });
 
 function validateEnv() {

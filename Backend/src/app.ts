@@ -1,24 +1,29 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import helmet from 'helmet';
 import { appConfig } from '@config/index.js';
 import {
   requestTracker,
   errorHandler,
   notFoundHandler,
+  rateLimiter,
 } from '@core/middlewares/index.js';
 import routes from './routes/index.js';
 
 export function createApp(): Application {
   const app: Application = express();
+  app.set('trust proxy', 1);
 
   app.use(cors(appConfig.cors));
+  app.use(helmet());
 
   if (appConfig.server.isDevelopment) {
     app.use(morgan('dev'));
   }
 
   app.use(requestTracker);
+  app.use(rateLimiter);
 
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.path.includes('/webhook/')) {
