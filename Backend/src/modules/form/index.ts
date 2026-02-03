@@ -3,3 +3,8 @@ export { FormService } from './form.service.js';
 export { FormController } from './form.controller.js';
 export * from './form.types.js';
 export * from './form.validators.js';
+export * from './form.model.js';
+export * from './block.model.js';
+export * from './response.model.js';
+export * from './answer.model.js';
+export * from './analytics.model.js';

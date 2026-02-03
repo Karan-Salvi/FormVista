@@ -33,7 +33,13 @@ const BlockSchema = new Schema<IBlock>(
 );
 
 // Indexes
+// 1. Unique constraint: each field_key must be unique within a form
 BlockSchema.index({ form_id: 1, field_key: 1 }, { unique: true });
-BlockSchema.index({ form_id: 1 });
+
+// 2. Fetch all blocks for a form (already covered by compound unique index above)
+// BlockSchema.index({ form_id: 1 }); // REMOVED - redundant with compound index
+
+// 3. Fetch blocks sorted by position for form rendering
+BlockSchema.index({ form_id: 1, position: 1 });
 
 export default model<IBlock>('Block', BlockSchema);

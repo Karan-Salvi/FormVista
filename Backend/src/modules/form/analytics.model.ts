@@ -9,16 +9,17 @@ export interface IFormAnalytics extends Document {
   updatedAt: Date;
 }
 
-const AnalyticsSchema = new Schema<IFormAnalytics>(
-  {
-    form_id: { type: Schema.Types.ObjectId, ref: 'Form', unique: true },
+const AnalyticsSchema = new Schema<IFormAnalytics>({
+  form_id: { type: Schema.Types.ObjectId, ref: 'Form', unique: true },
 
-    total_views: { type: Number, default: 0 },
-    total_submissions: { type: Number, default: 0 },
+  total_views: { type: Number, default: 0 },
+  total_submissions: { type: Number, default: 0 },
 
-    avg_completion_time_ms: Number,
-  },
-  { timestamps: true }
-);
+  avg_completion_time_ms: Number,
+});
+
+// Indexes
+// 1. form_id is already unique at schema level (1:1 relationship)
+// This is optimal for analytics lookups - no additional indexes needed
 
 export default model<IFormAnalytics>('FormAnalytics', AnalyticsSchema);

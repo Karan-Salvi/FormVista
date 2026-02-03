@@ -59,6 +59,18 @@ export default function DashboardPage() {
   const navigate = useNavigate()
   const user = authService.getCurrentUser()
 
+  // Helper function to safely format dates
+  const formatDate = (dateString: string | undefined, formatStr: string) => {
+    if (!dateString) return 'N/A'
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return 'N/A'
+      return format(date, formatStr)
+    } catch {
+      return 'N/A'
+    }
+  }
+
   useEffect(() => {
     if (!authService.isAuthenticated()) {
       navigate('/login')
@@ -278,7 +290,7 @@ export default function DashboardPage() {
                           {form.status}
                         </span>
                         <span className="text-xs text-gray-400">
-                          {format(new Date(form.createdAt), 'MMM d')}
+                          {formatDate(form.createdAt, 'MMM d')}
                         </span>
                       </div>
                       <CardTitle className="line-clamp-1 text-lg font-semibold text-gray-900">
@@ -327,8 +339,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-1.5">
                       <Calendar className="h-3 w-3" />
                       <span>
-                        Updated{' '}
-                        {format(new Date(form.updatedAt), 'MMM d, yyyy')}
+                        Updated {formatDate(form.updatedAt, 'MMM d, yyyy')}
                       </span>
                     </div>
                     <div className="flex items-center gap-1 font-mono">

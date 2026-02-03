@@ -82,6 +82,18 @@ export default function ResponsesPage() {
   const { formId } = useParams<{ formId: string }>()
   const navigate = useNavigate()
   const user = authService.getCurrentUser()
+
+  // Helper function to safely format dates
+  const formatDate = (dateString: string | undefined, formatStr: string) => {
+    if (!dateString) return 'N/A'
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return 'N/A'
+      return format(date, formatStr)
+    } catch {
+      return 'N/A'
+    }
+  }
   const [responses, setResponses] = useState<Response[]>([])
   const [form, setForm] = useState<FormResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -232,7 +244,7 @@ export default function ResponsesPage() {
       }
 
       const rows = dataToExport.map(res => [
-        escapeVal(format(new Date(res.submittedAt), 'yyyy-MM-dd HH:mm:ss')),
+        escapeVal(formatDate(res.submittedAt, 'yyyy-MM-dd HH:mm:ss')),
         ...inputBlocks.map((b: InputBlock) =>
           escapeVal(getAnswerValue(res, b.id, b.field_key))
         ),
@@ -527,7 +539,7 @@ export default function ResponsesPage() {
                   </p>
                   <p className="text-2xl font-bold text-purple-900">
                     {responses.length > 0
-                      ? format(new Date(responses[0].submittedAt), 'MMM d')
+                      ? formatDate(responses[0].submittedAt, 'MMM d')
                       : 'N/A'}
                   </p>
                 </div>
@@ -592,10 +604,7 @@ export default function ResponsesPage() {
                         className="group transition-colors hover:bg-gray-50"
                       >
                         <TableCell className="text-muted-foreground text-sm">
-                          {format(
-                            new Date(res.submittedAt),
-                            'MMM d, yyyy HH:mm'
-                          )}
+                          {formatDate(res.submittedAt, 'MMM d, yyyy HH:mm')}
                         </TableCell>
                         {inputBlocks.map((block: InputBlock) => (
                           <TableCell

@@ -14,7 +14,7 @@ export interface IUser extends Document {
 const UserSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true },
     password_hash: { type: String, required: true },
 
     plan: {
@@ -31,6 +31,22 @@ const UserSchema = new Schema<IUser>(
 );
 
 // Indexes
+// 1. Email is already unique at schema level, but add case-insensitive collation
+UserSchema.index(
+  { email: 1 },
+  { unique: true, collation: { locale: 'en', strength: 2 } }
+);
+
+// 2. Stripe customer lookups (webhook processing, subscription queries)
 UserSchema.index({ stripe_customer_id: 1 });
+
+// 3. Filter users by plan (admin dashboards, analytics)
+UserSchema.index({ plan: 1 });
+
+// 4. Compound index for pagination/sorting users by plan and signup date
+UserSchema.index({ plan: 1, createdAt: -1 });
+
+// 5. Email verification status (for sending reminder emails)
+UserSchema.index({ is_email_verified: 1, createdAt: -1 });
 
 export default model<IUser>('User', UserSchema);

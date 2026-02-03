@@ -35,6 +35,22 @@ const SubscriptionSchema = new Schema<ISubscription>(
 );
 
 // Indexes
-SubscriptionSchema.index({ stripe_subscription_id: 1 });
+// 1. Stripe subscription lookups (webhook processing)
+SubscriptionSchema.index({ stripe_subscription_id: 1 }, { unique: true });
+
+// 2. Fetch user's subscription (most common query)
+SubscriptionSchema.index({ user_id: 1 });
+
+// 3. Stripe customer lookups
+SubscriptionSchema.index({ stripe_customer_id: 1 });
+
+// 4. Filter subscriptions by status (active, canceled, etc.)
+SubscriptionSchema.index({ status: 1 });
+
+// 5. Compound index for user's active subscription
+SubscriptionSchema.index({ user_id: 1, status: 1 });
+
+// 6. Find subscriptions expiring soon (renewal reminders, cleanup jobs)
+SubscriptionSchema.index({ current_period_end: 1, status: 1 });
 
 export default model<ISubscription>('Subscription', SubscriptionSchema);

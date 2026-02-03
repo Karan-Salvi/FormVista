@@ -34,6 +34,13 @@ const ResponseAnswerSchema = new Schema<IResponseAnswer>(
 );
 
 // Indexes
+// 1. Fetch all answers for a response (most common query)
 ResponseAnswerSchema.index({ response_id: 1 });
+
+// 2. Compound index for response + block lookup
+ResponseAnswerSchema.index({ response_id: 1, block_id: 1 });
+
+// 3. Analytics: fetch all answers for a specific block/field
+ResponseAnswerSchema.index({ block_id: 1 });
 
 export default model<IResponseAnswer>('ResponseAnswer', ResponseAnswerSchema);
