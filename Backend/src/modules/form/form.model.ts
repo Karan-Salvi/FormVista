@@ -16,31 +16,34 @@ export interface IForm extends Document {
   updatedAt: Date;
 }
 
-const FormSchema = new Schema<IForm>({
-  user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+const FormSchema = new Schema<IForm>(
+  {
+    user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 
-  title: { type: String, required: true },
-  description: String,
+    title: { type: String, required: true },
+    description: String,
 
-  slug: { type: String, required: true, unique: true },
+    slug: { type: String, required: true, unique: true },
 
-  status: {
-    type: String,
-    enum: ['draft', 'published', 'archived'],
-    default: 'draft',
+    status: {
+      type: String,
+      enum: ['draft', 'published', 'archived'],
+      default: 'draft',
+    },
+
+    theme_config: {
+      type: Schema.Types.Mixed,
+      default: {},
+    },
+
+    export_settings: {
+      fileName: String,
+      includeMetadata: { type: Boolean, default: true },
+      dateFormat: { type: String, default: 'DD-MM-YYYY' },
+    },
   },
-
-  theme_config: {
-    type: Schema.Types.Mixed,
-    default: {},
-  },
-
-  export_settings: {
-    fileName: String,
-    includeMetadata: { type: Boolean, default: true },
-    dateFormat: { type: String, default: 'DD-MM-YYYY' },
-  },
-});
+  { timestamps: true }
+);
 
 // Indexes
 // 1. Slug is already unique at schema level for public form access

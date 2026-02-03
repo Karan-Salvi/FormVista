@@ -10,15 +10,18 @@ export interface IFormResponse extends Document {
   updatedAt: Date;
 }
 
-const FormResponseSchema = new Schema<IFormResponse>({
-  form_id: { type: Schema.Types.ObjectId, ref: 'Form', required: true },
+const FormResponseSchema = new Schema<IFormResponse>(
+  {
+    form_id: { type: Schema.Types.ObjectId, ref: 'Form', required: true },
 
-  submitted_at: { type: Date, default: Date.now },
-  completion_time_ms: Number,
+    submitted_at: { type: Date, default: Date.now },
+    completion_time_ms: Number,
 
-  ip_address: String,
-  user_agent: String,
-});
+    ip_address: String,
+    user_agent: String,
+  },
+  { timestamps: true }
+);
 
 // Indexes
 // 1. Fetch all responses for a form (most common query)
