@@ -120,6 +120,24 @@ export const formService = {
     )
   },
 
+  bulkDeleteResponses: async (formId: string, responseIds: string[]) => {
+    return apiClient.post<{ success: boolean }>(
+      `/forms/${formId}/responses/bulk-delete`,
+      { responseIds }
+    )
+  },
+
+  bulkUpdateResponses: async (
+    formId: string,
+    responseIds: string[],
+    data: { tags?: string[] }
+  ) => {
+    return apiClient.patch<{ success: boolean }>(
+      `/forms/${formId}/responses/bulk-update`,
+      { responseIds, data }
+    )
+  },
+
   getDashboardStats: async () => {
     return apiClient.get<{ success: boolean; data: any }>(
       '/forms/stats/dashboard'

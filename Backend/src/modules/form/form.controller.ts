@@ -213,6 +213,43 @@ export class FormController {
     }
   }
 
+  static async bulkDeleteResponses(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const user = getUser(req);
+      const { formId } = req.params as { formId: string };
+      const { responseIds } = req.body;
+      await FormService.bulkDeleteResponses(formId, user.userId, responseIds);
+      sendSuccess(res, null, 'Responses deleted successfully', req);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async bulkUpdateResponses(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const user = getUser(req);
+      const { formId } = req.params as { formId: string };
+      const { responseIds, data } = req.body;
+      await FormService.bulkUpdateResponses(
+        formId,
+        user.userId,
+        responseIds,
+        data
+      );
+      sendSuccess(res, null, 'Responses updated successfully', req);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getDashboardStats(
     req: Request,
     res: Response,

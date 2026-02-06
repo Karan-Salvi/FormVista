@@ -705,6 +705,61 @@ export class FormService {
     return { success: true };
   }
 
+  static async bulkDeleteResponses(
+    formId: string,
+    userId: string,
+    responseIds: string[]
+  ): Promise<ApiResponse<void>> {
+    const form = await FormModel.findOne({ _id: formId, user_id: userId });
+    if (!form) {
+      throw new Error('Form not found or unauthorized');
+    }
+
+    await FormResponseModel.deleteMany({
+      _id: { $in: responseIds },
+      form_id: formId,
+    });
+
+    // Also delete answers
+    await ResponseAnswerModel.deleteMany({
+      response_id: { $in: responseIds },
+    });
+
+    // Invalidate responses cache
+    await this.invalidateResponsesCache(formId);
+
+    // Update stats - Re-aggregation is safer
+    const count = await FormResponseModel.countDocuments({ form_id: formId });
+    await FormAnalyticsModel.updateOne(
+      { form_id: formId },
+      { total_submissions: count }
+    );
+
+    return { success: true };
+  }
+
+  static async bulkUpdateResponses(
+    formId: string,
+    userId: string,
+    responseIds: string[],
+    data: { tags?: string[] }
+  ): Promise<ApiResponse<void>> {
+    const form = await FormModel.findOne({ _id: formId, user_id: userId });
+    if (!form) {
+      throw new Error('Form not found or unauthorized');
+    }
+
+    if (data.tags) {
+      await FormResponseModel.updateMany(
+        { _id: { $in: responseIds }, form_id: formId },
+        { $addToSet: { tags: { $each: data.tags } } }
+      );
+    }
+
+    await this.invalidateResponsesCache(formId);
+    return { success: true };
+  }
+
   static async getDashboardStats(userId: string): Promise<ApiResponse<any>> {
     const today = new Date().setHours(0, 0, 0, 0);
     const sevenDaysAgo = new Date(today - 7 * 24 * 60 * 60 * 1000);
