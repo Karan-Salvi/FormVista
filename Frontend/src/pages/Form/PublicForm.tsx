@@ -5,7 +5,7 @@ import { type Form, type Block } from '@/types/form'
 import { BlockRenderer } from '@/components/blocks/BlockRenderer'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
-import { Loader2, CheckCircle2 } from 'lucide-react'
+import { Loader2, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react'
 import { colorThemes, fontFamilies } from '@/constants/theme'
 import { hexToHsl } from '@/lib/utils'
 
@@ -291,6 +291,10 @@ const PublicForm: React.FC = () => {
           >
             Submit another response
           </Button>
+          <div className="flex items-center justify-center gap-2 pt-4 text-xs opacity-50 grayscale">
+            <Sparkles className="h-3 w-3" />
+            <span>Powered by FormVista</span>
+          </div>
         </div>
       </div>
     )
@@ -326,25 +330,36 @@ const PublicForm: React.FC = () => {
             ))}
           </div>
 
-          <div className="flex w-full flex-col items-center justify-between gap-4 pt-4 sm:flex-row">
-            <Button
-              type="submit"
-              size="lg"
-              disabled={submitting}
-              className="w-full px-12 text-lg font-semibold sm:w-auto"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                'Submit'
-              )}
-            </Button>
-            <span className="text-muted-foreground text-sm">
-              Powered by FormVista
-            </span>
+          <div className="flex flex-col items-center gap-6 pt-8">
+            <div className="flex w-full flex-col items-center justify-between gap-6 sm:flex-row">
+              <Button
+                type="submit"
+                size="lg"
+                disabled={submitting}
+                className="w-full px-12 text-lg font-semibold sm:w-auto"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  'Submit'
+                )}
+              </Button>
+
+              <div className="text-muted-foreground bg-muted/30 border-border/50 flex items-center gap-2 rounded-full border px-4 py-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                <span className="text-xs font-medium">
+                  We respect your privacy. Your data is secure.
+                </span>
+              </div>
+            </div>
+
+            <div className="text-muted-foreground/60 hover:text-muted-foreground flex cursor-default items-center gap-2 transition-colors">
+              <Sparkles className="h-4 w-4" />
+              <span className="text-sm font-medium">Powered by FormVista</span>
+            </div>
           </div>
         </form>
       </div>

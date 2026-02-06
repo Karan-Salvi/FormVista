@@ -2,6 +2,7 @@ import React from 'react'
 import { useFormStore } from '@/store/formStore'
 import { BlockRenderer } from '@/components/blocks/BlockRenderer'
 import { Button } from '@/components/ui/button'
+import { ShieldCheck, Sparkles } from 'lucide-react'
 
 export const FormPreview: React.FC = () => {
   const { form } = useFormStore()
@@ -58,11 +59,29 @@ export const FormPreview: React.FC = () => {
             ))}
           </div>
 
-          {/* Submit Button */}
-          <div className="mt-10">
-            <Button type="submit" size="lg" className="w-full px-8 sm:w-auto">
-              Submit
-            </Button>
+          {/* Submit Button & Trust Signals */}
+          <div className="flex flex-col items-center gap-6 pt-10">
+            <div className="flex w-full flex-col items-center justify-between gap-6 sm:flex-row">
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full px-12 text-lg font-semibold sm:w-auto"
+              >
+                Submit
+              </Button>
+
+              <div className="text-muted-foreground bg-muted/30 border-border/50 flex items-center gap-2 rounded-full border px-4 py-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                <span className="text-xs font-medium">
+                  We respect your privacy. Your data is secure.
+                </span>
+              </div>
+            </div>
+
+            <div className="text-muted-foreground/60 flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              <span className="text-sm font-medium">Powered by FormVista</span>
+            </div>
           </div>
         </form>
       </div>
