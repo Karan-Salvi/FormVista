@@ -11,6 +11,10 @@ export interface FormResponse {
   createdAt: string
   updatedAt: string
   blocks?: Block[]
+  analytics?: {
+    total_views: number
+    total_submissions: number
+  }
 }
 
 export const formService = {
@@ -104,5 +108,17 @@ export const formService = {
         }
       }
     }>(`/forms/${formId}/responses?page=${page}&limit=${limit}`)
+  },
+
+  getDashboardStats: async () => {
+    return apiClient.get<{ success: boolean; data: any }>(
+      '/forms/stats/dashboard'
+    )
+  },
+
+  getFormStats: async (formId: string) => {
+    return apiClient.get<{ success: boolean; data: any }>(
+      `/forms/${formId}/stats`
+    )
   },
 }

@@ -193,4 +193,33 @@ export class FormController {
       next(error);
     }
   }
+
+  static async getDashboardStats(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const user = getUser(req);
+      const result = await FormService.getDashboardStats(user.userId);
+      sendSuccess(res, result.data, undefined, req);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getFormStats(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const user = getUser(req);
+      const { formId } = req.params as { formId: string };
+      const result = await FormService.getFormStats(formId, user.userId);
+      sendSuccess(res, result.data, undefined, req);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

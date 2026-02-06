@@ -20,6 +20,7 @@ import {
   Menu,
   LogOut,
   ChevronLeft,
+  Eye,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { format } from 'date-fns'
@@ -31,6 +32,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { toast } from 'sonner'
+import { motion } from 'motion/react'
 import { colorThemes } from '@/constants/theme'
 import { hexToHsl } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -53,9 +55,11 @@ import {
 } from '@/components/ui/sheet'
 
 import { TemplateGallery } from '@/components/TemplateGallery'
+import { StatsOverview } from '@/components/StatsOverview'
 
 export default function DashboardPage() {
   const [forms, setForms] = useState<FormResponse[]>([])
+  const [stats, setStats] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [formToDelete, setFormToDelete] = useState<string | null>(null)
   const navigate = useNavigate()
@@ -84,11 +88,15 @@ export default function DashboardPage() {
   const fetchForms = async () => {
     try {
       setIsLoading(true)
-      const response = await formService.getAll()
-      setForms(response.data || [])
+      const [formsResponse, statsResponse] = await Promise.all([
+        formService.getAll(),
+        formService.getDashboardStats(),
+      ])
+      setForms(formsResponse.data || [])
+      setStats(statsResponse.data)
     } catch (error) {
       console.error(error)
-      toast.error('Failed to fetch forms')
+      toast.error('Failed to fetch dashboard data')
     } finally {
       setIsLoading(false)
     }
@@ -227,7 +235,7 @@ export default function DashboardPage() {
         </div>
       </nav>
       <div className="mx-auto mt-16 max-w-7xl md:mt-20">
-        <TemplateGallery />
+        {stats && <StatsOverview stats={stats} />}
 
         <div className="mb-8 flex flex-row items-center justify-between gap-4">
           <div>
@@ -303,9 +311,47 @@ export default function DashboardPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="pb-4">
-                    <p className="line-clamp-2 min-h-[2.5rem] text-sm text-gray-500">
+                    <p className="mb-4 line-clamp-2 min-h-[2.5rem] text-sm text-gray-500">
                       {form.description || 'No description provided.'}
                     </p>
+
+                    {/* Insightful Stats Row */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1.5 text-gray-500">
+                          <Eye className="h-3.5 w-3.5" />
+                          <span>{form.analytics?.total_views || 0} views</span>
+                        </div>
+                        <div className="font-medium text-gray-900">
+                          {form.analytics?.total_submissions || 0} submissions
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
+                          <span>Conversion Rate</span>
+                          <span>
+                            {form.analytics?.total_views
+                              ? (
+                                  (form.analytics.total_submissions /
+                                    form.analytics.total_views) *
+                                  100
+                                ).toFixed(1)
+                              : 0}
+                            %
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{
+                              width: `${form.analytics?.total_views ? Math.min((form.analytics.total_submissions / form.analytics.total_views) * 100, 100) : 0}%`,
+                            }}
+                            className="bg-primary h-full rounded-full"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </CardContent>
                   <div className="grid grid-cols-3 divide-x divide-gray-100 border-t bg-gray-50/30">
                     <button
@@ -356,6 +402,10 @@ export default function DashboardPage() {
             })}
           </div>
         )}
+
+        <div className="mt-16 border-t pt-12">
+          <TemplateGallery />
+        </div>
       </div>
 
       <AlertDialog

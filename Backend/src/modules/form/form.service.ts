@@ -4,6 +4,7 @@ import BlockModel, { IBlock } from './block.model.js';
 import FormResponseModel from './response.model.js';
 import ResponseAnswerModel from './answer.model.js';
 import FormAnalyticsModel from './analytics.model.js';
+import DailyStatsModel from './daily_stats.model.js';
 import {
   CreateFormRequest,
   UpdateFormRequest,
@@ -116,14 +117,41 @@ export class FormService {
       });
     }
 
-    // Cache miss - fetch from database
-    const forms = await FormModel.find({
-      user_id: new Types.ObjectId(userId),
-    }).sort({ createdAt: -1 });
+    // Cache miss - fetch from database with analytics
+    const formsWithAnalytics = await FormModel.aggregate([
+      {
+        $match: {
+          user_id: new Types.ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'formanalytics',
+          localField: '_id',
+          foreignField: 'form_id',
+          as: 'analytics',
+        },
+      },
+      {
+        $unwind: {
+          path: '$analytics',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+    ]);
 
     const response = {
       success: true,
-      data: forms.map((form) => this.mapForm(form)),
+      data: formsWithAnalytics.map((form) => ({
+        ...this.mapForm(form),
+        analytics: {
+          total_views: form.analytics?.total_views || 0,
+          total_submissions: form.analytics?.total_submissions || 0,
+        },
+      })),
     };
 
     // Store in cache
@@ -152,10 +180,26 @@ export class FormService {
         logger.info(`Cache hit for form slug: ${slug}`);
         // Still increment views even for cached responses
         const cachedData = JSON.parse(cached);
-        await FormAnalyticsModel.updateOne(
-          { form_id: new Types.ObjectId(cachedData.data.id) },
-          { $inc: { total_views: 1 } }
-        );
+        const formId = new Types.ObjectId(cachedData.data.id);
+        const userId = new Types.ObjectId(cachedData.data.user_id);
+
+        await Promise.all([
+          FormAnalyticsModel.updateOne(
+            { form_id: formId },
+            { $inc: { total_views: 1 } }
+          ),
+          DailyStatsModel.updateOne(
+            {
+              form_id: formId,
+              date: new Date().setHours(0, 0, 0, 0),
+            },
+            {
+              $inc: { views: 1 },
+              $setOnInsert: { user_id: userId },
+            },
+            { upsert: true }
+          ),
+        ]);
         return cachedData;
       }
     } catch (error) {
@@ -172,10 +216,21 @@ export class FormService {
     }
 
     // Increment views
-    await FormAnalyticsModel.updateOne(
-      { form_id: form._id },
-      { $inc: { total_views: 1 } }
-    );
+    const today = new Date().setHours(0, 0, 0, 0);
+    await Promise.all([
+      FormAnalyticsModel.updateOne(
+        { form_id: form._id },
+        { $inc: { total_views: 1 } }
+      ),
+      DailyStatsModel.updateOne(
+        { form_id: form._id, date: today },
+        {
+          $inc: { views: 1 },
+          $setOnInsert: { user_id: form.user_id },
+        },
+        { upsert: true }
+      ),
+    ]);
 
     const blocks = await BlockModel.find({ form_id: form._id }).sort({
       position: 1,
@@ -509,12 +564,21 @@ export class FormService {
     await ResponseAnswerModel.insertMany(answers);
 
     // Update analytics
-    await FormAnalyticsModel.updateOne(
-      { form_id: form._id },
-      {
-        $inc: { total_submissions: 1 },
-      }
-    );
+    const today = new Date().setHours(0, 0, 0, 0);
+    await Promise.all([
+      FormAnalyticsModel.updateOne(
+        { form_id: form._id },
+        { $inc: { total_submissions: 1 } }
+      ),
+      DailyStatsModel.updateOne(
+        { form_id: form._id, date: today },
+        {
+          $inc: { submissions: 1 },
+          $setOnInsert: { user_id: form.user_id },
+        },
+        { upsert: true }
+      ),
+    ]);
 
     // Invalidate responses cache for this form
     await this.invalidateResponsesCache(form._id.toString());
@@ -606,6 +670,159 @@ export class FormService {
     }
 
     return response;
+  }
+
+  static async getDashboardStats(userId: string): Promise<ApiResponse<any>> {
+    const today = new Date().setHours(0, 0, 0, 0);
+    const sevenDaysAgo = new Date(today - 7 * 24 * 60 * 60 * 1000);
+    const fourteenDaysAgo = new Date(today - 14 * 24 * 60 * 60 * 1000);
+
+    const userForms = await FormModel.find({
+      user_id: new Types.ObjectId(userId),
+    });
+    const userFormIds = userForms.map((f) => f._id);
+
+    // Get stats for last 7 days
+    const currentPeriodStats = await DailyStatsModel.find({
+      form_id: { $in: userFormIds },
+      date: { $gte: sevenDaysAgo },
+    });
+
+    // Get stats for previous 7 days (for trends)
+    const previousPeriodStats = await DailyStatsModel.find({
+      form_id: { $in: userFormIds },
+      date: { $gte: fourteenDaysAgo, $lt: sevenDaysAgo },
+    });
+
+    const currentSubmissions = currentPeriodStats.reduce(
+      (acc, curr) => acc + curr.submissions,
+      0
+    );
+    const previousSubmissions = previousPeriodStats.reduce(
+      (acc, curr) => acc + curr.submissions,
+      0
+    );
+
+    const currentViews = currentPeriodStats.reduce(
+      (acc, curr) => acc + curr.views,
+      0
+    );
+    const previousViews = previousPeriodStats.reduce(
+      (acc, curr) => acc + curr.views,
+      0
+    );
+
+    // Get total across all time
+    const totalStats = await FormAnalyticsModel.aggregate([
+      {
+        $match: {
+          form_id: { $in: userFormIds },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalSubmissions: { $sum: '$total_submissions' },
+          totalViews: { $sum: '$total_views' },
+        },
+      },
+    ]);
+
+    const totals = totalStats[0] || { totalSubmissions: 0, totalViews: 0 };
+
+    return {
+      success: true,
+      data: {
+        submissions: {
+          total: totals.totalSubmissions,
+          thisWeek: currentSubmissions,
+          trend: currentSubmissions - previousSubmissions,
+        },
+        views: {
+          total: totals.totalViews,
+          thisWeek: currentViews,
+          trend: currentViews - previousViews,
+        },
+        conversion: {
+          rate:
+            totals.totalViews > 0
+              ? (totals.totalSubmissions / totals.totalViews) * 100
+              : 0,
+          previousRate:
+            previousViews > 0 ? (previousSubmissions / previousViews) * 100 : 0,
+        },
+      },
+    };
+  }
+
+  static async getFormStats(
+    formId: string,
+    userId: string
+  ): Promise<ApiResponse<any>> {
+    const form = await FormModel.findOne({ _id: formId, user_id: userId });
+    if (!form) {
+      throw new NotFoundError('Form not found');
+    }
+
+    const analytics = await FormAnalyticsModel.findOne({ form_id: formId });
+    const today = new Date().setHours(0, 0, 0, 0);
+    const sevenDaysAgo = new Date(today - 7 * 24 * 60 * 60 * 1000);
+    const fourteenDaysAgo = new Date(today - 14 * 24 * 60 * 60 * 1000);
+
+    const currentPeriodStats = await DailyStatsModel.find({
+      form_id: formId,
+      date: { $gte: sevenDaysAgo },
+    });
+
+    const previousPeriodStats = await DailyStatsModel.find({
+      form_id: formId,
+      date: { $gte: fourteenDaysAgo, $lt: sevenDaysAgo },
+    });
+
+    const currentSubmissions = currentPeriodStats.reduce(
+      (acc, curr) => acc + curr.submissions,
+      0
+    );
+    const previousSubmissions = previousPeriodStats.reduce(
+      (acc, curr) => acc + curr.submissions,
+      0
+    );
+
+    const currentViews = currentPeriodStats.reduce(
+      (acc, curr) => acc + curr.views,
+      0
+    );
+    const previousViews = previousPeriodStats.reduce(
+      (acc, curr) => acc + curr.views,
+      0
+    );
+
+    return {
+      success: true,
+      data: {
+        submissions: {
+          total: analytics?.total_submissions || 0,
+          thisWeek: currentSubmissions,
+          trend: currentSubmissions - previousSubmissions,
+        },
+        views: {
+          total: analytics?.total_views || 0,
+          thisWeek: currentViews,
+          trend: currentViews - previousViews,
+        },
+        conversion: {
+          rate:
+            (analytics?.total_views || 0) > 0
+              ? ((analytics?.total_submissions || 0) /
+                  (analytics?.total_views || 1)) *
+                100
+              : 0,
+          trend:
+            (currentViews > 0 ? currentSubmissions / currentViews : 0) -
+            (previousViews > 0 ? previousSubmissions / previousViews : 0),
+        },
+      },
+    };
   }
 
   private static mapForm(form: IForm, blocks?: IBlock[]): FormResponseData {
