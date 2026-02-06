@@ -54,6 +54,14 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { Info } from 'lucide-react'
+
 import { TemplateGallery } from '@/components/TemplateGallery'
 import { StatsOverview } from '@/components/StatsOverview'
 
@@ -329,7 +337,22 @@ export default function DashboardPage() {
 
                       <div className="space-y-1">
                         <div className="flex items-center justify-between text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
-                          <span>Conversion Rate</span>
+                          <div className="flex items-center gap-1">
+                            <span>Conversion Rate</span>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-2.5 w-2.5 cursor-help opacity-50" />
+                                </TooltipTrigger>
+                                <TooltipContent className="border-none bg-gray-900 p-2 text-[10px] text-white">
+                                  <p>
+                                    The percentage of views that resulted in a
+                                    submission.
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
                           <span>
                             {form.analytics?.total_views
                               ? (

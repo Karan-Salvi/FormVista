@@ -5,8 +5,15 @@ import {
   Users,
   FileText,
   MousePointerClick,
+  Info,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface StatCardProps {
   title: string
@@ -15,6 +22,7 @@ interface StatCardProps {
   icon: React.ReactNode
   description?: string
   trendPrefix?: string
+  tooltip?: string
 }
 
 function StatCard({
@@ -24,6 +32,7 @@ function StatCard({
   icon,
   description,
   trendPrefix = '',
+  tooltip,
 }: StatCardProps) {
   const isPositive = trend && trend > 0
   const isNegative = trend && trend < 0
@@ -55,11 +64,26 @@ function StatCard({
                 {trend}
                 {trendPrefix}
               </span>
+              <span className="font-normal opacity-60">vs last week</span>
             </div>
           )}
         </div>
         <div className="mt-4">
-          <h3 className="text-sm font-medium text-gray-500">{title}</h3>
+          <div className="flex items-center gap-1.5 text-gray-500">
+            <h3 className="text-sm font-medium">{title}</h3>
+            {tooltip && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-3.5 w-3.5 cursor-help opacity-50 transition-opacity hover:opacity-100" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-[200px] border-none bg-gray-900 text-[11px] text-white">
+                    <p>{tooltip}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
           <p className="mt-1 text-2xl font-bold text-gray-900">{value}</p>
           {description && (
             <p className="mt-1 text-xs text-gray-400">{description}</p>
@@ -106,6 +130,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
           trendPrefix=" this week"
           icon={<FileText className="h-5 w-5" />}
           description="Total responses across all forms"
+          tooltip="The total number of unique form submissions you have received to date."
         />
       </motion.div>
       <motion.div
@@ -120,6 +145,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
           trendPrefix=" this week"
           icon={<Users className="h-5 w-5" />}
           description="Total unique form openings"
+          tooltip="Total number of times your forms have been viewed by unique visitors."
         />
       </motion.div>
       <motion.div
@@ -134,6 +160,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
           trendPrefix="%"
           icon={<MousePointerClick className="h-5 w-5" />}
           description="Views to submissions conversion"
+          tooltip="The percentage of visitors who successfully submitted a form after viewing it."
         />
       </motion.div>
     </div>
