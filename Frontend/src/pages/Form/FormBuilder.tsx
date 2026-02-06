@@ -89,11 +89,17 @@ import { useSearchParams } from 'react-router-dom'
 import { formService } from '@/services/form.service'
 import { toast } from 'sonner'
 import type { Block } from '@/types/form'
+import { PublishSuccessModal } from '@/components/PublishSuccessModal'
+import { useState } from 'react'
 
 const FormBuilderPage: React.FC = () => {
   const { form, setForm, isPreviewMode, togglePreviewMode } = useFormStore()
   const [searchParams] = useSearchParams()
   const formId = searchParams.get('formId')
+
+  // Publish success modal state
+  const [showPublishSuccess, setShowPublishSuccess] = useState(false)
+  const [publishedFormUrl, setPublishedFormUrl] = useState('')
 
   useEffect(() => {
     const loadForm = async () => {
@@ -341,16 +347,8 @@ const FormBuilderPage: React.FC = () => {
                     })
 
                     const formUrl = `${window.location.origin}/f/${res.data.slug}`
-                    toast.success('Form published successfully!', {
-                      description: 'Anyone with the link can now fill it out.',
-                      action: {
-                        label: 'Copy Link',
-                        onClick: () => {
-                          navigator.clipboard.writeText(formUrl)
-                          toast.success('Link copied to clipboard!')
-                        },
-                      },
-                    })
+                    setPublishedFormUrl(formUrl)
+                    setShowPublishSuccess(true)
                   }
                 } catch (e) {
                   console.error(e)
@@ -371,6 +369,14 @@ const FormBuilderPage: React.FC = () => {
       <main className="min-h-[calc(100vh-3.5rem)]">
         {isPreviewMode ? <FormPreview /> : <FormEditor />}
       </main>
+
+      {/* Publish Success Modal */}
+      <PublishSuccessModal
+        isOpen={showPublishSuccess}
+        onClose={() => setShowPublishSuccess(false)}
+        formUrl={publishedFormUrl}
+        formTitle={form?.title || 'Your Form'}
+      />
     </div>
   )
 }
