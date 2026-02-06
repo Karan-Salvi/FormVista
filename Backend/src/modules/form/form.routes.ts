@@ -28,6 +28,7 @@ router.get('/stats/dashboard', FormController.getDashboardStats);
 router.get('/:id', FormController.getFormById);
 router.get('/:formId/stats', FormController.getFormStats);
 router.get('/:formId/responses', FormController.getResponses);
+router.patch('/responses/:responseId', FormController.updateResponse);
 router.patch('/:id', validate(updateFormSchema), FormController.updateForm);
 router.delete('/:id', FormController.deleteForm);
 

@@ -61,6 +61,9 @@ export interface FormSubmissionData {
     field_key: string;
     value: unknown;
   }[];
+  notes?: string;
+  tags?: string[];
+  completionTimeMs?: number;
 }
 
 export type FormResponsesResponse = ApiResponse<

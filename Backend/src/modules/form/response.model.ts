@@ -6,6 +6,8 @@ export interface IFormResponse extends Document {
   completion_time_ms?: number;
   ip_address?: string;
   user_agent?: string;
+  notes?: string;
+  tags?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -19,6 +21,8 @@ const FormResponseSchema = new Schema<IFormResponse>(
 
     ip_address: String,
     user_agent: String,
+    notes: { type: String, default: '' },
+    tags: { type: [String], default: [] },
   },
   { timestamps: true }
 );

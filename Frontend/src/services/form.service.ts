@@ -110,6 +110,16 @@ export const formService = {
     }>(`/forms/${formId}/responses?page=${page}&limit=${limit}`)
   },
 
+  updateResponse: async (
+    responseId: string,
+    data: { notes?: string; tags?: string[] }
+  ) => {
+    return apiClient.patch<{ success: boolean }>(
+      `/forms/responses/${responseId}`,
+      data
+    )
+  },
+
   getDashboardStats: async () => {
     return apiClient.get<{ success: boolean; data: any }>(
       '/forms/stats/dashboard'

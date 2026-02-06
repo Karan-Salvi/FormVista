@@ -637,6 +637,8 @@ export class FormService {
             field_key: ans.field_key,
             value: ans.value,
           })),
+          notes: (res as any).notes || '',
+          tags: (res as any).tags || [],
         };
       })
     );
@@ -670,6 +672,36 @@ export class FormService {
     }
 
     return response;
+  }
+
+  static async updateResponse(
+    responseId: string,
+    userId: string,
+    data: { notes?: string; tags?: string[] }
+  ): Promise<ApiResponse<void>> {
+    const res = await FormResponseModel.findById(responseId);
+    if (!res) {
+      throw new Error('Response not found');
+    }
+
+    const form = await FormModel.findOne({ _id: res.form_id, user_id: userId });
+    if (!form) {
+      throw new Error('Unauthorized to update this response');
+    }
+
+    if (data.notes !== undefined) {
+      (res as any).notes = data.notes;
+    }
+    if (data.tags !== undefined) {
+      (res as any).tags = data.tags;
+    }
+
+    await res.save();
+
+    // Invalidate responses cache
+    await this.invalidateResponsesCache(res.form_id.toString());
+
+    return { success: true };
   }
 
   static async getDashboardStats(userId: string): Promise<ApiResponse<any>> {

@@ -194,6 +194,25 @@ export class FormController {
     }
   }
 
+  static async updateResponse(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const user = getUser(req);
+      const { responseId } = req.params as { responseId: string };
+      const result = await FormService.updateResponse(
+        responseId,
+        user.userId,
+        req.body
+      );
+      sendSuccess(res, result.data, undefined, req);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getDashboardStats(
     req: Request,
     res: Response,

@@ -28,6 +28,10 @@ import {
   Menu,
   Search,
   X,
+  Tag,
+  MessageSquare,
+  History,
+  Copy,
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
@@ -59,6 +63,8 @@ interface Response {
     field_key: string
     value: unknown
   }[]
+  notes?: string
+  tags?: string[]
 }
 
 interface ApiAnswer {
@@ -72,6 +78,8 @@ interface ApiSubmission {
   _id?: string
   submittedAt: string
   answers: ApiAnswer[]
+  notes?: string
+  tags?: string[]
 }
 
 interface InputBlock extends Block {
@@ -94,6 +102,7 @@ export default function ResponsesPage() {
       return 'N/A'
     }
   }
+
   const [responses, setResponses] = useState<Response[]>([])
   const [form, setForm] = useState<FormResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -105,6 +114,16 @@ export default function ResponsesPage() {
   const [limit, setLimit] = useState(10)
   const [totalCount, setTotalCount] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
+
+  // Details Sheet State
+  const [selectedResponse, setSelectedResponse] = useState<Response | null>(
+    null
+  )
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+  const [isSavingDetails, setIsSavingDetails] = useState(false)
+  const [detailsNotes, setDetailsNotes] = useState('')
+  const [detailsTags, setDetailsTags] = useState<string[]>([])
+  const [newTag, setNewTag] = useState('')
 
   const fetchData = useCallback(
     async (page: number = currentPage, pageSize: number = limit) => {
@@ -141,7 +160,10 @@ export default function ResponsesPage() {
         setResponses(responsesData)
         setTotalCount(pagination.total)
         setTotalPages(pagination.totalPages)
-        setCurrentPage(pagination.page)
+        // Only update current page if it's different to avoid loops
+        if (pagination.page !== currentPage) {
+          setCurrentPage(pagination.page)
+        }
       } catch (error) {
         console.error(error)
         toast.error('Failed to fetch responses')
@@ -157,6 +179,64 @@ export default function ResponsesPage() {
       fetchData()
     }
   }, [formId, fetchData])
+
+  const handleOpenDetails = (res: Response) => {
+    setSelectedResponse(res)
+    setDetailsNotes(res.notes || '')
+    setDetailsTags(res.tags || [])
+    setIsDetailsOpen(true)
+  }
+
+  const handleSaveDetails = async () => {
+    if (!selectedResponse) return
+
+    try {
+      setIsSavingDetails(true)
+      await formService.updateResponse(selectedResponse.id, {
+        notes: detailsNotes,
+        tags: detailsTags,
+      })
+
+      // Update local state
+      setResponses(prev =>
+        prev.map(r =>
+          r.id === selectedResponse.id
+            ? { ...r, notes: detailsNotes, tags: detailsTags }
+            : r
+        )
+      )
+
+      toast.success('Response updated successfully')
+    } catch (error) {
+      console.error(error)
+      toast.error('Failed to update response')
+    } finally {
+      setIsSavingDetails(false)
+    }
+  }
+
+  const toggleTag = (tag: string) => {
+    setDetailsTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    )
+  }
+
+  const addCustomTag = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && newTag.trim()) {
+      if (!detailsTags.includes(newTag.trim())) {
+        setDetailsTags(prev => [...prev, newTag.trim()])
+      }
+      setNewTag('')
+    }
+  }
+
+  const PRESET_TAGS = [
+    'Hot Lead',
+    'Follow-up',
+    'Spam',
+    'Completed',
+    'Important',
+  ]
 
   const getAnswerValue = (
     response: Response,
@@ -174,7 +254,6 @@ export default function ResponsesPage() {
 
     if (typeof value === 'object') return JSON.stringify(value)
 
-    // Check if it's a date string and format it if possible
     if (
       typeof value === 'string' &&
       value.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/)
@@ -193,7 +272,6 @@ export default function ResponsesPage() {
     if (!form) return
 
     try {
-      // Create a function to escape CSV values
       const escapeVal = (val: unknown) => {
         const str = val === null || val === undefined ? '' : String(val)
         return `"${str.replace(/"/g, '""')}"`
@@ -219,7 +297,6 @@ export default function ResponsesPage() {
         ...inputBlocks.map((b: InputBlock) => b.config.label || b.field_key),
       ]
 
-      // Fetch all responses if there are multiple pages
       let dataToExport = responses
       if (totalCount > responses.length) {
         const toastId = toast.loading('Fetching all responses for export...')
@@ -255,7 +332,6 @@ export default function ResponsesPage() {
         ...rows.map(r => r.join(',')),
       ].join('\r\n')
 
-      // Use Blob with BOM for proper Excel encoding
       const blob = new Blob(['\ufeff', csvContent], {
         type: 'text/csv;charset=utf-8;',
       })
@@ -317,7 +393,6 @@ export default function ResponsesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-12">
-      {/* Header */}
       <nav className="bg-background/80 border-border/50 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-xl">
         <div className="mx-auto flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-4">
@@ -424,12 +499,6 @@ export default function ResponsesPage() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[300px]">
-                  <SheetHeader>
-                    <SheetTitle className="flex items-center gap-2">
-                      <Sparkles className="text-primary h-6 w-6" />
-                      FormVista
-                    </SheetTitle>
-                  </SheetHeader>
                   <div className="mt-8 flex flex-col gap-4">
                     <div className="border-border/50 flex items-center gap-3 border-b px-2 py-4">
                       <Avatar className="border-primary/10 h-10 w-10 border">
@@ -601,10 +670,26 @@ export default function ResponsesPage() {
                     {filteredResponses.map(res => (
                       <TableRow
                         key={res.id}
-                        className="group transition-colors hover:bg-gray-50"
+                        className="group cursor-pointer transition-colors hover:bg-gray-50"
+                        onClick={() => handleOpenDetails(res)}
                       >
                         <TableCell className="text-muted-foreground text-sm">
-                          {formatDate(res.submittedAt, 'MMM d, yyyy HH:mm')}
+                          <div className="flex flex-col gap-1">
+                            <span>
+                              {formatDate(res.submittedAt, 'MMM d, yyyy HH:mm')}
+                            </span>
+                            <div className="flex flex-wrap gap-1">
+                              {res.tags?.map(tag => (
+                                <Badge
+                                  key={tag}
+                                  variant="secondary"
+                                  className="px-1 py-0 text-[9px] font-normal uppercase"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
                         </TableCell>
                         {inputBlocks.map((block: InputBlock) => (
                           <TableCell
@@ -616,18 +701,6 @@ export default function ResponsesPage() {
                         ))}
                       </TableRow>
                     ))}
-                    {filteredResponses.length === 0 && (
-                      <TableRow>
-                        <TableCell
-                          colSpan={inputBlocks.length + 1}
-                          className="py-12 text-center"
-                        >
-                          <p className="text-muted-foreground font-medium">
-                            No responses matching "{searchTerm}"
-                          </p>
-                        </TableCell>
-                      </TableRow>
-                    )}
                   </TableBody>
                 </Table>
               </div>
@@ -702,7 +775,6 @@ export default function ResponsesPage() {
                                 pageToShow = totalPages - 4 + i
                               else pageToShow = currentPage - 2 + i
 
-                              // Ensure we don't show invalid pages
                               if (pageToShow <= 0 || pageToShow > totalPages)
                                 return null
 
@@ -752,6 +824,181 @@ export default function ResponsesPage() {
           )}
         </div>
       </div>
+
+      {/* Response Details Sidebar */}
+      <Sheet open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+        <SheetContent className="h-full w-full overflow-y-auto border-l p-0 shadow-2xl sm:max-w-xl">
+          {selectedResponse && (
+            <div className="flex h-full flex-col bg-white">
+              <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white p-6">
+                <div className="flex flex-col gap-1">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-2 text-xl font-bold">
+                      Submission Details
+                      <Badge
+                        variant="outline"
+                        className="py-0 text-[10px] font-normal"
+                      >
+                        ID: {selectedResponse.id.slice(-6)}
+                      </Badge>
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="text-muted-foreground flex items-center gap-3 text-xs">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />{' '}
+                      {formatDate(selectedResponse.submittedAt, 'MMMM d, yyyy')}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />{' '}
+                      {formatDate(selectedResponse.submittedAt, 'HH:mm:ss')}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="default"
+                    className="h-8 gap-1.5"
+                    onClick={handleSaveDetails}
+                    disabled={isSavingDetails}
+                  >
+                    {isSavingDetails ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex-1 space-y-8 p-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1 rounded-xl bg-gray-50 p-3">
+                    <span className="flex items-center gap-1 text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
+                      <Tag className="h-3 w-3" /> Status
+                    </span>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {detailsTags.length > 0 ? (
+                        detailsTags.map(tag => (
+                          <Badge
+                            key={tag}
+                            className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 px-2 py-0.5 text-[10px]"
+                          >
+                            {tag}
+                          </Badge>
+                        ))
+                      ) : (
+                        <span className="text-xs text-gray-400 italic">
+                          No tags
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-1 rounded-xl bg-gray-50 p-3">
+                    <span className="flex items-center gap-1 text-[10px] font-semibold tracking-wider text-gray-400 uppercase">
+                      <History className="h-3 w-3" /> Response Time
+                    </span>
+                    <div className="pt-1 text-sm font-bold text-gray-900">
+                      N/A
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900">
+                    <div className="bg-primary h-4 w-1 rounded-full" />
+                    USER ANSWERS
+                  </h3>
+                  <div className="grid gap-4">
+                    {inputBlocks.map(block => {
+                      const value = getAnswerValue(
+                        selectedResponse,
+                        block.id,
+                        block.field_key
+                      )
+                      return (
+                        <div
+                          key={block.id}
+                          className="group flex flex-col gap-1.5 rounded-xl border-2 border-transparent bg-gray-50/50 p-4 transition-all hover:border-gray-100 hover:bg-gray-50"
+                        >
+                          <span className="text-xs font-semibold text-gray-500">
+                            {block.config.label || block.field_key}
+                          </span>
+                          <div className="flex items-start justify-between">
+                            <p className="text-sm font-medium whitespace-pre-wrap text-gray-900">
+                              {value}
+                            </p>
+                            <button
+                              className="p-1 opacity-0 transition-opacity group-hover:opacity-40 hover:opacity-100"
+                              onClick={() => {
+                                navigator.clipboard.writeText(String(value))
+                                toast.success('Copied to clipboard')
+                              }}
+                            >
+                              <Copy className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900">
+                    <div className="h-4 w-1 rounded-full bg-emerald-500" />
+                    TAG SUBMISSION
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap gap-2">
+                      {PRESET_TAGS.map(tag => (
+                        <Badge
+                          key={tag}
+                          variant={
+                            detailsTags.includes(tag) ? 'default' : 'outline'
+                          }
+                          className={`cursor-pointer px-3 py-1 text-[11px] transition-all hover:scale-105 ${detailsTags.includes(tag) ? 'bg-emerald-600' : ''}`}
+                          onClick={() => toggleTag(tag)}
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="relative">
+                      <Search className="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Add custom tag (Press Enter)..."
+                        className="w-full rounded-lg border border-gray-100 bg-gray-50 py-2 pr-4 pl-9 text-xs transition-all outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                        value={newTag}
+                        onChange={e => setNewTag(e.target.value)}
+                        onKeyDown={addCustomTag}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3 pb-8">
+                  <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900">
+                    <div className="h-4 w-1 rounded-full bg-amber-500" />
+                    INTERNAL NOTES
+                  </h3>
+                  <div className="group relative">
+                    <MessageSquare className="absolute top-3 left-3 h-4 w-4 text-amber-500 opacity-50" />
+                    <textarea
+                      placeholder="Add private notes about this submission (leads info, follow-up context...)"
+                      className="min-h-[120px] w-full resize-none rounded-xl border border-amber-100 bg-amber-50/30 py-3 pr-4 pl-10 text-xs leading-relaxed transition-all outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10"
+                      value={detailsNotes}
+                      onChange={e => setDetailsNotes(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }
