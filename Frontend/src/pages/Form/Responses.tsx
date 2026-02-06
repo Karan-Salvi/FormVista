@@ -65,6 +65,7 @@ interface Response {
   }[]
   notes?: string
   tags?: string[]
+  completionTimeMs?: number
 }
 
 interface ApiAnswer {
@@ -80,6 +81,7 @@ interface ApiSubmission {
   answers: ApiAnswer[]
   notes?: string
   tags?: string[]
+  completionTimeMs?: number
 }
 
 interface InputBlock extends Block {
@@ -101,6 +103,21 @@ export default function ResponsesPage() {
     } catch {
       return 'N/A'
     }
+  }
+
+  const formatDuration = (ms: number | undefined) => {
+    if (!ms) return 'N/A'
+    if (ms < 1000) return `${ms}ms`
+    const seconds = Math.floor(ms / 1000)
+    if (seconds < 60) return `${seconds}s`
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+    if (minutes < 60) {
+      return `${minutes}m ${remainingSeconds}s`
+    }
+    const hours = Math.floor(minutes / 60)
+    const remainingMinutes = minutes % 60
+    return `${hours}h ${remainingMinutes}m`
   }
 
   const [responses, setResponses] = useState<Response[]>([])
@@ -900,7 +917,7 @@ export default function ResponsesPage() {
                       <History className="h-3 w-3" /> Response Time
                     </span>
                     <div className="pt-1 text-sm font-bold text-gray-900">
-                      N/A
+                      {formatDuration(selectedResponse.completionTimeMs)}
                     </div>
                   </div>
                 </div>

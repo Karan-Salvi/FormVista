@@ -639,6 +639,7 @@ export class FormService {
           })),
           notes: (res as any).notes || '',
           tags: (res as any).tags || [],
+          completionTimeMs: (res as any).completion_time_ms,
         };
       })
     );
