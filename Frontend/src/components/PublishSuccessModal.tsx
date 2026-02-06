@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -13,10 +12,11 @@ import {
   Copy,
   ExternalLink,
   Share2,
-  Sparkles,
   Twitter,
   Linkedin,
   Mail,
+  MessageCircle,
+  Download,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { motion, AnimatePresence } from 'motion/react'
@@ -91,6 +91,24 @@ export function PublishSuccessModal({
     window.location.href = `mailto:?subject=${subject}&body=${body}`
   }
 
+  const shareViaWhatsApp = () => {
+    const text = encodeURIComponent(
+      `Check out my new form: "${formTitle}"\n\nFill it out here: ${formUrl}`
+    )
+    window.open(`https://wa.me/?text=${text}`, '_blank')
+  }
+
+  const downloadQRCode = () => {
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+      formUrl
+    )}`
+    const link = document.createElement('a')
+    link.href = qrUrl
+    link.download = `qr-code-${formTitle}.png`
+    link.target = '_blank'
+    link.click()
+  }
+
   const nativeShare = async () => {
     if (navigator.share) {
       try {
@@ -112,14 +130,14 @@ export function PublishSuccessModal({
       <Confetti isActive={isOpen} duration={3500} particleCount={200} />
 
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[95vw] max-w-[400px] overflow-hidden rounded-2xl border p-6 shadow-2xl">
           <AnimatePresence>
             {isOpen && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
               >
                 <DialogHeader className="text-center">
                   <motion.div
@@ -131,10 +149,10 @@ export function PublishSuccessModal({
                       damping: 20,
                       delay: 0.1,
                     }}
-                    className="mx-auto mb-4"
+                    className="mx-auto mb-2"
                   >
                     <div className="relative">
-                      <div className="bg-primary/10 mx-auto flex h-20 w-20 items-center justify-center rounded-full">
+                      <div className="bg-primary/10 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
                         <motion.div
                           animate={{
                             rotate: [0, 10, -10, 10, 0],
@@ -144,17 +162,9 @@ export function PublishSuccessModal({
                             delay: 0.3,
                           }}
                         >
-                          <Check className="text-primary h-10 w-10" />
+                          <Check className="text-primary h-7 w-7" />
                         </motion.div>
                       </div>
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.4 }}
-                        className="bg-primary absolute -top-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full"
-                      >
-                        <Sparkles className="h-4 w-4 text-white" />
-                      </motion.div>
                     </div>
                   </motion.div>
 
@@ -163,87 +173,116 @@ export function PublishSuccessModal({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <DialogTitle className="text-2xl font-bold">
+                    <DialogTitle className="text-xl font-bold">
                       🎉 Your form is live!
                     </DialogTitle>
-                    <DialogDescription className="mt-2 text-base">
-                      Share it with the world and start collecting responses.
-                    </DialogDescription>
                   </motion.div>
                 </DialogHeader>
 
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="mt-6 space-y-4"
+                  className="mt-4 space-y-4"
                 >
-                  {/* Form URL Display */}
-                  <div className="bg-muted/50 flex items-center gap-2 rounded-lg border p-3">
-                    <div className="flex-1 truncate font-mono text-sm">
-                      {formUrl}
+                  {/* URL & QR Row */}
+                  <div className="bg-muted/20 flex flex-col items-center gap-4 rounded-xl border p-4 sm:flex-row">
+                    <div className="group relative shrink-0">
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(formUrl)}`}
+                        alt="QR"
+                        className="h-20 w-20 rounded-lg bg-white p-1.5 shadow-sm transition-transform group-hover:scale-105"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={downloadQRCode}
+                        className="bg-primary hover:bg-primary/90 absolute -top-2 -right-2 h-6 w-6 rounded-full text-white opacity-0 shadow-md transition-opacity group-hover:opacity-100"
+                      >
+                        <Download className="h-3 w-3" />
+                      </Button>
                     </div>
-                    <Button
-                      ref={copyButtonRef}
-                      size="sm"
-                      variant="outline"
-                      onClick={copyLink}
-                      className="shrink-0 gap-2"
-                    >
-                      <Copy className="h-4 w-4" />
-                      Copy
-                    </Button>
+
+                    <div className="w-full min-w-0 flex-1 space-y-2">
+                      <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                        Public Link
+                      </p>
+                      <div className="bg-background flex items-center gap-2 overflow-hidden rounded-lg border p-2">
+                        <div className="flex-1 truncate font-mono text-xs">
+                          {formUrl}
+                        </div>
+                        <Button
+                          ref={copyButtonRef}
+                          size="sm"
+                          variant="ghost"
+                          onClick={copyLink}
+                          className="h-8 shrink-0 gap-1.5 px-2 text-xs"
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                          Copy
+                        </Button>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Primary Actions */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="flex gap-2">
                     <Button
                       onClick={nativeShare}
-                      className="gap-2"
+                      className="flex-1 gap-2 shadow-sm"
                       variant="default"
                     >
                       <Share2 className="h-4 w-4" />
-                      Share
+                      Share Link
                     </Button>
                     <Button
                       onClick={() => window.open(formUrl, '_blank')}
                       variant="outline"
-                      className="gap-2"
+                      className="flex-1 gap-2"
                     >
                       <ExternalLink className="h-4 w-4" />
-                      View Form
+                      Open Form
                     </Button>
                   </div>
 
                   {/* Social Sharing */}
                   <div className="pt-2">
-                    <p className="text-muted-foreground mb-3 text-center text-sm">
-                      Or share on social media
-                    </p>
-                    <div className="flex justify-center gap-2">
+                    <div className="flex justify-center gap-3">
                       <Button
                         size="icon"
-                        variant="outline"
+                        variant="ghost"
+                        onClick={shareViaWhatsApp}
+                        className="border-border h-10 w-10 rounded-full border shadow-sm transition-all hover:scale-110 hover:bg-emerald-500 hover:text-white"
+                        title="WhatsApp"
+                      >
+                        <MessageCircle className="h-4.5 w-4.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
                         onClick={shareOnTwitter}
-                        className="h-10 w-10 rounded-full transition-colors hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2]"
+                        className="border-border h-10 w-10 rounded-full border shadow-sm transition-all hover:scale-110 hover:bg-[#1DA1F2] hover:text-white"
+                        title="Twitter"
                       >
-                        <Twitter className="h-4 w-4" />
+                        <Twitter className="h-4.5 w-4.5" />
                       </Button>
                       <Button
                         size="icon"
-                        variant="outline"
+                        variant="ghost"
                         onClick={shareOnLinkedIn}
-                        className="h-10 w-10 rounded-full transition-colors hover:bg-[#0A66C2]/10 hover:text-[#0A66C2]"
+                        className="border-border h-10 w-10 rounded-full border shadow-sm transition-all hover:scale-110 hover:bg-[#0A66C2] hover:text-white"
+                        title="LinkedIn"
                       >
-                        <Linkedin className="h-4 w-4" />
+                        <Linkedin className="h-4.5 w-4.5" />
                       </Button>
                       <Button
                         size="icon"
-                        variant="outline"
+                        variant="ghost"
                         onClick={shareViaEmail}
-                        className="h-10 w-10 rounded-full transition-colors hover:bg-amber-500/10 hover:text-amber-600"
+                        className="border-border h-10 w-10 rounded-full border shadow-sm transition-all hover:scale-110 hover:bg-amber-500 hover:text-white"
+                        title="Email"
                       >
-                        <Mail className="h-4 w-4" />
+                        <Mail className="h-4.5 w-4.5" />
                       </Button>
                     </div>
                   </div>
@@ -253,9 +292,14 @@ export function PublishSuccessModal({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="mt-6 flex justify-center"
+                  className="mt-4 flex justify-center"
                 >
-                  <Button variant="ghost" onClick={onClose}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onClose}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
                     Continue editing
                   </Button>
                 </motion.div>
