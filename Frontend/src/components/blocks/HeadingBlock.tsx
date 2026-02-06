@@ -18,9 +18,9 @@ export const HeadingBlock: React.FC<HeadingBlockProps> = ({
   const isInitialized = useRef(false)
 
   const level = block.config.level || 1
-  const content = block.config.content || 'Untitled'
+  const content = block.config.content || ''
 
-  // Set initial content only once
+  // Set initial content only once (only if there's actual content)
   useEffect(() => {
     if (inputRef.current && !isInitialized.current && !isPreview) {
       inputRef.current.textContent = content
@@ -52,10 +52,12 @@ export const HeadingBlock: React.FC<HeadingBlockProps> = ({
   }
 
   if (isPreview) {
-    const Tag = `h${level}` as any
+    const Tag = `h${level}` as 'h1' | 'h2' | 'h3'
     return (
-      <Tag className={`${baseClasses} ${levelClasses[level as 1 | 2 | 3]}`}>
-        {content}
+      <Tag
+        className={`${baseClasses} ${levelClasses[level as 1 | 2 | 3]} ${!content ? 'text-muted-foreground/50' : ''}`}
+      >
+        {content || 'Heading'}
       </Tag>
     )
   }

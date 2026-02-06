@@ -140,7 +140,7 @@ export const FormEditor: React.FC = () => {
             updateFormTitle(e.target.value)
           }
           placeholder="Untitled Form"
-          className="text-display text-foreground placeholder:text-muted-foreground/50 mb-4 w-full resize-none bg-transparent text-lg sm:text-2xl outline-none"
+          className="text-display text-foreground placeholder:text-muted-foreground/50 mb-4 w-full resize-none bg-transparent text-lg outline-none sm:text-2xl"
         />
         <TextareaAutosize
           readOnly={isPreviewMode}
@@ -149,7 +149,7 @@ export const FormEditor: React.FC = () => {
             updateFormDescription(e.target.value)
           }
           placeholder="Add a description..."
-          className="text-body text-muted-foreground placeholder:text-muted-foreground/50 w-full resize-none bg-transparent text-sm sm:text-lg outline-none"
+          className="text-body text-muted-foreground placeholder:text-muted-foreground/50 w-full resize-none bg-transparent text-sm outline-none sm:text-lg"
         />
       </div>
 

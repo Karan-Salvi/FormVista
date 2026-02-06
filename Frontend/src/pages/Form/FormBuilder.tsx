@@ -257,7 +257,7 @@ const FormBuilderPage: React.FC = () => {
                   const blocksToSave = form.blocks.map(b => ({
                     id: /^[0-9a-fA-F]{24}$/.test(b.id) ? b.id : undefined,
                     type: b.type,
-                    label: b.config.label || 'Untitled',
+                    label: b.config.label || '',
                     field_key: (b as any).field_key || `field_${b.id}`,
                     position: b.order,
                     required: b.config.required,
@@ -312,7 +312,7 @@ const FormBuilderPage: React.FC = () => {
                   const blocksToSave = form.blocks.map(b => ({
                     id: /^[0-9a-fA-F]{24}$/.test(b.id) ? b.id : undefined,
                     type: b.type,
-                    label: b.config.label || 'Untitled',
+                    label: b.config.label || '',
                     field_key: (b as any).field_key || `field_${b.id}`,
                     position: b.order,
                     required: b.config.required,

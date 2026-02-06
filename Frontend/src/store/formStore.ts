@@ -31,14 +31,14 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
       return {
         id: generateId(),
         type,
-        config: { ...baseConfig, content: 'Untitled', level: 1 },
+        config: { ...baseConfig, content: '', level: 1 },
         order,
       }
     case 'text':
       return {
         id: generateId(),
         type,
-        config: { ...baseConfig, content: 'Start typing...' },
+        config: { ...baseConfig, content: '' },
         order,
       }
     case 'bullet-list':
@@ -55,8 +55,8 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
         type,
         config: {
           ...baseConfig,
-          label: 'Toggle heading',
-          content: 'Toggle content...',
+          label: '',
+          content: '',
           isOpen: false,
         },
         order,
@@ -65,7 +65,7 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
       return {
         id: generateId(),
         type,
-        config: { ...baseConfig, content: 'Type a quote...' },
+        config: { ...baseConfig, content: '' },
         order,
       }
     case 'callout':
@@ -74,7 +74,7 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
         type,
         config: {
           ...baseConfig,
-          content: 'Type callout text...',
+          content: '',
           icon: 'info',
         },
         order,
@@ -85,7 +85,7 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
         type,
         config: {
           ...baseConfig,
-          label: 'Short answer',
+          label: '',
           placeholder: 'Your answer',
         },
         order,
@@ -96,7 +96,7 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
         type,
         config: {
           ...baseConfig,
-          label: 'Long answer',
+          label: '',
           placeholder: 'Your detailed answer',
         },
         order,
@@ -107,7 +107,7 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
         type,
         config: {
           ...baseConfig,
-          label: 'Email',
+          label: '',
           placeholder: 'your@email.com',
         },
         order,
@@ -116,7 +116,7 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
       return {
         id: generateId(),
         type,
-        config: { ...baseConfig, label: 'Number', placeholder: '0' },
+        config: { ...baseConfig, label: '', placeholder: '0' },
         order,
       }
     case 'dropdown':
@@ -125,7 +125,7 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
         type,
         config: {
           ...baseConfig,
-          label: 'Select an option',
+          label: '',
           options: ['Option 1', 'Option 2', 'Option 3'],
         },
         order,
@@ -136,7 +136,7 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
         type,
         config: {
           ...baseConfig,
-          label: 'Choose one',
+          label: '',
           options: ['Option 1', 'Option 2', 'Option 3'],
         },
         order,
@@ -147,7 +147,7 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
         type,
         config: {
           ...baseConfig,
-          label: 'Select all that apply',
+          label: '',
           options: ['Option 1', 'Option 2', 'Option 3'],
         },
         order,
@@ -156,7 +156,7 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
       return {
         id: generateId(),
         type,
-        config: { ...baseConfig, label: 'Date' },
+        config: { ...baseConfig, label: '' },
         order,
       }
     case 'divider':
@@ -194,7 +194,7 @@ const createDefaultBlock = (type: BlockType, order: number): Block => {
         type,
         config: {
           ...baseConfig,
-          label: 'Phone Number',
+          label: '',
           placeholder: 'Enter your phone number',
         },
         order,
