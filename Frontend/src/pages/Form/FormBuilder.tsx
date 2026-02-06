@@ -88,12 +88,14 @@ const createDefaultForm = (): Form => ({
 import { useSearchParams } from 'react-router-dom'
 import { formService } from '@/services/form.service'
 import { toast } from 'sonner'
-import type { Block } from '@/types/form'
+import type { Block, BlockType } from '@/types/form'
 import { PublishSuccessModal } from '@/components/PublishSuccessModal'
+import { QuestionSidebar } from '@/components/editor/QuestionSidebar'
 import { useState } from 'react'
 
 const FormBuilderPage: React.FC = () => {
-  const { form, setForm, isPreviewMode, togglePreviewMode } = useFormStore()
+  const { form, setForm, isPreviewMode, togglePreviewMode, addBlock } =
+    useFormStore()
   const [searchParams] = useSearchParams()
   const formId = searchParams.get('formId')
 
@@ -366,8 +368,13 @@ const FormBuilderPage: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="min-h-[calc(100vh-3.5rem)]">
-        {isPreviewMode ? <FormPreview /> : <FormEditor />}
+      <main className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
+        {!isPreviewMode && (
+          <QuestionSidebar onAddBlock={(type: BlockType) => addBlock(type)} />
+        )}
+        <div className="bg-muted/30 flex-1 overflow-y-auto">
+          {isPreviewMode ? <FormPreview /> : <FormEditor />}
+        </div>
       </main>
 
       {/* Publish Success Modal */}

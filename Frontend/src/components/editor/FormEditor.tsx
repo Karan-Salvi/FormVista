@@ -8,6 +8,7 @@ import { BlockContextMenu } from './BlockContextMenu'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import TextareaAutosize from 'react-textarea-autosize'
+import { cn } from '@/lib/utils'
 
 export const FormEditor: React.FC = () => {
   const {
@@ -126,9 +127,23 @@ export const FormEditor: React.FC = () => {
 
   const sortedBlocks = [...form.blocks].sort((a, b) => a.order - b.order)
 
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    const type = e.dataTransfer.getData('blockType') as BlockType
+    if (type) {
+      addBlock(
+        type,
+        dragOverIndex !== null ? sortedBlocks[dragOverIndex]?.id : undefined
+      )
+    }
+    setDragOverIndex(null)
+  }
+
   return (
     <div
       ref={editorRef}
+      onDragOver={e => e.preventDefault()}
+      onDrop={handleDrop}
       className="mx-auto max-w-2xl px-4 py-8 text-start sm:px-8 sm:py-12"
     >
       {/* Form Header */}
@@ -162,13 +177,18 @@ export const FormEditor: React.FC = () => {
               onDragStart={() => handleDragStart(index)}
               onDragOver={e => handleDragOver(e, index)}
               onDragEnd={handleDragEnd}
+              onDrop={handleDrop}
               onClick={() => selectBlock(block.id)}
-              className={`form-block group pr-2 pl-10 sm:pr-4 sm:pl-20 ${
-                selectedBlockId === block.id ? 'selected' : ''
-              } ${dragOverIndex === index ? 'border-primary border-t-2' : ''} ${
-                draggedIndex === index ? 'opacity-50' : ''
-              }`}
+              className={cn(
+                'form-block group relative pr-2 pl-10 transition-all sm:pr-4 sm:pl-20',
+                selectedBlockId === block.id && 'selected',
+                dragOverIndex === index && 'pt-4',
+                draggedIndex === index && 'opacity-50'
+              )}
             >
+              {dragOverIndex === index && (
+                <div className="bg-primary absolute top-0 right-4 left-10 h-1 rounded-full sm:left-20" />
+              )}
               {!isPreviewMode && (
                 <BlockToolbar
                   onDuplicate={() => duplicateBlock(block.id)}
@@ -185,6 +205,27 @@ export const FormEditor: React.FC = () => {
             </div>
           </BlockContextMenu>
         ))}
+
+        {/* Drop zone when empty or at bottom */}
+        {sortedBlocks.length === 0 && !isPreviewMode && (
+          <div
+            onDragOver={e => {
+              e.preventDefault()
+              setDragOverIndex(0)
+            }}
+            onDrop={handleDrop}
+            className={cn(
+              'flex h-32 items-center justify-center rounded-lg border-2 border-dashed transition-colors',
+              dragOverIndex === 0
+                ? 'border-primary bg-primary/5'
+                : 'border-muted-foreground/20'
+            )}
+          >
+            <p className="text-muted-foreground text-sm">
+              Drag blocks here to get started
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Add Block Button */}
