@@ -52,6 +52,8 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 
+import { TemplateGallery } from '@/components/TemplateGallery'
+
 export default function DashboardPage() {
   const [forms, setForms] = useState<FormResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -110,14 +112,14 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      <div className="bg-background flex h-screen w-full items-center justify-center">
+        <Loader2 className="text-primary h-8 w-8 animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="relative min-h-screen px-4 py-8 md:px-8">
+    <div className="bg-muted/20 relative min-h-screen px-4 py-8 md:px-8">
       <nav className="bg-background/80 border-border/50 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-xl">
         <div className="mx-auto flex h-16 items-center justify-between px-6">
           <div className="flex items-center gap-4">
@@ -225,6 +227,8 @@ export default function DashboardPage() {
         </div>
       </nav>
       <div className="mx-auto mt-16 max-w-7xl md:mt-20">
+        <TemplateGallery />
+
         <div className="mb-8 flex flex-row items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
@@ -248,7 +252,7 @@ export default function DashboardPage() {
               No forms yet
             </h3>
             <p className="mt-2 mb-4 text-gray-500">
-              Create your first form to get started
+              Start with a template above or create a blank form
             </p>
             <CreateFormDialog />
           </div>
