@@ -130,7 +130,7 @@ export function PublishSuccessModal({
       <Confetti isActive={isOpen} duration={3500} particleCount={200} />
 
       <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-        <DialogContent className="w-[95vw] max-w-[400px] overflow-hidden rounded-2xl border p-6 shadow-2xl">
+        <DialogContent className="w-[95vw] max-w-125 overflow-hidden rounded-2xl border p-6 shadow-2xl">
           <AnimatePresence>
             {isOpen && (
               <motion.div
@@ -209,7 +209,9 @@ export function PublishSuccessModal({
                       </p>
                       <div className="bg-background flex items-center gap-2 overflow-hidden rounded-lg border p-2">
                         <div className="flex-1 truncate font-mono text-xs">
-                          {formUrl}
+                          {formUrl.length > 15
+                            ? formUrl.substring(0, 15) + '...'
+                            : formUrl}
                         </div>
                         <Button
                           ref={copyButtonRef}
