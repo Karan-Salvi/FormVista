@@ -33,7 +33,10 @@ import {
   History,
   Copy,
   Trash2,
+  FileText,
 } from 'lucide-react'
+import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
@@ -410,19 +413,10 @@ export default function ResponsesPage() {
     }
   }
 
-  const handleBulkExport = () => {
-    // We reuse exportToCSV but filter by selected IDs if any are selected
-    // Since exportToCSV logic is specifically built to export *all* or *current page*,
-    // we might want to tweak it or just let the user use the updated logic below
-    // For now, let's create a specialized export for selected
+  const handleBulkExport = (format: 'csv' | 'excel' | 'pdf') => {
     if (!form || selectedResponseIds.length === 0) return
 
     try {
-      const escapeVal = (val: unknown) => {
-        const str = val === null || val === undefined ? '' : String(val)
-        return `"${str.replace(/"/g, '""')}"`
-      }
-
       const inputBlocks: InputBlock[] =
         (form.blocks as InputBlock[])?.filter((b: InputBlock) =>
           [
@@ -447,34 +441,85 @@ export default function ResponsesPage() {
         selectedResponseIds.includes(r.id)
       )
 
-      const rows = dataToExport.map(res => [
-        escapeVal(formatDate(res.submittedAt, 'yyyy-MM-dd HH:mm:ss')),
+      const getRowData = (res: Response) => [
+        formatDate(res.submittedAt, 'yyyy-MM-dd HH:mm:ss'),
         ...inputBlocks.map((b: InputBlock) =>
-          escapeVal(getAnswerValue(res, b.id, b.field_key))
+          getAnswerValue(res, b.id, b.field_key)
         ),
-      ])
+      ]
 
-      const csvContent = [
-        headers.map(h => escapeVal(h)).join(','),
-        ...rows.map(r => r.join(',')),
-      ].join('\r\n')
+      if (format === 'csv') {
+        const escapeVal = (val: unknown) => {
+          const str = val === null || val === undefined ? '' : String(val)
+          return `"${str.replace(/"/g, '""')}"`
+        }
 
-      const blob = new Blob(['\ufeff', csvContent], {
-        type: 'text/csv;charset=utf-8;',
-      })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.setAttribute('href', url)
-      link.setAttribute(
-        'download',
-        `${form.title.replace(/[/\\?%*:|"<>]/g, '-')}-selected-responses.csv`
+        const rows = dataToExport.map(res => getRowData(res).map(escapeVal))
+        const csvContent = [
+          headers.map(h => escapeVal(h)).join(','),
+          ...rows.map(r => r.join(',')),
+        ].join('\r\n')
+
+        const blob = new Blob(['\ufeff', csvContent], {
+          type: 'text/csv;charset=utf-8;',
+        })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.setAttribute('href', url)
+        link.setAttribute(
+          'download',
+          `${form.title.replace(/[^a-z0-9]/gi, '-')}-selected.csv`
+        )
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      } else if (format === 'excel') {
+        // Simple HTML Table export for Excel
+        const rows = dataToExport.map(getRowData)
+        const tableContent = rows
+          .map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`)
+          .join('')
+        const headerContent = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`
+        const template = `
+           <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+           <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Responses</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+           <body><table>${headerContent}${tableContent}</table></body></html>`
+
+        const blob = new Blob([template], { type: 'application/vnd.ms-excel' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.setAttribute('href', url)
+        link.setAttribute(
+          'download',
+          `${form.title.replace(/[^a-z0-9]/gi, '-')}-selected.xls`
+        )
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+      } else if (format === 'pdf') {
+        const doc = new jsPDF()
+        doc.text(`${form.title} Responses`, 14, 15)
+        doc.setFontSize(10)
+        doc.text(`Generated on ${new Date().toLocaleDateString()}`, 14, 22)
+
+        const rows = dataToExport.map(getRowData)
+
+        autoTable(doc, {
+          head: [headers],
+          body: rows,
+          startY: 25,
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [41, 128, 185] },
+        })
+
+        doc.save(`${form.title.replace(/[^a-z0-9]/gi, '-')}-selected.pdf`)
+      }
+
+      toast.success(
+        `Exported ${dataToExport.length} selected responses as ${format.toUpperCase()}`
       )
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-
-      toast.success(`Exported ${dataToExport.length} selected responses`)
     } catch (error) {
       console.error('Export error:', error)
       toast.error('Failed to export responses')
@@ -826,15 +871,32 @@ export default function ResponsesPage() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 gap-2 rounded-full text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              onClick={handleBulkExport}
-            >
-              <Download className="h-4 w-4" />
-              Export
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-2 rounded-full text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                >
+                  <Download className="h-4 w-4" />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-48">
+                <DropdownMenuItem onClick={() => handleBulkExport('csv')}>
+                  <FileText className="mr-2 h-4 w-4 text-gray-500" />
+                  As CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBulkExport('excel')}>
+                  <FileSpreadsheet className="mr-2 h-4 w-4 text-emerald-600" />
+                  As Excel
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBulkExport('pdf')}>
+                  <FileText className="mr-2 h-4 w-4 text-red-600" />
+                  As PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <div className="mx-1 h-4 w-px bg-gray-200" />
 
