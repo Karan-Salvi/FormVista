@@ -7,12 +7,21 @@ import { colorThemes, fontFamilies } from '@/constants/theme'
 import { hexToHsl } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
   Eye,
   EyeOff,
   Share,
   ChevronLeft,
   Sparkles,
   Palette,
+  ChevronDown,
+  Globe,
+  Check,
 } from 'lucide-react'
 import { type Form } from '@/types/form'
 
@@ -187,6 +196,23 @@ const FormBuilderPage: React.FC = () => {
     }
   }, [form?.theme])
 
+  const handleUnpublish = async () => {
+    if (!form) return
+    try {
+      await formService.update(form.id, {
+        status: 'draft',
+      })
+      setForm({
+        ...form,
+        isPublished: false,
+      })
+      toast.success('Form unpublished successfully')
+    } catch (e) {
+      console.error(e)
+      toast.error('Failed to unpublish form')
+    }
+  }
+
   // Helper: Validate all blocks have required label
   const validateBlockLabels = () => {
     if (!form) return true
@@ -327,70 +353,104 @@ const FormBuilderPage: React.FC = () => {
               <Sparkles className="h-4 w-4" />
               <span className="hidden sm:inline">Save</span>
             </Button>
-            <Button
-              size="sm"
-              className="h-9 gap-2 px-2 sm:px-3"
-              variant={form?.isPublished ? 'outline' : 'default'}
-              onClick={async () => {
-                // ... (publish logic)
-                if (!form) return
-                if (!validateBlockLabels()) {
-                  toast.error('All question blocks must have a label.')
-                  return
-                }
-                try {
-                  const blocksToSave = form.blocks.map(b => ({
-                    id: /^[0-9a-fA-F]{24}$/.test(b.id) ? b.id : undefined,
-                    type: b.type,
-                    label: b.config.label || '',
-                    field_key: (b as any).field_key || `field_${b.id}`,
-                    position: b.order,
-                    required: b.config.required,
-                    config: b.config,
-                  }))
+            {form?.isPublished ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    className="h-9 gap-2 border-green-600 bg-green-600 px-2 text-white hover:bg-green-700 sm:px-3"
+                    variant="outline"
+                  >
+                    <Check className="h-4 w-4" />
+                    <span className="hidden sm:inline">Published</span>
+                    <ChevronDown className="h-3 w-3 opacity-70" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (form) {
+                        const url = `${window.location.origin}/f/${form.slug}`
+                        setPublishedFormUrl(url)
+                        setShowPublishSuccess(true)
+                      }
+                    }}
+                  >
+                    <Share className="mr-2 h-4 w-4" />
+                    Share Link
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleUnpublish}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Globe className="mr-2 h-4 w-4" />
+                    Unpublish
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                size="sm"
+                className="h-9 gap-2 px-2 sm:px-3"
+                variant="default"
+                onClick={async () => {
+                  if (!form) return
+                  if (!validateBlockLabels()) {
+                    toast.error('All question blocks must have a label.')
+                    return
+                  }
+                  try {
+                    const blocksToSave = form.blocks.map(b => ({
+                      id: /^[0-9a-fA-F]{24}$/.test(b.id) ? b.id : undefined,
+                      type: b.type,
+                      label: b.config.label || '',
+                      field_key: (b as any).field_key || `field_${b.id}`,
+                      position: b.order,
+                      required: b.config.required,
+                      config: b.config,
+                    }))
 
-                  const res = await formService.update(form.id, {
-                    title: form.title,
-                    description: form.description,
-                    theme_config: form.theme,
-                    blocks: blocksToSave as any,
-                    status: 'published',
-                  })
+                    const res = await formService.update(form.id, {
+                      title: form.title,
+                      description: form.description,
+                      theme_config: form.theme,
+                      blocks: blocksToSave as any,
+                      status: 'published',
+                    })
 
-                  if (res.data) {
-                    const blocksRes = await formService.getBlocks(form.id)
-                    const formattedBlocks: Block[] = (blocksRes.data || []).map(
-                      (b: any) => ({
+                    if (res.data) {
+                      const blocksRes = await formService.getBlocks(form.id)
+                      const formattedBlocks: Block[] = (
+                        blocksRes.data || []
+                      ).map((b: any) => ({
                         ...b,
                         id: b._id || b.id,
                         config: b.config || {},
                         order: b.position !== undefined ? b.position : b.order,
+                      }))
+                      setForm({
+                        ...form,
+                        title: res.data.title,
+                        description: res.data.description,
+                        theme: res.data.theme_config,
+                        isPublished: true,
+                        blocks: formattedBlocks,
                       })
-                    )
-                    setForm({
-                      ...form,
-                      title: res.data.title,
-                      description: res.data.description,
-                      theme: res.data.theme_config,
-                      isPublished: true,
-                      blocks: formattedBlocks,
-                    })
 
-                    const formUrl = `${window.location.origin}/f/${res.data.slug}`
-                    setPublishedFormUrl(formUrl)
-                    setShowPublishSuccess(true)
+                      const formUrl = `${window.location.origin}/f/${res.data.slug}`
+                      setPublishedFormUrl(formUrl)
+                      setShowPublishSuccess(true)
+                    }
+                  } catch (e) {
+                    console.error(e)
+                    toast.error('Failed to publish')
                   }
-                } catch (e) {
-                  console.error(e)
-                  toast.error('Failed to publish')
-                }
-              }}
-            >
-              <Share className="h-4 w-4" />
-              <span className="hidden sm:inline">
-                {form?.isPublished ? 'Published' : 'Publish'}
-              </span>
-            </Button>
+                }}
+              >
+                <Share className="h-4 w-4" />
+                <span className="hidden sm:inline">Publish</span>
+              </Button>
+            )}
           </div>
         </div>
       </header>
