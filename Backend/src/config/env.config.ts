@@ -23,7 +23,19 @@ const envSchema = z.object({
     .string()
     .min(32, 'AD_SUPER_SECRET must be at least 32 characters'),
 
-  CORS_ORIGIN: z.string().optional().default('*'),
+  CORS_ORIGIN: z
+    .string()
+    .default('*')
+    .transform((val) => {
+      if (val === '*') {
+        return val;
+      }
+      const origins = val.split(',').map((origin) => origin.trim());
+      if (origins.length === 1) {
+        return origins[0];
+      }
+      return origins;
+    }),
 
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
 
