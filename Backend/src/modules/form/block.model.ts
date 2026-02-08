@@ -18,7 +18,7 @@ const BlockSchema = new Schema<IBlock>(
 
     type: { type: String, required: true },
 
-    label: { type: String, required: true },
+    label: { type: String, default: '' },
     field_key: { type: String, required: true },
 
     position: { type: Number, required: true },

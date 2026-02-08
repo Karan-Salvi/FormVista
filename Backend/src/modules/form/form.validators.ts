@@ -13,7 +13,7 @@ export const createFormSchema = z.object({
 
 export const addBlockSchema = z.object({
   type: z.string().min(1, 'Type is required'),
-  label: z.string().min(1, 'Label is required'),
+  label: z.string(),
   field_key: z.string().min(1, 'Field key is required'),
   position: z.number().int().min(0),
   required: z.boolean().optional(),

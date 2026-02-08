@@ -187,6 +187,26 @@ const FormBuilderPage: React.FC = () => {
     }
   }, [form?.theme])
 
+  // Helper: Validate all blocks have required label
+  const validateBlockLabels = () => {
+    if (!form) return true
+    return form.blocks.every(b =>
+      // Only require label for input/question blocks (not heading/text)
+      [
+        'short-text',
+        'long-text',
+        'email',
+        'multiple-choice',
+        'dropdown',
+        'checkbox',
+        'number',
+        'date',
+      ].includes(b.type)
+        ? typeof b.config.label === 'string' && b.config.label.trim().length > 0
+        : true
+    )
+  }
+
   return (
     <div className="bg-background min-h-screen">
       {/* Header */}
@@ -255,6 +275,10 @@ const FormBuilderPage: React.FC = () => {
               onClick={async () => {
                 // ... (save logic)
                 if (!form) return
+                if (!validateBlockLabels()) {
+                  toast.error('All question blocks must have a label.')
+                  return
+                }
                 try {
                   const blocksToSave = form.blocks.map(b => ({
                     id: /^[0-9a-fA-F]{24}$/.test(b.id) ? b.id : undefined,
@@ -310,6 +334,10 @@ const FormBuilderPage: React.FC = () => {
               onClick={async () => {
                 // ... (publish logic)
                 if (!form) return
+                if (!validateBlockLabels()) {
+                  toast.error('All question blocks must have a label.')
+                  return
+                }
                 try {
                   const blocksToSave = form.blocks.map(b => ({
                     id: /^[0-9a-fA-F]{24}$/.test(b.id) ? b.id : undefined,
