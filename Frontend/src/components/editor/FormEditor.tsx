@@ -129,6 +129,7 @@ export const FormEditor: React.FC = () => {
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
+    e.stopPropagation()
     const type = e.dataTransfer.getData('blockType') as BlockType
     if (type) {
       addBlock(
