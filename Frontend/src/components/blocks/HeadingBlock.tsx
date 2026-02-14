@@ -20,7 +20,6 @@ export const HeadingBlock: React.FC<HeadingBlockProps> = ({
   const level = block.config.level || 1
   const content = block.config.content || ''
 
-  // Set initial content only once (only if there's actual content)
   useEffect(() => {
     if (inputRef.current && !isInitialized.current && !isPreview) {
       inputRef.current.textContent = content

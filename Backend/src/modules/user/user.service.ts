@@ -9,7 +9,13 @@ import type {
   RegisterRequest,
   UserResponseData,
 } from './user.types.js';
-import { AuthenticationError, ValidationError } from '@core/errors/index.js';
+import crypto from 'crypto';
+import { EmailService } from '../../services/email/email.service.js';
+import {
+  AuthenticationError,
+  ValidationError,
+  NotFoundError,
+} from '@core/errors/index.js';
 
 export class AuthService {
   static async register(data: RegisterRequest): Promise<AuthResponse> {
@@ -25,11 +31,21 @@ export class AuthService {
 
       const password_hash = PasswordUtil.hashPassword(password);
 
+      const verificationToken = crypto.randomBytes(32).toString('hex');
+
       const user = await UserModel.create({
         name,
         email: email.toLowerCase(),
         password_hash,
+        email_verification_token: verificationToken,
+        is_email_verified: false,
       });
+
+      await EmailService.sendVerificationEmail(
+        user.email,
+        user.name,
+        verificationToken
+      );
 
       const tokenPayload: Omit<JwtPayload, 'iat' | 'exp'> = {
         userId: user.id || user._id.toString(),
@@ -117,6 +133,55 @@ export class AuthService {
   static async getUserById(userId: string): Promise<UserResponseData | null> {
     const user = await UserModel.findById(userId);
     return user ? this.mapUser(user) : null;
+  }
+
+  static async verifyEmail(token: string): Promise<boolean> {
+    const user = await UserModel.findOne({ email_verification_token: token });
+    if (!user) {
+      throw new ValidationError('Invalid verification token');
+    }
+
+    user.is_email_verified = true;
+    user.email_verification_token = undefined;
+    await user.save();
+    return true;
+  }
+
+  static async forgotPassword(email: string): Promise<void> {
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    user.reset_password_token = resetToken;
+    user.reset_password_expires = new Date(Date.now() + 3600000); // 1 hour
+    await user.save();
+
+    await EmailService.sendPasswordResetEmail(
+      user.email,
+      user.name,
+      resetToken
+    );
+  }
+
+  static async resetPassword(
+    token: string,
+    newPassword: string
+  ): Promise<void> {
+    const user = await UserModel.findOne({
+      reset_password_token: token,
+      reset_password_expires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      throw new ValidationError('Invalid or expired password reset token');
+    }
+
+    user.password_hash = PasswordUtil.hashPassword(newPassword);
+    user.reset_password_token = undefined;
+    user.reset_password_expires = undefined;
+    await user.save();
   }
 
   private static mapUser(user: IUser): UserResponseData {

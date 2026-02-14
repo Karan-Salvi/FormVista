@@ -5,7 +5,11 @@ import {
   sendUnauthorized,
   sendCreated,
 } from '@core/utils/response.util.js';
-import { AuthenticationError, NotFoundError } from '@core/errors/index.js';
+import {
+  AuthenticationError,
+  NotFoundError,
+  ValidationError,
+} from '@core/errors/index.js';
 
 export class AuthController {
   static async register(
@@ -68,6 +72,81 @@ export class AuthController {
       }
 
       sendSuccess(res, user, undefined, req);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async verifyEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { token } = req.query;
+
+      if (!token || typeof token !== 'string') {
+        throw new ValidationError('Invalid verification token');
+      }
+
+      await AuthService.verifyEmail(token);
+
+      sendSuccess(
+        res,
+        { message: 'Email verified successfully' },
+        'Email verified successfully',
+        req
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async forgotPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        throw new ValidationError('Email is required');
+      }
+
+      await AuthService.forgotPassword(email);
+
+      sendSuccess(
+        res,
+        { message: 'Password reset email sent' },
+        'Password reset email sent',
+        req
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async resetPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { token, password } = req.body;
+
+      if (!token || !password) {
+        throw new ValidationError('Token and password are required');
+      }
+
+      await AuthService.resetPassword(token, password);
+
+      sendSuccess(
+        res,
+        { message: 'Password reset successfully' },
+        'Password reset successfully',
+        req
+      );
     } catch (error) {
       next(error);
     }

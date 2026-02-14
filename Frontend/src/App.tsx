@@ -13,6 +13,9 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 
 import PublicForm from './pages/Form/PublicForm'
 import ResponsesPage from './pages/Form/Responses'
+import VerifyEmailPage from './pages/Auth/VerifyEmail'
+import ForgotPasswordPage from './pages/Auth/ForgotPassword'
+import ResetPasswordPage from './pages/Auth/ResetPassword'
 
 const queryClient = new QueryClient()
 
@@ -35,6 +38,9 @@ const App = () => (
           <Route path="/f/:slug" element={<PublicForm />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
             path="/dashboard"
             element={

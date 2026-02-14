@@ -55,6 +55,10 @@ const envSchema = z.object({
     .default('100')
     .transform(Number)
     .pipe(z.number().positive()),
+
+  RESEND_API_KEY: z.string().startsWith('re_'),
+  RESEND_FROM_EMAIL: z.string().email(),
+  FRONTEND_URL: z.string().url(),
 });
 
 function validateEnv() {
@@ -65,7 +69,7 @@ function validateEnv() {
     if (error instanceof z.ZodError) {
       // eslint-disable-next-line no-console
       console.error('Environment validation failed:');
-      error.issues.forEach((err: any) => {
+      error.issues.forEach((err) => {
         // eslint-disable-next-line no-console
         console.error(`  - ${err.path.join('.')}: ${err.message}`);
       });

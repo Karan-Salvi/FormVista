@@ -1,0 +1,13 @@
+commitlint.config.js
+dist
+docs
+eslint.config.mjs
+node_modules
+nodemon.json
+output.txt
+package.json
+package-lock.json
+README.md
+src
+test-email.ts
+tsconfig.json

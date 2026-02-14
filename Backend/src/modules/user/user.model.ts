@@ -7,6 +7,9 @@ export interface IUser extends Document {
   plan: 'free' | 'pro';
   stripe_customer_id?: string;
   is_email_verified: boolean;
+  email_verification_token?: string;
+  reset_password_token?: string;
+  reset_password_expires?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -26,6 +29,10 @@ const UserSchema = new Schema<IUser>(
     stripe_customer_id: { type: String },
 
     is_email_verified: { type: Boolean, default: false },
+    email_verification_token: { type: String },
+
+    reset_password_token: { type: String },
+    reset_password_expires: { type: Date },
   },
   { timestamps: true }
 );

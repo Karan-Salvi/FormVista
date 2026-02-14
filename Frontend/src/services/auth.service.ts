@@ -37,11 +37,23 @@ export const authService = {
       '/user/register',
       userData
     )
-    if (response.data?.token) {
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.user))
-    }
+    // We don't set local storage here anymore if we want to enforce email verification before login
+    // BUT the backend currently sends a token anyway.
+    // If we want to support "Register but need verification", we might still allow them to see the dashboard
+    // or redirect them to a "Verify your email" page.
     return response
+  },
+
+  verifyEmail: async (token: string) => {
+    return await apiClient.get(`/user/verify-email?token=${token}`)
+  },
+
+  forgotPassword: async (email: string) => {
+    return await apiClient.post('/user/forgot-password', { email })
+  },
+
+  resetPassword: async (token: string, password: string) => {
+    return await apiClient.post('/user/reset-password', { token, password })
   },
 
   logout: () => {
