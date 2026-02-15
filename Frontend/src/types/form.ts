@@ -64,6 +64,7 @@ export interface FormTheme {
   primaryColor: string
   backgroundColor: string
   fontFamily: string
+  textColor: string
 }
 
 export interface FormResponse {

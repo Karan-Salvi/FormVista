@@ -29,7 +29,15 @@ export const FormPreview: React.FC = () => {
   const sortedBlocks = [...form.blocks].sort((a, b) => a.order - b.order)
 
   return (
-    <div className="bg-surface-subtle min-h-screen text-start">
+    <div
+      className="form-container-custom selection:bg-primary/10 min-h-screen text-start transition-colors duration-300"
+      style={
+        {
+          backgroundColor: form.theme?.backgroundColor || '#ffffff',
+          '--text-custom': form.theme?.textColor || 'inherit',
+        } as React.CSSProperties
+      }
+    >
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-8 sm:py-16">
         <form onSubmit={handleSubmit}>
           {/* Form Header */}

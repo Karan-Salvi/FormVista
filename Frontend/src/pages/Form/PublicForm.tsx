@@ -55,7 +55,8 @@ const PublicForm: React.FC = () => {
 
           // Apply theme
           if (formData.theme) {
-            const { primaryColor, fontFamily } = formData.theme
+            const { primaryColor, backgroundColor, textColor, fontFamily } =
+              formData.theme
 
             if (primaryColor?.startsWith('#')) {
               const { h, s, l } = hexToHsl(primaryColor)
@@ -83,6 +84,20 @@ const PublicForm: React.FC = () => {
                   theme.primary
                 )
               }
+            }
+
+            if (backgroundColor) {
+              document.documentElement.style.setProperty(
+                '--background-custom',
+                backgroundColor
+              )
+            }
+
+            if (textColor) {
+              document.documentElement.style.setProperty(
+                '--text-custom',
+                textColor
+              )
             }
 
             const font = fontFamilies.find(f => f.id === fontFamily)
@@ -303,7 +318,15 @@ const PublicForm: React.FC = () => {
   const sortedBlocks = [...form.blocks].sort((a, b) => a.order - b.order)
 
   return (
-    <div className="bg-surface-subtle selection:bg-primary/10 min-h-screen">
+    <div
+      className="form-container-custom selection:bg-primary/10 min-h-screen transition-colors duration-300"
+      style={
+        {
+          backgroundColor: form.theme?.backgroundColor || '#ffffff',
+          '--text-custom': form.theme?.textColor || 'inherit',
+        } as React.CSSProperties
+      }
+    >
       <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:py-20">
         {/* <div className="bg-background mb-12 space-y-4 rounded-2xl p-8 shadow-sm">
           <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">

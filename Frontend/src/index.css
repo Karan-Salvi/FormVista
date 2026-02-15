@@ -113,6 +113,10 @@
     --sidebar-accent-foreground: 220 14% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 221 83% 53%;
+
+    /* Theme Customization - Dynamic */
+    --background-custom: #ffffff;
+    --text-custom: #0a0a0a;
   }
 
   .dark {
@@ -238,6 +242,20 @@
   .editor-input {
     @apply w-full resize-none bg-transparent outline-none;
     @apply placeholder:text-muted-foreground/60;
+  }
+
+  .form-container-custom {
+    color: var(--text-custom);
+  }
+
+  .form-container-custom input:not(.bg-transparent),
+  .form-container-custom textarea:not(.bg-transparent),
+  .form-container-custom select {
+    color: hsl(var(--foreground));
+  }
+
+  .form-container-custom .block-renderer-themed {
+    color: var(--text-custom);
   }
 }
 

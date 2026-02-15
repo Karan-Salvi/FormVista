@@ -21,7 +21,7 @@ import {
 
 import { colorThemes, fontFamilies } from '@/constants/theme'
 import { Input } from '@/components/ui/input'
-import { hexToHsl } from '@/lib/utils'
+import { hexToHsl, hslToHex } from '@/lib/utils'
 
 interface ThemePanelProps {
   trigger?: React.ReactNode
@@ -30,19 +30,32 @@ interface ThemePanelProps {
 export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
   const { form, setForm } = useFormStore()
   const [customHex, setCustomHex] = React.useState('#000000')
+  const [customBgHex, setCustomBgHex] = React.useState('#ffffff')
+  const [customTextHex, setCustomTextHex] = React.useState('#000000')
 
-  const currentTheme = form?.theme || {
-    primaryColor: 'blue',
-    backgroundColor: '0 0% 100%',
-    fontFamily: 'inter',
-  }
+  const currentTheme = React.useMemo(
+    () =>
+      form?.theme || {
+        primaryColor: 'blue',
+        backgroundColor: '#ffffff',
+        fontFamily: 'inter',
+        textColor: '#000000',
+      },
+    [form?.theme]
+  )
 
-  // Initialize customHex if current color is not in presets
+  // Initialize custom hexes
   React.useEffect(() => {
     if (currentTheme.primaryColor?.startsWith('#')) {
       setCustomHex(currentTheme.primaryColor)
     }
-  }, [currentTheme.primaryColor])
+    if (currentTheme.backgroundColor?.startsWith('#')) {
+      setCustomBgHex(currentTheme.backgroundColor)
+    }
+    if (currentTheme.textColor?.startsWith('#')) {
+      setCustomTextHex(currentTheme.textColor)
+    }
+  }, [currentTheme])
 
   const updateTheme = (updates: Partial<typeof currentTheme>) => {
     if (!form) return
@@ -75,6 +88,18 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
     document.documentElement.style.setProperty('--ring', hslString)
 
     updateTheme({ primaryColor: hex })
+  }
+
+  const applyBackgroundColor = (hex: string) => {
+    if (!/^#[0-9A-F]{6}$/i.test(hex) && !/^#[0-9A-F]{3}$/i.test(hex)) return
+    document.documentElement.style.setProperty('--background-custom', hex)
+    updateTheme({ backgroundColor: hex })
+  }
+
+  const applyTextColor = (hex: string) => {
+    if (!/^#[0-9A-F]{6}$/i.test(hex) && !/^#[0-9A-F]{3}$/i.test(hex)) return
+    document.documentElement.style.setProperty('--text-custom', hex)
+    updateTheme({ textColor: hex })
   }
 
   const applyFontToDocument = (fontId: string) => {
@@ -170,6 +195,163 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
               </div>
             </div>
           </div>
+          {/* Background Color */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Background Color</Label>
+              <span className="text-muted-foreground text-[10px] tracking-wider uppercase">
+                Presets
+              </span>
+            </div>
+            <div className="grid grid-cols-5 gap-2">
+              {[
+                { id: 'white', name: 'White', hex: '#ffffff' },
+                { id: 'black', name: 'Black', hex: '#000000' },
+                { id: 'gray', name: 'Light Gray', hex: '#f3f4f6' },
+                ...colorThemes.map(t => {
+                  const [h, s, l] = t.primary.split(' ').map(v => parseFloat(v))
+                  return { id: t.id, name: t.name, hex: hslToHex(h, s, l) }
+                }),
+              ].map(theme => {
+                const isSelected = currentTheme.backgroundColor === theme.hex
+                return (
+                  <button
+                    key={theme.id}
+                    onClick={() => {
+                      setCustomBgHex(theme.hex)
+                      applyBackgroundColor(theme.hex)
+                    }}
+                    className={`relative aspect-square w-full rounded-lg transition-all hover:scale-105 ${
+                      isSelected ? 'ring-primary ring-2 ring-offset-2' : ''
+                    }`}
+                    style={{ backgroundColor: theme.hex }}
+                    title={theme.name}
+                  >
+                    {isSelected && (
+                      <Check
+                        className={`absolute inset-0 m-auto h-4 w-4 ${theme.id === 'white' || theme.id === 'gray' ? 'text-black' : 'text-white'}`}
+                      />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Custom Background Color */}
+            <div className="space-y-3 pt-2">
+              <Label className="text-muted-foreground text-xs">
+                Custom Background (Hex)
+              </Label>
+              <div className="flex gap-2">
+                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md border">
+                  <input
+                    type="color"
+                    value={
+                      customBgHex?.startsWith('#') ? customBgHex : '#ffffff'
+                    }
+                    onChange={e => {
+                      setCustomBgHex(e.target.value)
+                      applyBackgroundColor(e.target.value)
+                    }}
+                    className="absolute -inset-2 h-[150%] w-[150%] cursor-pointer border-none bg-transparent"
+                  />
+                </div>
+                <Input
+                  value={customBgHex}
+                  onChange={e => {
+                    setCustomBgHex(e.target.value)
+                    if (
+                      /^#[0-9A-F]{6}$/i.test(e.target.value) ||
+                      /^#[0-9A-F]{3}$/i.test(e.target.value)
+                    ) {
+                      applyBackgroundColor(e.target.value)
+                    }
+                  }}
+                  placeholder="#ffffff"
+                  className="h-10 text-sm"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Text Color */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Text Color</Label>
+              <span className="text-muted-foreground text-[10px] tracking-wider uppercase">
+                Presets
+              </span>
+            </div>
+            <div className="grid grid-cols-5 gap-2">
+              {[
+                { id: 'black', name: 'Black', hex: '#000000' },
+                { id: 'white', name: 'White', hex: '#ffffff' },
+                { id: 'dark-gray', name: 'Dark Gray', hex: '#1f2937' },
+                ...colorThemes.map(t => {
+                  const [h, s, l] = t.primary.split(' ').map(v => parseFloat(v))
+                  return { id: t.id, name: t.name, hex: hslToHex(h, s, l) }
+                }),
+              ].map(theme => {
+                const isSelected = currentTheme.textColor === theme.hex
+                return (
+                  <button
+                    key={theme.id}
+                    onClick={() => {
+                      setCustomTextHex(theme.hex)
+                      applyTextColor(theme.hex)
+                    }}
+                    className={`relative aspect-square w-full rounded-lg transition-all hover:scale-105 ${
+                      isSelected ? 'ring-primary ring-2 ring-offset-2' : ''
+                    }`}
+                    style={{ backgroundColor: theme.hex }}
+                    title={theme.name}
+                  >
+                    {isSelected && (
+                      <Check
+                        className={`absolute inset-0 m-auto h-4 w-4 ${theme.id === 'white' ? 'text-black' : 'text-white'}`}
+                      />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Custom Text Color */}
+            <div className="space-y-3 pt-2">
+              <Label className="text-muted-foreground text-xs">
+                Custom Text (Hex)
+              </Label>
+              <div className="flex gap-2">
+                <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md border">
+                  <input
+                    type="color"
+                    value={
+                      customTextHex?.startsWith('#') ? customTextHex : '#000000'
+                    }
+                    onChange={e => {
+                      setCustomTextHex(e.target.value)
+                      applyTextColor(e.target.value)
+                    }}
+                    className="absolute -inset-2 h-[150%] w-[150%] cursor-pointer border-none bg-transparent"
+                  />
+                </div>
+                <Input
+                  value={customTextHex}
+                  onChange={e => {
+                    setCustomTextHex(e.target.value)
+                    if (
+                      /^#[0-9A-F]{6}$/i.test(e.target.value) ||
+                      /^#[0-9A-F]{3}$/i.test(e.target.value)
+                    ) {
+                      applyTextColor(e.target.value)
+                    }
+                  }}
+                  placeholder="#000000"
+                  className="h-10 text-sm"
+                />
+              </div>
+            </div>
+          </div>
 
           {/* Font Family */}
           <div className="space-y-3">
@@ -192,16 +374,30 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
           </div>
 
           {/* Preview */}
-          <div className="space-y-3">
+          <div className="space-y-3 pb-8">
             <Label className="text-sm font-medium">Preview</Label>
-            <div className="border-border bg-card rounded-lg border p-4">
-              <h3 className="text-foreground mb-2 text-lg font-semibold">
-                Sample Heading
-              </h3>
-              <p className="text-muted-foreground mb-3 text-sm">
-                This is how your form text will appear to users.
+            <div
+              className="border-border rounded-lg border p-4 shadow-sm transition-colors"
+              style={{
+                backgroundColor: currentTheme.backgroundColor,
+                color: currentTheme.textColor,
+              }}
+            >
+              <h3 className="mb-2 text-lg font-semibold">Sample Heading</h3>
+              <p className="mb-4 text-sm opacity-80">
+                This is how your form text will appear to users with the
+                selected colors and typography.
               </p>
-              <Button size="sm">Submit Button</Button>
+              <Button
+                size="sm"
+                style={{
+                  backgroundColor: currentTheme.primaryColor?.startsWith('#')
+                    ? currentTheme.primaryColor
+                    : `hsl(${colorThemes.find(t => t.id === currentTheme.primaryColor)?.primary})`,
+                }}
+              >
+                Submit Button
+              </Button>
             </div>
           </div>
         </div>

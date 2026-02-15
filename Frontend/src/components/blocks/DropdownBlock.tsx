@@ -78,7 +78,7 @@ export const DropdownBlock: React.FC<DropdownBlockProps> = ({
   if (isPreview) {
     return (
       <div className="space-y-2">
-        <Label className="text-foreground text-sm font-medium">
+        <Label className="text-sm font-medium">
           {label}
           {(required || isPreview) && (
             <span className="text-destructive ml-0.5">*</span>
@@ -113,7 +113,7 @@ export const DropdownBlock: React.FC<DropdownBlockProps> = ({
           contentEditable
           suppressContentEditableWarning
           onInput={handleLabelChange}
-          className="text-foreground empty:before:text-muted-foreground/50 text-sm font-medium outline-none empty:before:content-['Label']"
+          className="empty:before:text-muted-foreground/50 text-sm font-medium outline-none empty:before:content-['Label']"
         />
       </Label>
 

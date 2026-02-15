@@ -188,6 +188,8 @@ const FormBuilderPage: React.FC = () => {
         }
       }
 
+      // Custom background and text colors are now handled locally in containers
+
       const font = fontFamilies.find(f => f.id === fontFamily)
       if (font) {
         document.documentElement.style.setProperty('--font-family', font.value)

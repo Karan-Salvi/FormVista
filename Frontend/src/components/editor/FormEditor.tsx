@@ -145,7 +145,13 @@ export const FormEditor: React.FC = () => {
       ref={editorRef}
       onDragOver={e => e.preventDefault()}
       onDrop={handleDrop}
-      className="mx-auto max-w-2xl px-4 py-8 text-start sm:px-8 sm:py-12"
+      className="form-container-custom mx-auto min-h-screen max-w-2xl px-4 py-8 text-start transition-colors duration-300 sm:px-8 sm:py-12"
+      style={
+        {
+          backgroundColor: form.theme?.backgroundColor || '#ffffff',
+          '--text-custom': form.theme?.textColor || 'inherit',
+        } as React.CSSProperties
+      }
     >
       {/* Form Header */}
       <div className="mb-10">
@@ -156,7 +162,7 @@ export const FormEditor: React.FC = () => {
             updateFormTitle(e.target.value)
           }
           placeholder="Untitled Form"
-          className="text-display text-foreground placeholder:text-muted-foreground/50 mb-4 w-full resize-none bg-transparent text-lg outline-none sm:text-2xl"
+          className="text-display placeholder:text-muted-foreground/50 mb-4 w-full resize-none bg-transparent text-lg outline-none sm:text-2xl"
         />
         <TextareaAutosize
           readOnly={isPreviewMode}
@@ -165,7 +171,7 @@ export const FormEditor: React.FC = () => {
             updateFormDescription(e.target.value)
           }
           placeholder="Add a description..."
-          className="text-body text-muted-foreground placeholder:text-muted-foreground/50 w-full resize-none bg-transparent text-sm outline-none sm:text-lg"
+          className="text-body placeholder:text-muted-foreground/50 w-full resize-none bg-transparent text-sm outline-none sm:text-lg"
         />
       </div>
 

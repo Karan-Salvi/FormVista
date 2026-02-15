@@ -76,7 +76,7 @@ export const InputBlock: React.FC<InputBlockProps> = ({
     <div className="space-y-2">
       <Label className="flex items-center gap-1">
         {isPreview ? (
-          <span className="text-foreground text-sm font-medium">
+          <span className="text-sm font-medium">
             {label}
             {(required || isPreview) && (
               <span className="text-destructive ml-0.5">*</span>
@@ -88,7 +88,7 @@ export const InputBlock: React.FC<InputBlockProps> = ({
             contentEditable
             suppressContentEditableWarning
             onInput={handleLabelChange}
-            className="text-foreground empty:before:text-muted-foreground/50 text-sm font-medium outline-none empty:before:content-['Label']"
+            className="empty:before:text-muted-foreground/50 text-sm font-medium outline-none empty:before:content-['Label']"
           />
         )}
       </Label>

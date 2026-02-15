@@ -43,7 +43,7 @@ export const HeadingBlock: React.FC<HeadingBlockProps> = ({
     [block.id, block.config, updateBlock]
   )
 
-  const baseClasses = 'outline-none w-full font-semibold text-foreground'
+  const baseClasses = 'outline-none w-full font-semibold'
   const levelClasses = {
     1: 'text-h1',
     2: 'text-h2',

@@ -44,11 +44,7 @@ export const TextBlock: React.FC<TextBlockProps> = ({
   )
 
   if (isPreview) {
-    return (
-      <p className="text-body text-muted-foreground leading-relaxed">
-        {content}
-      </p>
-    )
+    return <p className="text-body leading-relaxed">{content}</p>
   }
 
   return (
@@ -57,7 +53,7 @@ export const TextBlock: React.FC<TextBlockProps> = ({
       contentEditable
       suppressContentEditableWarning
       onInput={handleInput}
-      className="text-body text-muted-foreground empty:before:text-muted-foreground/40 w-full leading-relaxed outline-none empty:before:content-['Start_typing...']"
+      className="text-body empty:before:text-muted-foreground/40 w-full leading-relaxed outline-none empty:before:content-['Start_typing...']"
     />
   )
 }

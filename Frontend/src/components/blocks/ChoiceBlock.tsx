@@ -82,7 +82,7 @@ export const ChoiceBlock: React.FC<ChoiceBlockProps> = ({
   if (isPreview) {
     return (
       <div className="space-y-3">
-        <Label className="text-foreground text-sm font-medium">
+        <Label className="text-sm font-medium">
           {label}
           {(required || isPreview) && (
             <span className="text-destructive ml-0.5">*</span>
@@ -108,7 +108,7 @@ export const ChoiceBlock: React.FC<ChoiceBlockProps> = ({
                 />
                 <label
                   htmlFor={`${block.id}-${index}`}
-                  className="text-foreground cursor-pointer text-sm"
+                  className="cursor-pointer text-sm"
                 >
                   {option}
                 </label>
@@ -134,7 +134,7 @@ export const ChoiceBlock: React.FC<ChoiceBlockProps> = ({
                   />
                   <label
                     htmlFor={`${block.id}-${index}`}
-                    className="text-foreground cursor-pointer text-sm"
+                    className="cursor-pointer text-sm"
                   >
                     {option}
                   </label>
@@ -155,7 +155,7 @@ export const ChoiceBlock: React.FC<ChoiceBlockProps> = ({
           contentEditable
           suppressContentEditableWarning
           onInput={handleLabelChange}
-          className="text-foreground empty:before:text-muted-foreground/50 text-sm font-medium outline-none empty:before:content-['Label']"
+          className="empty:before:text-muted-foreground/50 text-sm font-medium outline-none empty:before:content-['Label']"
         />
       </Label>
 

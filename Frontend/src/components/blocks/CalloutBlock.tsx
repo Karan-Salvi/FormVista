@@ -79,9 +79,7 @@ export const CalloutBlock: React.FC<CalloutBlockProps> = ({
     return (
       <div className="bg-accent/50 border-border flex items-start gap-3 rounded-lg border p-4">
         <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${IconData.color}`} />
-        <p className="text-foreground">
-          {block.config.content || 'Type callout text...'}
-        </p>
+        <p>{block.config.content || 'Type callout text...'}</p>
       </div>
     )
   }
@@ -121,7 +119,7 @@ export const CalloutBlock: React.FC<CalloutBlockProps> = ({
           contentEditable
           suppressContentEditableWarning
           onInput={handleInput}
-          className="text-foreground flex-1 outline-none"
+          className="flex-1 outline-none"
         />
       </div>
     </div>

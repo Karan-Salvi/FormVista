@@ -55,7 +55,7 @@ export const QuoteBlock: React.FC<QuoteBlockProps> = ({
         contentEditable
         suppressContentEditableWarning
         onInput={handleInput}
-        className="border-primary text-muted-foreground border-l-4 py-2 pl-4 italic outline-none"
+        className="border-primary border-l-4 py-2 pl-4 italic outline-none"
       />
     </div>
   )
