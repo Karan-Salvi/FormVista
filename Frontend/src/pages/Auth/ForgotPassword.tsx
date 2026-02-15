@@ -2,14 +2,13 @@ import { useState } from 'react'
 import '@/App.css'
 import { Sparkles, Loader2, ArrowLeft } from 'lucide-react'
 import { authService } from '@/services/auth.service'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isSent, setIsSent] = useState(false)
-  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

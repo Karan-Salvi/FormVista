@@ -8,7 +8,7 @@ import {
   ArrowRight,
 } from 'lucide-react'
 import { authService } from '@/services/auth.service'
-import { useNavigate, useSearchParams, Link } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 
 export default function VerifyEmailPage() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
@@ -16,7 +16,6 @@ export default function VerifyEmailPage() {
   )
   const [message, setMessage] = useState('Verifying your email...')
   const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
   const token = searchParams.get('token')
 
   useEffect(() => {

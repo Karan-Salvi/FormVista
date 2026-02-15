@@ -1,5 +1,5 @@
 import { authService } from '@/services/auth.service'
-import { Sparkles, Mail, ArrowRight, Loader2 } from 'lucide-react'
+import { Sparkles, ArrowRight, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { toast } from 'sonner'
