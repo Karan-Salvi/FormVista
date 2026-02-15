@@ -151,4 +151,37 @@ export class AuthController {
       next(error);
     }
   }
+  static async resendVerification(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new AuthenticationError();
+      }
+
+      try {
+        await AuthService.resendVerification(req.user.userId);
+      } catch (error: any) {
+        // If it's a domain verification or service error, return a specific error message
+        if (
+          error.message.includes('not verified') ||
+          error.message.includes('Failed to send')
+        ) {
+          throw new ValidationError(error.message);
+        }
+        throw error;
+      }
+
+      sendSuccess(
+        res,
+        { message: 'Verification email resent successfully' },
+        'Verification email resent successfully',
+        req
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
 }

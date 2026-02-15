@@ -41,12 +41,6 @@ export class AuthService {
         is_email_verified: false,
       });
 
-      await EmailService.sendVerificationEmail(
-        user.email,
-        user.name,
-        verificationToken
-      );
-
       const tokenPayload: Omit<JwtPayload, 'iat' | 'exp'> = {
         userId: user.id || user._id.toString(),
         email: user.email,
@@ -55,11 +49,36 @@ export class AuthService {
 
       const token = JwtService.generateToken(tokenPayload);
 
+      try {
+        await EmailService.sendVerificationEmail(
+          user.email,
+          user.name,
+          verificationToken
+        );
+      } catch (emailError) {
+        logger.error(
+          'Failed to send verification email during registration',
+          emailError
+        );
+        // We still return success: true because the user account was created.
+        // But we warn them about the email.
+        return {
+          success: true,
+          message:
+            "Account created, but we couldn't send the verification email. Please try resending it from your dashboard.",
+          data: {
+            token,
+            user: this.mapUser(user),
+          },
+        };
+      }
+
       logger.info('User registered successfully', { userId: user.id });
 
       return {
         success: true,
-        message: 'Registration successful',
+        message:
+          'Registration successful. Please check your email to verify your account.',
         data: {
           token,
           user: this.mapUser(user),
@@ -145,6 +164,27 @@ export class AuthService {
     user.email_verification_token = undefined;
     await user.save();
     return true;
+  }
+
+  static async resendVerification(userId: string): Promise<void> {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    if (user.is_email_verified) {
+      throw new ValidationError('Email is already verified');
+    }
+
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    user.email_verification_token = verificationToken;
+    await user.save();
+
+    await EmailService.sendVerificationEmail(
+      user.email,
+      user.name,
+      verificationToken
+    );
   }
 
   static async forgotPassword(email: string): Promise<void> {

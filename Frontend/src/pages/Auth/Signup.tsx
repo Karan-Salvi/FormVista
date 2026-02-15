@@ -22,8 +22,16 @@ const SignUpCard = () => {
     setIsLoading(true)
 
     try {
-      await authService.register({ name: fullName, email, password })
-      toast.success('Account created successfully!')
+      const result = await authService.register({
+        name: fullName,
+        email,
+        password,
+      })
+      if (result.data?.token) {
+        localStorage.setItem('token', result.data.token)
+        localStorage.setItem('user', JSON.stringify(result.data.user))
+      }
+      toast.success(result.message || 'Account created successfully!')
       setIsRegistered(true)
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to create account')

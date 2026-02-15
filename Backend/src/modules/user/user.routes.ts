@@ -28,5 +28,10 @@ router.post(
 
 // Protected routes
 router.get('/me', authenticate, AuthController.getCurrentUser);
+router.post(
+  '/resend-verification',
+  authenticate,
+  AuthController.resendVerification
+);
 
 export default router;

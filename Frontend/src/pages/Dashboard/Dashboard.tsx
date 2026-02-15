@@ -243,6 +243,38 @@ export default function DashboardPage() {
         </div>
       </nav>
       <div className="mx-auto mt-16 max-w-7xl md:mt-20">
+        {!user?.is_email_verified && (
+          <div className="mb-6 flex flex-col items-center justify-between gap-4 rounded-xl border border-blue-100 bg-blue-50/50 p-4 shadow-sm md:flex-row">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+                <Info className="h-5 w-5 text-blue-600" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="font-semibold text-blue-900">
+                  Verify your email address
+                </p>
+                <p className="text-sm text-blue-700">
+                  Please verify your email to ensure full access to all
+                  features.
+                </p>
+              </div>
+            </div>
+            <Button
+              onClick={async () => {
+                try {
+                  await authService.resendVerification()
+                  toast.success('Verification email resent!')
+                } catch (error) {
+                  toast.error('Failed to resend verification email')
+                }
+              }}
+              variant="outline"
+              className="border-blue-200 bg-white text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+            >
+              Resend Link
+            </Button>
+          </div>
+        )}
         {stats && <StatsOverview stats={stats} />}
 
         <div className="mb-8 flex flex-row items-center justify-between gap-4">

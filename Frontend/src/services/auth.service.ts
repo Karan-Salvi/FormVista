@@ -32,20 +32,20 @@ export const authService = {
     name: string
     email: string
     password: string
-  }) => {
+  }): Promise<AuthResponse> => {
     const response = await apiClient.post<AuthResponse>(
       '/user/register',
       userData
     )
-    // We don't set local storage here anymore if we want to enforce email verification before login
-    // BUT the backend currently sends a token anyway.
-    // If we want to support "Register but need verification", we might still allow them to see the dashboard
-    // or redirect them to a "Verify your email" page.
     return response
   },
 
   verifyEmail: async (token: string) => {
     return await apiClient.get(`/user/verify-email?token=${token}`)
+  },
+
+  resendVerification: async () => {
+    return await apiClient.post('/user/resend-verification')
   },
 
   forgotPassword: async (email: string) => {
