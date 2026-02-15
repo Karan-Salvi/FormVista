@@ -4,6 +4,8 @@ export interface User {
   id: string
   name: string
   email: string
+  is_email_verified: boolean
+  plan: string
 }
 
 export interface AuthResponse {
@@ -41,7 +43,10 @@ export const authService = {
   },
 
   verifyEmail: async (token: string) => {
-    return await apiClient.get(`/user/verify-email?token=${token}`)
+    return await apiClient.get<{
+      success: boolean
+      data: { message: string; user: User }
+    }>(`/user/verify-email?token=${token}`)
   },
 
   resendVerification: async () => {

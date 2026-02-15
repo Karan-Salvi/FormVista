@@ -89,11 +89,11 @@ export class AuthController {
         throw new ValidationError('Invalid verification token');
       }
 
-      await AuthService.verifyEmail(token);
+      const user = await AuthService.verifyEmail(token);
 
       sendSuccess(
         res,
-        { message: 'Email verified successfully' },
+        { message: 'Email verified successfully', user },
         'Email verified successfully',
         req
       );

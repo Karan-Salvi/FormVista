@@ -154,7 +154,7 @@ export class AuthService {
     return user ? this.mapUser(user) : null;
   }
 
-  static async verifyEmail(token: string): Promise<boolean> {
+  static async verifyEmail(token: string): Promise<UserResponseData> {
     const user = await UserModel.findOne({ email_verification_token: token });
     if (!user) {
       throw new ValidationError('Invalid verification token');
@@ -163,7 +163,7 @@ export class AuthService {
     user.is_email_verified = true;
     user.email_verification_token = undefined;
     await user.save();
-    return true;
+    return this.mapUser(user);
   }
 
   static async resendVerification(userId: string): Promise<void> {

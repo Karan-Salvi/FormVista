@@ -28,7 +28,11 @@ export default function VerifyEmailPage() {
       }
 
       try {
-        await authService.verifyEmail(token)
+        const response = await authService.verifyEmail(token)
+        const updatedUser = response.data.user
+        if (updatedUser) {
+          localStorage.setItem('user', JSON.stringify(updatedUser))
+        }
         setStatus('success')
         setMessage(
           'Your email has been successfully verified! You can now start using FormVista.'

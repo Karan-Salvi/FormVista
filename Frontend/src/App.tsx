@@ -16,6 +16,7 @@ import ResponsesPage from './pages/Form/Responses'
 import VerifyEmailPage from './pages/Auth/VerifyEmail'
 import ForgotPasswordPage from './pages/Auth/ForgotPassword'
 import ResetPasswordPage from './pages/Auth/ResetPassword'
+import VerifyNoticePage from './pages/Auth/VerifyNotice'
 
 const queryClient = new QueryClient()
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/verify-notice" element={<VerifyNoticePage />} />
           <Route
             path="/dashboard"
             element={

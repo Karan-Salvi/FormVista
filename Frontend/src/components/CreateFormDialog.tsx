@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useState, useEffect } from 'react'
 import { formService } from '@/services/form.service'
 import { toast } from 'sonner'
+import { authService } from '@/services/auth.service'
 import { useNavigate } from 'react-router-dom'
 import { Plus, Type, Link as LinkIcon, Loader2, FileText } from 'lucide-react'
 
@@ -76,8 +77,18 @@ export function CreateFormDialog() {
     }
   }
 
+  const user = authService.getCurrentUser()
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (newOpen && !user?.is_email_verified) {
+      navigate('/verify-notice')
+      return
+    }
+    setOpen(newOpen)
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className="bg-primary hover:bg-primary/90 shadow-primary/20 gap-2 shadow-lg transition-all hover:scale-105 active:scale-95">
           <Plus className="h-4 w-4" />

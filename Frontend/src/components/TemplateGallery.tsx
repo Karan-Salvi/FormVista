@@ -20,6 +20,8 @@ import { formService } from '@/services/form.service'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
+import { authService } from '@/services/auth.service'
+
 const iconMap: Record<string, React.ReactNode> = {
   mail: <Mail className="h-5 w-5" />,
   calendar: <Calendar className="h-5 w-5" />,
@@ -45,8 +47,14 @@ const colorMap: Record<string, string> = {
 export function TemplateGallery() {
   const [creatingTemplate, setCreatingTemplate] = useState<string | null>(null)
   const navigate = useNavigate()
+  const user = authService.getCurrentUser()
 
   const handleTemplateSelect = async (template: Template) => {
+    if (!user?.is_email_verified) {
+      navigate('/verify-notice')
+      return
+    }
+
     setCreatingTemplate(template.id)
     try {
       // 1. Create the base form
