@@ -317,9 +317,12 @@ export const useFormStore = create<FormState>(set => ({
       const blockIndex = state.form.blocks.findIndex(b => b.id === blockId)
       if (blockIndex === -1) return state
 
-      const originalBlock = state.form.blocks[blockIndex]
+      const blockToDuplicate = { ...state.form.blocks[blockIndex] } as any
+      delete blockToDuplicate.field_key
+      delete blockToDuplicate._id
+
       const newBlock: Block = {
-        ...originalBlock,
+        ...blockToDuplicate,
         id: generateId(),
         order: blockIndex + 1,
       }

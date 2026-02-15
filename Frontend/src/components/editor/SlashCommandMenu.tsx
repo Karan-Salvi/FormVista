@@ -67,7 +67,41 @@ export const SlashCommandMenu: React.FC<SlashCommandMenuProps> = ({
 }) => {
   const [activeIndex, setActiveIndex] = useState(0)
   const [lastSearchQuery, setLastSearchQuery] = useState(searchQuery)
+  const [adjustedPosition, setAdjustedPosition] = useState(position)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  React.useLayoutEffect(() => {
+    if (menuRef.current) {
+      const rect = menuRef.current.getBoundingClientRect()
+      const viewportWidth = window.innerWidth
+      const viewportHeight = window.innerHeight
+
+      let { top, left } = position
+
+      // Check right overflow
+      if (left + rect.width > viewportWidth) {
+        left = viewportWidth - rect.width - 16
+      }
+
+      // Check left overflow
+      if (left < 16) {
+        left = 16
+      }
+
+      // Check bottom overflow
+      if (top + rect.height > viewportHeight) {
+        // Try showing above the cursor instead
+        top = top - rect.height - 16
+      }
+
+      // Check top overflow
+      if (top < 16) {
+        top = 16
+      }
+
+      setAdjustedPosition({ top, left })
+    }
+  }, [position])
 
   const filteredBlocks = BLOCK_TYPES.filter(
     block =>
@@ -120,7 +154,7 @@ export const SlashCommandMenu: React.FC<SlashCommandMenuProps> = ({
       <div
         ref={menuRef}
         className="bg-popover border-border animate-scale-in fixed z-50 w-72 rounded-xl border p-2 shadow-xl"
-        style={{ top: position.top, left: position.left }}
+        style={{ top: adjustedPosition.top, left: adjustedPosition.left }}
       >
         <p className="text-muted-foreground px-3 py-2 text-sm">
           No blocks found
@@ -133,7 +167,7 @@ export const SlashCommandMenu: React.FC<SlashCommandMenuProps> = ({
     <div
       ref={menuRef}
       className="bg-popover border-border animate-scale-in fixed z-50 w-72 overflow-hidden rounded-xl border shadow-xl"
-      style={{ top: position.top, left: position.left }}
+      style={{ top: adjustedPosition.top, left: adjustedPosition.left }}
     >
       <div className="border-border border-b p-2">
         <p className="text-muted-foreground px-2 text-xs font-medium tracking-wider uppercase">

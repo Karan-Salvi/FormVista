@@ -12,7 +12,7 @@ export class TemplateController {
     }
   }
 
-  static async getTemplates(req: Request, res: Response, next: NextFunction) {
+  static async getTemplates(_req: Request, res: Response, next: NextFunction) {
     try {
       const response = await TemplateService.getTemplates();
       res.status(200).json(response);
@@ -27,7 +27,9 @@ export class TemplateController {
     next: NextFunction
   ) {
     try {
-      const response = await TemplateService.getTemplateById(req.params.id);
+      const response = await TemplateService.getTemplateById(
+        req.params.id as string
+      );
       res.status(200).json(response);
     } catch (error) {
       next(error);
@@ -55,7 +57,9 @@ export class TemplateController {
 
   static async deleteTemplate(req: Request, res: Response, next: NextFunction) {
     try {
-      const response = await TemplateService.deleteTemplate(req.params.id);
+      const response = await TemplateService.deleteTemplate(
+        req.params.id as string
+      );
       res.status(200).json(response);
     } catch (error) {
       next(error);
