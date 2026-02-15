@@ -5,4 +5,5 @@ export interface AuthenticatedUser {
   userId: string;
   email: string;
   plan: 'free' | 'pro';
+  role: 'user' | 'admin';
 }

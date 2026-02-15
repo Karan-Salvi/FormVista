@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import {
@@ -14,12 +14,19 @@ import {
   Bug,
   Bell,
   HelpCircle,
+  Shapes,
 } from 'lucide-react'
-import { templates, type Template } from '@/constants/templates'
+import {
+  templates as staticTemplates,
+  type Template as StaticTemplate,
+} from '@/constants/templates'
 import { formService } from '@/services/form.service'
+import {
+  templateService,
+  type Template as BackendTemplate,
+} from '@/services/template.service'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-
 import { authService } from '@/services/auth.service'
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -31,6 +38,7 @@ const iconMap: Record<string, React.ReactNode> = {
   bug: <Bug className="h-5 w-5" />,
   bell: <Bell className="h-5 w-5" />,
   'help-circle': <HelpCircle className="h-5 w-5" />,
+  template: <Shapes className="h-5 w-5" />,
 }
 
 const colorMap: Record<string, string> = {
@@ -46,10 +54,32 @@ const colorMap: Record<string, string> = {
 
 export function TemplateGallery() {
   const [creatingTemplate, setCreatingTemplate] = useState<string | null>(null)
+  const [backendTemplates, setBackendTemplates] = useState<BackendTemplate[]>(
+    []
+  )
+  const [loadingBackend, setLoadingBackend] = useState(false)
   const navigate = useNavigate()
   const user = authService.getCurrentUser()
 
-  const handleTemplateSelect = async (template: Template) => {
+  useEffect(() => {
+    fetchBackendTemplates()
+  }, [])
+
+  const fetchBackendTemplates = async () => {
+    try {
+      setLoadingBackend(true)
+      const response = await templateService.getTemplates()
+      if (response.success) {
+        setBackendTemplates(response.data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch templates:', error)
+    } finally {
+      setLoadingBackend(false)
+    }
+  }
+
+  const handleStaticTemplateSelect = async (template: StaticTemplate) => {
     if (!user?.is_email_verified) {
       navigate('/verify-notice')
       return
@@ -57,7 +87,6 @@ export function TemplateGallery() {
 
     setCreatingTemplate(template.id)
     try {
-      // 1. Create the base form
       const slug = `${template.id}-${Math.random().toString(36).substring(2, 7)}`
       const createResponse = await formService.create({
         title: template.title,
@@ -67,7 +96,6 @@ export function TemplateGallery() {
 
       const formId = createResponse.data.id
 
-      // 2. Prepare blocks from template
       const blocksToSave = template.blocks.map((block, index) => ({
         type: block.type,
         label: block.label || '',
@@ -79,7 +107,6 @@ export function TemplateGallery() {
         },
       }))
 
-      // 3. Update form with blocks and theme
       await formService.update(formId, {
         theme_config: {
           primaryColor: template.primaryColor || 'blue',
@@ -91,13 +118,44 @@ export function TemplateGallery() {
 
       toast.success(`${template.title} created!`)
       navigate(`/builder?formId=${formId}`)
-    } catch (error: any) {
+    } catch (error) {
       console.error(error)
       toast.error('Failed to create form from template')
     } finally {
       setCreatingTemplate(null)
     }
   }
+
+  const handleBackendTemplateSelect = async (template: BackendTemplate) => {
+    if (!user?.is_email_verified) {
+      navigate('/verify-notice')
+      return
+    }
+
+    setCreatingTemplate(template.id)
+    try {
+      const response = await templateService.createFormFromTemplate(template.id)
+      if (response.success) {
+        toast.success(`Form created from ${template.title}!`)
+        navigate(`/builder?formId=${response.data.id}`)
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error('Failed to create form from template')
+    } finally {
+      setCreatingTemplate(null)
+    }
+  }
+
+  const allTemplates = [
+    ...staticTemplates.map(t => ({ ...t, source: 'static' as const })),
+    ...backendTemplates.map(t => ({
+      ...t,
+      source: 'backend' as const,
+      icon: 'template',
+      primaryColor: 'indigo',
+    })),
+  ]
 
   return (
     <section className="mb-12">
@@ -114,15 +172,25 @@ export function TemplateGallery() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {templates.map((template, index) => (
+        {loadingBackend && backendTemplates.length === 0 && (
+          <div className="col-span-full flex items-center justify-center py-12">
+            <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          </div>
+        )}
+
+        {allTemplates.map((template, index) => (
           <motion.div
-            key={template.id}
+            key={`${template.source}-${template.id}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
             <button
-              onClick={() => handleTemplateSelect(template)}
+              onClick={() =>
+                template.source === 'static'
+                  ? handleStaticTemplateSelect(template as StaticTemplate)
+                  : handleBackendTemplateSelect(template as BackendTemplate)
+              }
               disabled={!!creatingTemplate}
               className={cn(
                 'group border-border bg-card relative w-full cursor-pointer rounded-xl border p-5 text-left transition-all duration-300',
@@ -137,7 +205,9 @@ export function TemplateGallery() {
                   colorMap[template.primaryColor || 'blue'] || colorMap.blue
                 )}
               >
-                {iconMap[template.icon] || <Plus className="h-5 w-5" />}
+                {iconMap[template.icon as string] || (
+                  <Plus className="h-5 w-5" />
+                )}
               </div>
 
               <h3 className="text-foreground group-hover:text-primary mb-1 font-bold transition-colors">

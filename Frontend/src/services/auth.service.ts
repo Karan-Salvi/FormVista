@@ -6,6 +6,7 @@ export interface User {
   email: string
   is_email_verified: boolean
   plan: string
+  role: string
 }
 
 export interface AuthResponse {

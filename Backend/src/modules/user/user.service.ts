@@ -45,6 +45,7 @@ export class AuthService {
         userId: user.id || user._id.toString(),
         email: user.email,
         plan: user.plan,
+        role: user.role,
       };
 
       const token = JwtService.generateToken(tokenPayload);
@@ -123,6 +124,7 @@ export class AuthService {
         userId: user.id || user._id.toString(),
         email: user.email,
         plan: user.plan,
+        role: user.role,
       };
 
       const token = JwtService.generateToken(tokenPayload);
@@ -230,6 +232,7 @@ export class AuthService {
       name: user.name,
       email: user.email,
       plan: user.plan,
+      role: user.role,
       is_email_verified: user.is_email_verified,
     };
   }

@@ -5,6 +5,7 @@ export interface IUser extends Document {
   email: string;
   password_hash: string;
   plan: 'free' | 'pro';
+  role: 'user' | 'admin';
   stripe_customer_id?: string;
   is_email_verified: boolean;
   email_verification_token?: string;
@@ -24,6 +25,12 @@ const UserSchema = new Schema<IUser>(
       type: String,
       enum: ['free', 'pro'],
       default: 'free',
+    },
+
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
     },
 
     stripe_customer_id: { type: String },

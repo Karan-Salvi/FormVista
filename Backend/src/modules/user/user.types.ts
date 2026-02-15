@@ -14,6 +14,7 @@ export interface UserResponseData {
   name: string;
   email: string;
   plan: string;
+  role: string;
   is_email_verified: boolean;
 }
 
@@ -36,6 +37,7 @@ export interface JwtPayload {
   userId: string;
   email: string;
   plan: string;
+  role: string;
   iat?: number;
   exp?: number;
 }

@@ -33,6 +33,7 @@ export const authenticate = async (
       userId: decoded.userId,
       email: decoded.email,
       plan: decoded.plan as 'free' | 'pro',
+      role: decoded.role as 'user' | 'admin',
     };
 
     // Set user on request
@@ -48,6 +49,27 @@ export const authenticate = async (
     logger.error('Authentication error', error);
     next(new AuthenticationError('Authentication failed.'));
   }
+};
+
+/**
+ * Middleware to restrict access based on user role.
+ */
+export const requireRole = (role: 'user' | 'admin') => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    try {
+      if (!req.user) {
+        throw new AuthenticationError('Authentication required.');
+      }
+
+      if (req.user.role !== role) {
+        throw new AuthorizationError(`Access denied. ${role} role required.`);
+      }
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
 };
 
 /**

@@ -96,9 +96,12 @@ const createDefaultForm = (): Form => ({
 
 import { useSearchParams } from 'react-router-dom'
 import { formService } from '@/services/form.service'
+import { templateService } from '@/services/template.service'
+import { authService } from '@/services/auth.service'
 import { toast } from 'sonner'
 import type { Block, BlockType } from '@/types/form'
 import { PublishSuccessModal } from '@/components/PublishSuccessModal'
+import { Layout } from 'lucide-react'
 import { QuestionSidebar } from '@/components/editor/QuestionSidebar'
 import { useState } from 'react'
 
@@ -451,6 +454,48 @@ const FormBuilderPage: React.FC = () => {
               >
                 <Share className="h-4 w-4" />
                 <span className="hidden sm:inline">Publish</span>
+              </Button>
+            )}
+
+            {authService.getCurrentUser()?.role === 'admin' && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-2"
+                onClick={async () => {
+                  if (!validateBlockLabels()) {
+                    toast.error('All question blocks must have a label.')
+                    return
+                  }
+                  try {
+                    const blocksToSave = (form?.blocks || []).map(b => ({
+                      type: b.type,
+                      label: b.config.label || '',
+                      field_key: (b as any).field_key || `field_${b.id}`,
+                      position: b.order,
+                      required: b.config.required,
+                      config: b.config,
+                    }))
+
+                    const res = await templateService.createTemplate({
+                      title: form?.title || 'Untitled Template',
+                      description: form?.description || '',
+                      category: 'Custom',
+                      theme_config: form?.theme,
+                      blocks: blocksToSave,
+                    })
+
+                    if (res.success) {
+                      toast.success('Saved as template!')
+                    }
+                  } catch (e) {
+                    console.error(e)
+                    toast.error('Failed to save template')
+                  }
+                }}
+              >
+                <Layout className="h-4 w-4" />
+                <span className="hidden sm:inline">Save as Template</span>
               </Button>
             )}
           </div>
