@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
-    "build": "tsc && tsc-alias && cp -r src/templates dist/",
+    "build": "tsc && tsc-alias && shx cp -r src/templates dist/",
     "build:watch": "tsc --watch",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",
@@ -16,7 +16,7 @@
     "format:check": "prettier --check .",
     "fix:eol": "prettier --write --end-of-line lf .",
     "validate": "npm run type-check && npm run lint && npm run format:check",
-    "clean": "rm -rf dist",
+    "clean": "shx rm -rf dist",
     "clean:build": "npm run clean && npm run build"
   },
   "repository": {
@@ -77,6 +77,7 @@
     "lint-staged": "^16.2.7",
     "nodemon": "^3.0.2",
     "prettier": "^3.6.2",
+    "shx": "^0.4.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
     "typescript": "^5.7.3",

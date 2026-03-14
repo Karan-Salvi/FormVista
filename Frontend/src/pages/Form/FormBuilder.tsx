@@ -148,6 +148,7 @@ const FormBuilderPage: React.FC = () => {
             title: formRes.data.title,
             slug: formRes.data.slug,
             description: formRes.data.description,
+            formMode: (formRes.data as any).form_mode || 'classic',
             theme: formRes.data.theme_config,
             blocks: formattedBlocks,
             isPublished: formRes.data.status === 'published',
@@ -322,8 +323,8 @@ const FormBuilderPage: React.FC = () => {
                   }))
 
                   const res = await formService.update(form.id, {
-                    title: form.title,
                     description: form.description,
+                    form_mode: form.formMode || 'classic',
                     theme_config: form.theme,
                     blocks: blocksToSave as any,
                   })
@@ -342,6 +343,10 @@ const FormBuilderPage: React.FC = () => {
                       ...form,
                       title: res.data.title,
                       description: res.data.description,
+                      formMode:
+                        (res.data as any).form_mode ||
+                        form.formMode ||
+                        'classic',
                       theme: res.data.theme_config,
                       isPublished: res.data.status === 'published',
                       blocks: formattedBlocks,
@@ -416,8 +421,8 @@ const FormBuilderPage: React.FC = () => {
                     }))
 
                     const res = await formService.update(form.id, {
-                      title: form.title,
                       description: form.description,
+                      form_mode: form.formMode || 'classic',
                       theme_config: form.theme,
                       blocks: blocksToSave as any,
                       status: 'published',
@@ -437,6 +442,10 @@ const FormBuilderPage: React.FC = () => {
                         ...form,
                         title: res.data.title,
                         description: res.data.description,
+                        formMode:
+                          (res.data as any).form_mode ||
+                          form.formMode ||
+                          'classic',
                         theme: res.data.theme_config,
                         isPublished: true,
                         blocks: formattedBlocks,

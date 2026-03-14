@@ -9,6 +9,7 @@ export interface CreateFormRequest {
   title: string;
   description?: string;
   slug: string;
+  form_mode?: 'classic' | 'interactive';
   theme_config?: Record<string, unknown>;
 }
 
@@ -16,6 +17,7 @@ export interface UpdateFormRequest {
   title?: string;
   description?: string;
   status?: 'draft' | 'published' | 'archived';
+  form_mode?: 'classic' | 'interactive';
   theme_config?: Record<string, unknown>;
   export_settings?: {
     fileName?: string;
@@ -46,6 +48,7 @@ export interface SubmitResponseRequest {
 export interface FormResponseData extends Omit<Partial<IForm>, 'user_id'> {
   id: string;
   user_id?: string;
+  form_mode?: 'classic' | 'interactive';
   blocks?: IBlock[];
 }
 

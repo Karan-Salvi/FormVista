@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { formService } from '@/services/form.service'
 import { type Form, type Block } from '@/types/form'
@@ -8,6 +8,20 @@ import { toast } from 'sonner'
 import { Loader2, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react'
 import { colorThemes, fontFamilies } from '@/constants/theme'
 import { hexToHsl } from '@/lib/utils'
+import InteractiveFormView from '@/components/interactive/InteractiveFormView'
+
+// -------- Input block types (shared) --------
+const INPUT_BLOCK_TYPES = [
+  'short-text',
+  'long-text',
+  'email',
+  'number',
+  'dropdown',
+  'multiple-choice',
+  'checkbox',
+  'date',
+  'phone',
+]
 
 const PublicForm: React.FC = () => {
   const { slug } = useParams<{ slug: string }>()
@@ -19,6 +33,7 @@ const PublicForm: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [startTime] = useState(Date.now())
 
+  // -------- Load form --------
   useEffect(() => {
     const loadForm = async () => {
       if (!slug) return
@@ -45,6 +60,7 @@ const PublicForm: React.FC = () => {
             title: res.data.title,
             slug: res.data.slug,
             description: res.data.description,
+            formMode: (res.data as any).form_mode || 'classic',
             theme: res.data.theme_config,
             blocks: formattedBlocks,
             isPublished: true,
@@ -120,16 +136,13 @@ const PublicForm: React.FC = () => {
     loadForm()
   }, [slug])
 
-  // Load responses from local storage
+  // -------- Autosave / restore draft --------
   useEffect(() => {
     if (slug) {
       const saved = localStorage.getItem(`form-draft-${slug}`)
       if (saved) {
         try {
-          const parsed = JSON.parse(saved)
-          // Convert date strings back to Date objects if needed
-          // Some blocks might store dates as strings in JSON
-          setResponses(parsed)
+          setResponses(JSON.parse(saved))
         } catch (e) {
           console.error('Failed to parse saved responses', e)
         }
@@ -137,13 +150,13 @@ const PublicForm: React.FC = () => {
     }
   }, [slug])
 
-  // Save responses to local storage
   useEffect(() => {
     if (slug && !submitted && Object.keys(responses).length > 0) {
       localStorage.setItem(`form-draft-${slug}`, JSON.stringify(responses))
     }
   }, [responses, slug, submitted])
 
+  // -------- Handlers --------
   const handleResponseChange = (blockId: string, value: unknown) => {
     setResponses(prev => ({ ...prev, [blockId]: value }))
     if (errors[blockId]) {
@@ -155,27 +168,51 @@ const PublicForm: React.FC = () => {
     }
   }
 
-  const validate = (): { isValid: boolean; errors: Record<string, string> } => {
-    const newErrors: Record<string, string> = {}
-    const inputBlockTypes = [
-      'short-text',
-      'long-text',
-      'email',
-      'number',
-      'dropdown',
-      'multiple-choice',
-      'checkbox',
-      'date',
-      'phone',
-    ]
-
-    form?.blocks.forEach(block => {
-      if (!inputBlockTypes.includes(block.type)) return
+  /** Validate a single block — returns error string or null */
+  const validateSingle = useCallback(
+    (block: Block): string | null => {
+      if (!INPUT_BLOCK_TYPES.includes(block.type)) return null
 
       const value = responses[block.id]
       const label = block.config.label || 'This field'
 
-      // Required check
+      const isEmpty =
+        value === undefined ||
+        value === null ||
+        (typeof value === 'string' && value.trim() === '') ||
+        (Array.isArray(value) && value.length === 0)
+
+      if (block.config.required && isEmpty) return `${label} is required`
+
+      if (!isEmpty) {
+        if (block.type === 'email' && typeof value === 'string') {
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+            return 'Please enter a valid email address'
+        }
+        if (block.type === 'phone' && typeof value === 'string') {
+          if (!/^\+?[\d\s-]{10,}$/.test(value))
+            return 'Please enter a valid phone number'
+        }
+        if (block.type === 'number' && value !== '' && isNaN(Number(value))) {
+          return 'Please enter a valid number'
+        }
+      }
+
+      return null
+    },
+    [responses]
+  )
+
+  /** Validate ALL blocks (used by classic mode) */
+  const validate = (): { isValid: boolean; errors: Record<string, string> } => {
+    const newErrors: Record<string, string> = {}
+
+    form?.blocks.forEach(block => {
+      if (!INPUT_BLOCK_TYPES.includes(block.type)) return
+
+      const value = responses[block.id]
+      const label = block.config.label || 'This field'
+
       const isEmpty =
         value === undefined ||
         value === null ||
@@ -189,8 +226,7 @@ const PublicForm: React.FC = () => {
         typeof value === 'string' &&
         value.trim() !== ''
       ) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(value)) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
           newErrors[block.id] = 'Please enter a valid email address'
         }
       } else if (
@@ -198,8 +234,7 @@ const PublicForm: React.FC = () => {
         typeof value === 'string' &&
         value.trim() !== ''
       ) {
-        const phoneRegex = /^\+?[\d\s-]{10,}$/
-        if (!phoneRegex.test(value)) {
+        if (!/^\+?[\d\s-]{10,}$/.test(value)) {
           newErrors[block.id] = 'Please enter a valid phone number'
         }
       } else if (
@@ -218,25 +253,24 @@ const PublicForm: React.FC = () => {
     return { isValid: Object.keys(newErrors).length === 0, errors: newErrors }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault()
     if (!form || !slug) return
 
-    const { isValid, errors: validationErrors } = validate()
-    if (!isValid) {
-      toast.error('Please fix the errors before submitting')
-      // Scroll to first error
-      const firstErrorId = Object.keys(validationErrors)[0]
-      if (firstErrorId) {
-        const element = document.getElementById(`block-${firstErrorId}`)
-        if (element) {
-          element.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-          })
+    // Classic mode: validate all. Interactive: validation happens per-step.
+    if (form.formMode !== 'interactive') {
+      const { isValid, errors: validationErrors } = validate()
+      if (!isValid) {
+        toast.error('Please fix the errors before submitting')
+        const firstErrorId = Object.keys(validationErrors)[0]
+        if (firstErrorId) {
+          const element = document.getElementById(`block-${firstErrorId}`)
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }
         }
+        return
       }
-      return
     }
 
     setSubmitting(true)
@@ -265,6 +299,7 @@ const PublicForm: React.FC = () => {
     }
   }
 
+  // -------- Loading / Not found / Submitted screens --------
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -315,6 +350,22 @@ const PublicForm: React.FC = () => {
     )
   }
 
+  // -------- Render the correct mode --------
+  if (form.formMode === 'interactive') {
+    return (
+      <InteractiveFormView
+        form={form}
+        responses={responses}
+        errors={errors}
+        onResponseChange={handleResponseChange}
+        onSubmit={() => handleSubmit()}
+        submitting={submitting}
+        validateSingle={validateSingle}
+      />
+    )
+  }
+
+  // -------- Classic (Google Forms) mode --------
   const sortedBlocks = [...form.blocks].sort((a, b) => a.order - b.order)
 
   return (
@@ -328,15 +379,6 @@ const PublicForm: React.FC = () => {
       }
     >
       <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:py-20">
-        {/* <div className="bg-background mb-12 space-y-4 rounded-2xl p-8 shadow-sm">
-          <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
-            {form.title}
-          </h1>
-          {form.description && (
-            <p className="text-muted-foreground text-lg">{form.description}</p>
-          )}
-        </div> */}
-
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-6">
             {sortedBlocks.map(block => (

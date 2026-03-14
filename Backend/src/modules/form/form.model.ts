@@ -6,6 +6,7 @@ export interface IForm extends Document {
   description?: string;
   slug: string;
   status: 'draft' | 'published' | 'archived';
+  form_mode: 'classic' | 'interactive';
   theme_config?: any;
   export_settings: {
     fileName?: string;
@@ -29,6 +30,12 @@ const FormSchema = new Schema<IForm>(
       type: String,
       enum: ['draft', 'published', 'archived'],
       default: 'draft',
+    },
+
+    form_mode: {
+      type: String,
+      enum: ['classic', 'interactive'],
+      default: 'classic',
     },
 
     theme_config: {

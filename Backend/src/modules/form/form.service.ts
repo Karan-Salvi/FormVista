@@ -920,6 +920,7 @@ export class FormService {
       description: form.description,
       slug: form.slug,
       status: form.status,
+      form_mode: form.form_mode || 'classic',
       theme_config: form.theme_config,
       export_settings: form.export_settings,
       createdAt: form.createdAt,

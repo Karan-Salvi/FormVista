@@ -1,6 +1,6 @@
 import React from 'react'
 import { useFormStore } from '@/store/formStore'
-import { Palette, Check } from 'lucide-react'
+import { Palette, Check, ListChecks, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import {
@@ -18,10 +18,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 import { colorThemes, fontFamilies } from '@/constants/theme'
 import { Input } from '@/components/ui/input'
 import { hexToHsl, hslToHex } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 
 interface ThemePanelProps {
   trigger?: React.ReactNode
@@ -132,6 +134,76 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
         </SheetHeader>
 
         <div className="mt-6 space-y-8">
+          {/* Form Experience Mode */}
+          <div className="space-y-4">
+            <Label className="text-sm font-medium">Form Experience</Label>
+            <RadioGroup
+              value={form?.formMode || 'classic'}
+              onValueChange={(val: 'classic' | 'interactive') => {
+                if (!form) return
+                setForm({
+                  ...form,
+                  formMode: val,
+                  updatedAt: new Date(),
+                })
+              }}
+              className="grid grid-cols-2 gap-3"
+            >
+              <Label
+                htmlFor="mode-classic"
+                className={cn(
+                  'border-border hover:border-primary/50 flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all',
+                  (form?.formMode || 'classic') === 'classic' &&
+                    'border-primary bg-primary/5'
+                )}
+              >
+                <RadioGroupItem
+                  value="classic"
+                  id="mode-classic"
+                  className="sr-only"
+                />
+                <ListChecks
+                  className={cn(
+                    'h-6 w-6',
+                    (form?.formMode || 'classic') === 'classic'
+                      ? 'text-primary'
+                      : 'text-muted-foreground'
+                  )}
+                />
+                <span className="text-xs font-semibold">Classic</span>
+                <span className="text-muted-foreground text-center text-[10px] leading-tight">
+                  All questions on one page
+                </span>
+              </Label>
+              <Label
+                htmlFor="mode-interactive"
+                className={cn(
+                  'border-border hover:border-primary/50 flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all',
+                  form?.formMode === 'interactive' &&
+                    'border-primary bg-primary/5'
+                )}
+              >
+                <RadioGroupItem
+                  value="interactive"
+                  id="mode-interactive"
+                  className="sr-only"
+                />
+                <Zap
+                  className={cn(
+                    'h-6 w-6',
+                    form?.formMode === 'interactive'
+                      ? 'text-primary'
+                      : 'text-muted-foreground'
+                  )}
+                />
+                <span className="text-xs font-semibold">Interactive</span>
+                <span className="text-muted-foreground text-center text-[10px] leading-tight">
+                  One question at a time
+                </span>
+              </Label>
+            </RadioGroup>
+          </div>
+
           {/* Color Theme */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
