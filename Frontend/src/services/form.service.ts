@@ -7,7 +7,7 @@ export interface FormResponse {
   description?: string
   slug: string
   status: 'draft' | 'published' | 'archived'
-  form_mode?: 'classic' | 'interactive'
+  form_mode?: 'classic' | 'interactive' | 'chat'
   theme_config?: any
   createdAt: string
   updatedAt: string

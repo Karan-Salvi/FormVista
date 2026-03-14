@@ -9,6 +9,7 @@ import { Loader2, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react'
 import { colorThemes, fontFamilies } from '@/constants/theme'
 import { hexToHsl } from '@/lib/utils'
 import InteractiveFormView from '@/components/interactive/InteractiveFormView'
+import ChatFormView from '@/components/chat/ChatFormView'
 
 // -------- Input block types (shared) --------
 const INPUT_BLOCK_TYPES = [
@@ -354,6 +355,20 @@ const PublicForm: React.FC = () => {
   if (form.formMode === 'interactive') {
     return (
       <InteractiveFormView
+        form={form}
+        responses={responses}
+        errors={errors}
+        onResponseChange={handleResponseChange}
+        onSubmit={() => handleSubmit()}
+        submitting={submitting}
+        validateSingle={validateSingle}
+      />
+    )
+  }
+
+  if (form.formMode === 'chat') {
+    return (
+      <ChatFormView
         form={form}
         responses={responses}
         errors={errors}

@@ -8,7 +8,7 @@ export const createFormSchema = z.object({
     .toLowerCase()
     .trim()
     .min(3, 'Slug must be at least 3 characters'),
-  form_mode: z.enum(['classic', 'interactive']).optional(),
+  form_mode: z.enum(['classic', 'interactive', 'chat']).optional(),
   theme_config: z.record(z.string(), z.unknown()).optional(),
 });
 
@@ -25,7 +25,7 @@ export const updateFormSchema = z.object({
   title: z.string().trim().min(1).optional(),
   description: z.string().optional(),
   status: z.enum(['draft', 'published', 'archived']).optional(),
-  form_mode: z.enum(['classic', 'interactive']).optional(),
+  form_mode: z.enum(['classic', 'interactive', 'chat']).optional(),
   theme_config: z.record(z.string(), z.unknown()).optional(),
   export_settings: z
     .object({

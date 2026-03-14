@@ -1,6 +1,6 @@
 import React from 'react'
 import { useFormStore } from '@/store/formStore'
-import { Palette, Check, ListChecks, Zap } from 'lucide-react'
+import { Palette, Check, ListChecks, Zap, MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import {
@@ -139,7 +139,7 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
             <Label className="text-sm font-medium">Form Experience</Label>
             <RadioGroup
               value={form?.formMode || 'classic'}
-              onValueChange={(val: 'classic' | 'interactive') => {
+              onValueChange={(val: 'classic' | 'interactive' | 'chat') => {
                 if (!form) return
                 setForm({
                   ...form,
@@ -147,7 +147,7 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
                   updatedAt: new Date(),
                 })
               }}
-              className="grid grid-cols-2 gap-3"
+              className="grid grid-cols-3 gap-3"
             >
               <Label
                 htmlFor="mode-classic"
@@ -199,6 +199,32 @@ export const ThemePanel: React.FC<ThemePanelProps> = ({ trigger }) => {
                 <span className="text-xs font-semibold">Interactive</span>
                 <span className="text-muted-foreground text-center text-[10px] leading-tight">
                   One question at a time
+                </span>
+              </Label>
+              <Label
+                htmlFor="mode-chat"
+                className={cn(
+                  'border-border hover:border-primary/50 flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all',
+                  form?.formMode === 'chat' &&
+                    'border-primary bg-primary/5'
+                )}
+              >
+                <RadioGroupItem
+                  value="chat"
+                  id="mode-chat"
+                  className="sr-only"
+                />
+                <MessageSquare
+                  className={cn(
+                    'h-6 w-6',
+                    form?.formMode === 'chat'
+                      ? 'text-primary'
+                      : 'text-muted-foreground'
+                  )}
+                />
+                <span className="text-xs font-semibold">Chat</span>
+                <span className="text-muted-foreground text-center text-[10px] leading-tight">
+                  Conversational interface
                 </span>
               </Label>
             </RadioGroup>

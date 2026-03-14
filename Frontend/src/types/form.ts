@@ -54,7 +54,7 @@ export interface Form {
   slug: string
   description?: string
   blocks: Block[]
-  formMode?: 'classic' | 'interactive'
+  formMode?: 'classic' | 'interactive' | 'chat'
   theme?: FormTheme
   createdAt: Date
   updatedAt: Date
