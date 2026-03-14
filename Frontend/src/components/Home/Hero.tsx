@@ -131,7 +131,7 @@ const Hero = () => {
               <div className="bg-warning/60 h-3 w-3 rounded-full" />
               <div className="bg-success/60 h-3 w-3 rounded-full" />
               <span className="text-muted-foreground ml-4 text-xs">
-                formvista.app/builder
+                formvista.in/builder
               </span>
             </div>
             <div className="from-card to-secondary/20 min-h-[400px] bg-gradient-to-b p-8">
