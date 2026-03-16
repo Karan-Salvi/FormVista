@@ -7,7 +7,7 @@ import HomeFooter from '@/components/Home/Footer'
 import HomeLayout from '@/pages/Home/HomeLayout'
 import FAQSection from '@/components/ui/faq-sections'
 import CTA from '@/components/Home/CTA'
-import Pricing from '@/components/Home/Pricing'
+// import Pricing from '@/components/Home/Pricing'
 import SecondaryCTA from '@/components/Home/SecondaryCTA'
 import HowItWorks from '@/components/Home/HowItWorks'
 import Features from '@/components/Home/Features'
@@ -24,7 +24,7 @@ const Index: React.FC = () => {
         <Features />
         <BlockSection />
         <SecondaryCTA />
-        <Pricing />
+        {/* <Pricing /> */}
         <FAQSection />
         <CTA />
       </HomeLayout>

@@ -270,7 +270,7 @@ const ChatFormView: React.FC<ChatFormViewProps> = ({
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col gap-4 sm:flex-row sm:items-end"
+              className="flex flex-row items-center gap-4 sm:flex-row sm:items-end"
               onKeyDown={handleKeyDown}
             >
               <div
